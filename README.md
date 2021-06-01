@@ -7,7 +7,7 @@ Real time and management  dashboard  for multiple kafka clusters
  - List of topics with details about replica - ISR etc..
  - List of consumers and consumer groups with details
  - Create / Delete topics
- - Cluster summary topicCount,partitionCount,underReplicatedCount,preferredReplicaPercent,brokerCount etc..
+ - Cluster summary topic count,partition count,unde replicated count,preferred replica rercent,broker count etc..
  - Get topic by name with details
  - Get messages from topic with filter by timeStamp start - end with message details 
  - Realtime consume message from topic with socket to update client-side 
