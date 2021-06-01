@@ -1,0 +1,64 @@
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Topics List</h5>
+               
+            </div>
+            <div class="card-body">
+            <p-table #dt1  [globalFilterFields]="['name']" [value]="topics" [paginator]="true" [rows]="rows" [showCurrentPageReport]="true" 
+                [loading]="topics.length == 0"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                [rowsPerPageOptions]="[5,10,25,50,200,500,1000]">
+                <ng-template pTemplate="caption">
+                    <div class="p-d-flex">
+                 
+                        <span class="p-input-icon-right p-ml-auto">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text" #search (input)="dt1.filterGlobal(search.value, 'contains')"
+                                placeholder="Search keyword" />
+                        </span>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Name</th>
+                        <th>Partitions</th>
+                        <th>Available Size</th>
+                        <th>Total Size</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-topic>
+                    <tr>
+                        <td>{{topic?.name}}</td>
+                        <td>{{topic?.partitions?.length}}</td>
+                        <td>{{topic?.availableSize}}</td>
+                        <td>{{topic?.totalSize}}</td>
+                        <td>
+                          
+                            <button pButton pRipple icon="pi pi-trash" (click)="deleteTopic(topic?.name)" class="p-button-rounded p-button-warning"
+                              ></button>
+                        </td>
+                        <td>
+                        
+                            <button pButton pRipple icon="pi pi-arrow" (click)="details(topic?.name)"
+                                class="p-button-rounded p-button-warning"></button>
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="paginatorleft">
+                    <p-button type="button" icon="pi pi-plus" styleClass="p-button-text"></p-button>
+                </ng-template>
+               
+            </p-table>
+
+            </div>
+          
+        </div>
+    </div>
+</div>
+
+<p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>

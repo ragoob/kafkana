@@ -31,6 +31,7 @@ public class kafkaAdminServiceImpl implements kafkaAdminService {
         }
         Properties config = new Properties();
         config.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, cluster.get().getBootStrapServers());
+        config.put(AdminClientConfig.REQUEST_TIMEOUT_MS_CONFIG, 30000);
         AdminClient admin = AdminClient.create(config);
 
         return  admin;

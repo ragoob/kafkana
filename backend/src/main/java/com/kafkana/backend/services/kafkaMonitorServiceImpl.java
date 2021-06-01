@@ -96,25 +96,52 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
     }
     @Override
     public  List<messageModel> getMessages(String topic,String clusterId,int size){
-        final var records = getLatestRecords(topic, size,clusterId);
-        if (records != null) {
-            final var messages = new ArrayList<messageModel>();
-            for (var record : records) {
-                final var message = new messageModel();
-                message.setPartition(record.partition());
-                message.setOffset(record.offset());
-                message.setKey(record.key());
-                message.setMessage(record.value());
-                message.setHeaders(headersToMap(record.headers()));
-                message.setTimestamp(new Date(record.timestamp()));
-                messages.add(message);
+        List<messageModel> messages = new ArrayList<>();
+        Consumer<String, String> kafkaConsumer =this.createConsumer(clusterId);
+        TopicPartition partition = new TopicPartition(topic, 0);
+
+
+        kafkaConsumer.assign(Collections.singleton(partition));
+        kafkaConsumer.seekToBeginning(Collections.singleton(partition));
+        while (messages.size() < size){
+            for (ConsumerRecord<String, String> record : kafkaConsumer.poll(Duration.ofMillis(200))) {
+                if (messages.size() >= size) {
+                    break;
+                }
+                messages.add(new messageModel(record.partition(),record.offset(),record.value(),record.key(),
+                        headersToMap(record.headers())
+                        ,new Date(record.timestamp())));
+
             }
-            return messages;
-        } else {
-            return Collections.emptyList();
         }
+        return  messages;
 
     }
+
+    @Override
+    public  List<messageModel> getMessages(String topic,String clusterId,int size,long start, long end){
+         List<messageModel> messages = new ArrayList<>();
+        Consumer<String, String> kafkaConsumer =this.createConsumer(clusterId);
+        TopicPartition partition = new TopicPartition(topic, 0);
+        long beginningOffset = kafkaConsumer.offsetsForTimes(
+                Collections.singletonMap(partition, start))
+                .get(partition).offset();
+
+        kafkaConsumer.assign(Collections.singleton(partition)); // must assign before seeking
+        kafkaConsumer.seek(partition, beginningOffset);
+       long lastMessageTimeStamp = start;
+        while (lastMessageTimeStamp < end && messages.size() < size){
+            for (ConsumerRecord<String, String> record : kafkaConsumer.poll(Duration.ofMillis(200))) {
+                messages.add(new messageModel(record.partition(),record.offset(),record.value(),record.key(),
+                        headersToMap(record.headers())
+                        ,new Date(record.timestamp())));
+                lastMessageTimeStamp = record.timestamp();
+            }
+        }
+
+        return  messages;
+    }
+
 
     private  List<ConsumerRecord<String, String>> getLatestRecords(String topic,
                                                                    int count,String clusterId) {
@@ -223,7 +250,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         }
         Properties config = new Properties();
         config.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, cluster.get().getBootStrapServers());
-
+        config.put(AdminClientConfig.REQUEST_TIMEOUT_MS_CONFIG, 30000);
         return AdminClient.create(config);
     }
 

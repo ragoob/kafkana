@@ -1,0 +1,50 @@
+
+    <p-table [value]="messages" dataKey="key"  [loading]="messages.length == 0">
+        <ng-template pTemplate="header">
+            <tr>
+                <th></th>
+                <th>
+                    Key
+                </th>
+                <th>partition</th>
+                <th>
+                    offset
+                </th>
+                <th>
+                    timestamp
+                </th>
+                
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-message let-expanded="expanded">
+            <tr>
+                <td>
+                    <button type="button" pButton pRipple [pRowToggler]="message"
+                        class="p-button-text p-button-rounded p-button-plain"
+                        [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                </td>
+                <td>{{message?.key}}</td>
+                <td>
+                    {{message?.partition}}
+                </td>
+                <td>{{message?.offset}}</td>
+                <td>{{message?.timestamp | date :'dd-MMM-yy h:mm:ss'}}</td>
+              
+                
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="rowexpansion" let-message>
+            <tr>
+                <td colspan="7">
+                    <div class="p-p-3" *ngIf="message?.fromatedMessage">
+                       formated msg
+                     </div>
+                     <div *ngIf="!message?.fromatedMessage">
+                        {{message?.message}}
+                     </div>
+            </td>
+            </tr>
+         
+         </ng-template>
+    </p-table>
+

@@ -41,7 +41,7 @@ public class kafkaMonitoringController {
 
     @GetMapping("/topics/{name:.+}")
     Optional<topicModel> getTopic(@PathVariable(value = "clusterId") String clusterId, @PathVariable(value = "name") String name){
-        return this.kafkaMonitorService.getTopic(clusterId,name);
+        return this.kafkaMonitorService.getTopic(name,clusterId);
 
     }
 
@@ -53,11 +53,20 @@ public class kafkaMonitoringController {
 
     @GetMapping("/messages/{name:.+}")
     List<messageModel> getMessages(@PathVariable(value = "clusterId") String clusterId, @PathVariable(value = "name") String name,
-                                   @RequestParam(name = "size", required = false) Integer size
+                                   @RequestParam(name = "size", required = false) Integer size,
+                                   @RequestParam(name = "start", required = false) Long  start,
+                                   @RequestParam(name = "end", required = false) Long  end
                                    ){
         final int count = (size != null? size : 200);
-        return this.kafkaMonitorService.getMessages(name,clusterId,count);
+        if(start == null || end == null){
+            return this.kafkaMonitorService.getMessages(name,clusterId,count);
+        }
+        else{
+            return this.kafkaMonitorService.getMessages(name,clusterId,count,start,end);
+        }
+
     }
+
 
 
 }

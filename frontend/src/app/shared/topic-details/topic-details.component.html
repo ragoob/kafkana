@@ -1,0 +1,102 @@
+<div class="row">
+    <div class="col-md-12">
+        <div class="card" style="min-height: 500px;" [ngClass]="{'loader-animated-background': !topic}">
+            <div class="card-header">
+                <h5 class="card-title">topic details {{topic?.name}}</h5>
+
+            </div>
+            <div class="card-body">
+                <ul ngbNav #nav="ngbNav" [(activeId)]="active" class="nav-tabs">
+                    <li [ngbNavItem]="1">
+                        <a ngbNavLink>Basic Info</a>
+                        <ng-template ngbNavContent>
+                         <div class="col-lg-12">
+                             <table class="table table-bordered">
+                                 <tbody>
+                                        <tr>
+                                            <td>
+                                                Name
+                                            </td>
+                                            <td>
+                                                {{topic?.name}}
+                                            </td>
+                                        
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Partitions Count
+                                            </td>
+                                            <td>
+                                                {{topic?.partitions?.length}}
+                                            </td>
+                                        
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Available Size
+                                            </td>
+                                            <td>
+                                                {{topic?.availableSize}}
+                                            </td>
+                                        
+                                        </tr>
+                                 </tbody>
+                             </table>
+                         </div>
+                        </ng-template>
+
+                    </li>
+
+                    <li [ngbNavItem]="2">
+                        <a ngbNavLink>Offsets</a>
+                        <ng-template ngbNavContent>
+                    
+                    
+                        </ng-template>
+                    
+                    </li>
+                    
+                    <li [ngbNavItem]="3">
+                        <a ngbNavLink>Messages</a>
+                        <ng-template ngbNavContent>
+                    
+                            <div class="col-lg-12">
+                                <app-topic-messages [clusterId]="clusterId" [topic]="topic"></app-topic-messages>
+                            </div>
+                        </ng-template>
+                    
+                    </li>
+                    <li [ngbNavItem]="4">
+                        <a ngbNavLink>Config</a>
+                        <ng-template ngbNavContent>
+                          <div class="col-lg-12">
+                                <table *ngIf="topic?.config" class="table table-bordered">
+                                    <tbody>
+                                        <tr *ngFor="let map of topic?.config | keyvalue">
+                                            <td>
+                                                {{map.key}}
+                                            </td>
+                                            <td>
+                                                {{map.value}}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                          </div>
+                    
+                        </ng-template>
+                    
+                    </li>
+
+                       
+                </ul>
+
+
+              <div [ngbNavOutlet]="nav" class="mt-2"></div>
+
+
+            </div>
+           
+        </div>
+    </div>
+</div>
