@@ -1,7 +1,7 @@
 # docker build -t spring-in-docker:1.1 .
 
 FROM adoptopenjdk/openjdk16:alpine-slim as build
-
+RUN apk add curl
 COPY .mvn .mvn
 COPY mvnw .
 COPY pom.xml .
