@@ -67,6 +67,17 @@ public class kafkaMonitoringController {
 
     }
 
+    @GetMapping("/getLatestMessages/{name:.+}")
+    List<messageModel> getLatestMessages(@PathVariable(value = "clusterId") String clusterId, @PathVariable(value = "name") String name,
+                                   @RequestParam(name = "size", required = false) Integer size
+
+    ){
+        final int count = (size != null? size : 200);
+
+            return this.kafkaMonitorService.getLatestMessages(name,clusterId,count);
+
+    }
+
 
 
 }

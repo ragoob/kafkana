@@ -142,6 +142,18 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         return  messages;
     }
 
+    @Override
+    public  List<messageModel> getLatestMessages(String topic,String clusterId,int size){
+        List<messageModel> messages = new ArrayList<>();
+       final  var records = getLatestRecords(topic,size,clusterId);
+       for(ConsumerRecord<String, String> record : records){
+           messages.add(new messageModel(record.partition(),record.offset(),record.value(),record.key(),
+                   headersToMap(record.headers())
+                   ,new Date(record.timestamp())));
+       }
+       return  messages;
+    }
+
 
     private  List<ConsumerRecord<String, String>> getLatestRecords(String topic,
                                                                    int count,String clusterId) {
@@ -186,7 +198,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
     }
 
     private Map<String, topicModel> getTopicMetadata(String cluserId, Consumer<String,String> consumer,AdminClient adminClient,String... topics) {
-        final var topicsMap = getTopicInfos(topics,cluserId,consumer);
+        final var topicsMap = getTopicInformation(topics,cluserId,consumer);
         final var retrievedTopicNames = topicsMap.keySet();
         Map<String, Config> topicConfigs = new HashMap<>();
         try {
@@ -315,7 +327,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         return topicModel;
     }
 
-    synchronized Map<String, topicModel> getTopicInfos(String[] topics,String clusterId,Consumer<String,String> kafkaConsumer ) {
+    synchronized Map<String, topicModel> getTopicInformation(String[] topics, String clusterId, Consumer<String,String> kafkaConsumer ) {
         final var topicSet = kafkaConsumer.listTopics().keySet();
 
         if (topics.length == 0) {
