@@ -1,7 +1,7 @@
     <label>Message Count : 
         <input type="number" #countInput class="form-control"  (change)="filterBySize(countInput.value)"/>
     </label>
-    <p-table [value]="messages" dataKey="key"  [loading]="messages.length == 0">
+    <p-table [value]="messages" dataKey="key"  [loading]="!loaded"  [paginator]="true" [rows]="20" [showCurrentPageReport]="true" >
         <ng-template pTemplate="header">
             <tr>
                 <th></th>

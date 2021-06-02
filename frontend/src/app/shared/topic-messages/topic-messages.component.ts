@@ -15,6 +15,7 @@ export class TopicMessagesComponent implements OnInit {
   private destoryed$: ReplaySubject<any> = new ReplaySubject(1);
   @Input('topic') topic?: Topic
   messages: Message[] = [];
+  loaded: boolean = false;
   constructor(private monitoringService: KafkaMonitorService) { }
 
 
@@ -28,17 +29,21 @@ export class TopicMessagesComponent implements OnInit {
   }
 
   private loadmessages(topicName: string, clusterId: string) {
+    this.loaded = false;
     this.monitoringService.getMessages(topicName, clusterId)
       .then(data => {
         this.messages = data;
+        this.loaded = true;
       })
   }
 
   public filterBySize(input: string) {
+    this.loaded = false;
     const  size: number = parseInt(input);
     this.monitoringService.getMessages(this.topic?.name ?? "", this.clusterId, size)
       .then(data => {
         this.messages = data;
+        this.loaded = true;
       })
   }
 

@@ -8,7 +8,7 @@
             </div>
             <div class="card-body">
             <p-table #dt1  [globalFilterFields]="['name']" [value]="topics" [paginator]="true" [rows]="rows" [showCurrentPageReport]="true" 
-                [loading]="topics.length == 0"
+                [loading]="!loaded"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                 [rowsPerPageOptions]="[5,10,25,50,200,500,1000]">
                 <ng-template pTemplate="caption">

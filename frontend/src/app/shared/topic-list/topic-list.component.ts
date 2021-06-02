@@ -16,6 +16,7 @@ export class TopicListComponent implements OnInit, OnDestroy {
   clusterId: string="";
   first = 0;
   rows = 5;
+  loaded: boolean = false;
   public topics: Topic[] = [];
   private destoryed$: ReplaySubject<any> = new ReplaySubject(1);
   constructor(private monitoringService: KafkaMonitorService, private confirmationService: ConfirmationService, 
@@ -35,9 +36,11 @@ export class TopicListComponent implements OnInit, OnDestroy {
   }
 
   private loadTopics(clusterId: string) {
+    this.loaded = false;
     this.monitoringService.getTopics(clusterId)
       .then(data => {
         this.topics = data;
+        this.loaded = true;
       })
   }
 
