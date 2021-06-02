@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  baseURL: "http://gapi-dev.aptar.mobi/api",
+  baseURL: "https://kafka-ui-api.aptar.dev/api",
   hideMenu: true
 };
