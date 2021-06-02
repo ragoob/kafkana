@@ -130,7 +130,8 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         kafkaConsumer.assign(Collections.singleton(partition)); // must assign before seeking
         kafkaConsumer.seek(partition, beginningOffset);
        long lastMessageTimeStamp = start;
-        while (lastMessageTimeStamp < end && messages.size() < size){
+        long startTime = System.currentTimeMillis();
+        while (lastMessageTimeStamp < end && messages.size() < size && (System.currentTimeMillis()-startTime)<10000){
             for (ConsumerRecord<String, String> record : kafkaConsumer.poll(Duration.ofMillis(200))) {
                 messages.add(new messageModel(record.partition(),record.offset(),record.value(),record.key(),
                         headersToMap(record.headers())
@@ -177,7 +178,8 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
                 = partitions.stream().collect(Collectors.toMap(p -> p , p -> new ArrayList<>(count)));
 
         var moreRecords = true;
-        while (rawRecords.size() < totalCount && moreRecords) {
+        long startTime = System.currentTimeMillis();
+        while (rawRecords.size() < totalCount && moreRecords && (System.currentTimeMillis()-startTime)<10000) {
             final var polled = kafkaConsumer.poll(Duration.ofMillis(200));
 
             moreRecords = false;

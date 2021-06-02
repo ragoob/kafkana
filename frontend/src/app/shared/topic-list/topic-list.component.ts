@@ -42,20 +42,7 @@ export class TopicListComponent implements OnInit, OnDestroy {
   }
 
   public deleteTopic(name: string) {
-    const index = this.topics.findIndex(c=> c.name === name);
-      this.confirmationService.confirm({
-        message: 'Are you sure that you want to perform this action?',
-        accept: () => {
-          this.kafkaAdminService.deleteTopic(name, this.clusterId)
-            .then(d => {
-              this.topics.splice(index,1);
-              alert("Topic Deleted");
-
-            }).catch(error=> {
-              alert(error)
-            })
-        }
-      });
+    alert("Under dev");
   }
 
 
