@@ -18,24 +18,24 @@ public class kafkaAdminController {
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    void  create(@RequestHeader(value = "clusterId") String clusterId, @RequestBody() createTopicModel model) {
-       this.kafkaAdminService.create(model,clusterId);
+    void  create(@RequestHeader(value = "clusterIp") String clusterIp, @RequestBody() createTopicModel model) {
+       this.kafkaAdminService.create(model,clusterIp);
     }
 
     @DeleteMapping("/{name}")
     @ResponseStatus(HttpStatus.OK)
-    void  delete(@RequestHeader(value = "clusterId") String clusterId, @PathVariable(value = "name") String name) {
-        this.kafkaAdminService.delete(new createTopicModel(name),clusterId);
+    void  delete(@RequestHeader(value = "clusterIp") String clusterIp, @PathVariable(value = "name") String name) {
+        this.kafkaAdminService.delete(new createTopicModel(name),clusterIp);
     }
 
     @GetMapping("/config/{nodeId}")
-    HashMap<String,String> getConfig(@RequestHeader(value = "clusterId") String clusterId,@PathVariable(value = "nodeId") String nodeId){
-        return  this.kafkaAdminService.getConfig(clusterId,nodeId);
+    HashMap<String,String> getConfig(@RequestHeader(value = "clusterIp") String clusterIp,@PathVariable(value = "nodeId") String nodeId){
+        return  this.kafkaAdminService.getConfig(clusterIp,nodeId);
     }
 
     @GetMapping("/nodes")
-    ArrayList<brokers> getNodes(@RequestHeader(value = "clusterId") String clusterId){
-        return  this.kafkaAdminService.getBrokers(clusterId);
+    ArrayList<brokers> getNodes(@RequestHeader(value = "clusterIp") String clusterIp){
+        return  this.kafkaAdminService.getBrokers(clusterIp);
     }
 
 

@@ -22,6 +22,8 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { TableModule } from 'primeng/table';
 import { AdminService } from './core/services/admin.service';
+import { MatDialogModule } from '@angular/material/dialog';
+import { AddNewComponent } from './add-new/add-new.component';
 
 
 
@@ -29,7 +31,8 @@ import { AdminService } from './core/services/admin.service';
   declarations: [
     AppComponent,
     AdminLayoutComponent,
-    HomeComponent
+    HomeComponent,
+    AddNewComponent
     
     
   ],
@@ -51,6 +54,8 @@ import { AdminService } from './core/services/admin.service';
     ButtonModule,
     InputTextModule,
     TableModule,
+    MatDialogModule
+
   ],
   providers: [{ provide: API_BASE_URL, useValue: environment.baseURL }, AdminService],
 

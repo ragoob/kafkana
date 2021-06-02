@@ -13,8 +13,8 @@ import java.util.concurrent.ExecutionException;
 public class kafkaAdminServiceImpl implements kafkaAdminService {
 
     @Override
-    public void create(createTopicModel model,String clusterId) {
-        try (final AdminClient admin = getAdminClient(clusterId)){
+    public void create(createTopicModel model,String clusterIp) {
+        try (final AdminClient admin = getAdminClient(clusterIp)){
             NewTopic newTopic = new NewTopic(model.getTopicName(),model.getPartitions(),model.getReplication());
             newTopic.configs(model.getConfigurations());
             admin.createTopics(Collections.singleton(newTopic));
@@ -22,9 +22,9 @@ public class kafkaAdminServiceImpl implements kafkaAdminService {
 
     }
 
-    private AdminClient getAdminClient(String clusterId) {
+    private AdminClient getAdminClient(String clusterIp) {
         Properties config = new Properties();
-        config.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, clusterId);
+        config.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, clusterIp);
         config.put(AdminClientConfig.REQUEST_TIMEOUT_MS_CONFIG, 30000);
         AdminClient admin = AdminClient.create(config);
 
@@ -32,8 +32,8 @@ public class kafkaAdminServiceImpl implements kafkaAdminService {
     }
 
     @Override
-    public void delete(createTopicModel model,String clusterId) {
-        try (final AdminClient admin = getAdminClient(clusterId)){
+    public void delete(createTopicModel model,String clusterIp) {
+        try (final AdminClient admin = getAdminClient(clusterIp)){
             admin.deleteTopics(Collections.singleton(model.getTopicName()));
             admin.listTopics();
         }
@@ -41,9 +41,9 @@ public class kafkaAdminServiceImpl implements kafkaAdminService {
     }
 
     @Override
-    public ArrayList<brokers> getConfig(String clusterId) {
+    public ArrayList<brokers> getConfig(String clusterIp) {
         ArrayList<brokers> configs = new ArrayList<>();
-        try (final AdminClient admin = getAdminClient(clusterId)){
+        try (final AdminClient admin = getAdminClient(clusterIp)){
          final  var clusterDescription =  admin.describeCluster();
            final  var controller = clusterDescription.controller().get();
             clusterDescription.nodes().get().forEach(c-> {
@@ -60,17 +60,17 @@ public class kafkaAdminServiceImpl implements kafkaAdminService {
     }
 
     @Override
-    public HashMap<String,String> getConfig(String clusterId,String id) {
-        try (final AdminClient admin = getAdminClient(clusterId)) {
+    public HashMap<String,String> getConfig(String clusterIp,String id) {
+        try (final AdminClient admin = getAdminClient(clusterIp)) {
             return getBrokersConfig(id,admin);
         }
     }
 
     @Override
-    public ArrayList<brokers> getBrokers(String clusterId) {
+    public ArrayList<brokers> getBrokers(String clusterIp) {
         ArrayList<brokers> nodes = new ArrayList<>();
 
-        try (final AdminClient admin = getAdminClient(clusterId)){
+        try (final AdminClient admin = getAdminClient(clusterIp)){
             final var clusterDescription = admin.describeCluster();
             final  var controller = clusterDescription.controller().get();
             clusterDescription.nodes().get().forEach(c-> {

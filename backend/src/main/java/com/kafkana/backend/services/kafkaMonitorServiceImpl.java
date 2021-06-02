@@ -65,10 +65,10 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         return topicSummary;
     }
     @Override
-    public List<topicModel> getTopics(String clusterId) {
-        final  var kafkaConsumer= createConsumer(clusterId);
-        final  var admin = getAdminClient(clusterId);
-        final var topics = getTopicMetadata(clusterId,kafkaConsumer,admin).values().stream()
+    public List<topicModel> getTopics(String clusterIp) {
+        final  var kafkaConsumer= createConsumer(clusterIp);
+        final  var admin = getAdminClient(clusterIp);
+        final var topics = getTopicMetadata(clusterIp,kafkaConsumer,admin).values().stream()
                 .sorted(Comparator.comparing(topicModel::getName))
                 .collect(Collectors.toList());
         kafkaConsumer.close();
@@ -76,27 +76,27 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         return topics;
     }
     @Override
-    public Optional<topicModel> getTopic(String topic,String clusterId) {
-        final  var kafkaConsumer= createConsumer(clusterId);
-        final  var admin = getAdminClient(clusterId);
+    public Optional<topicModel> getTopic(String topic,String clusterIp) {
+        final  var kafkaConsumer= createConsumer(clusterIp);
+        final  var admin = getAdminClient(clusterIp);
         final var topicModel = Optional.ofNullable(getTopicMetadata(topic,kafkaConsumer,admin).get(topic));
-        topicModel.ifPresent(model -> model.setPartitions(getTopicPartitionSizes(model,clusterId,kafkaConsumer)));
+        topicModel.ifPresent(model -> model.setPartitions(getTopicPartitionSizes(model,clusterIp,kafkaConsumer)));
         kafkaConsumer.close();
         admin.close();
         return topicModel;
     }
     @Override
-    public List<consumerModel> getConsumers(Collection<topicModel> topicModels,String clusterId) {
-        final  var admin = getAdminClient(clusterId);
+    public List<consumerModel> getConsumers(Collection<topicModel> topicModels,String clusterIp) {
+        final  var admin = getAdminClient(clusterIp);
         final var topics = topicModels.stream().map(topicModel::getName).collect(Collectors.toSet());
-        final var consumerGroupOffsets = getConsumerOffsets(topics,clusterId,admin);
+        final var consumerGroupOffsets = getConsumerOffsets(topics,clusterIp,admin);
         admin.close();
         return convert(consumerGroupOffsets, topicModels);
     }
     @Override
-    public  List<messageModel> getMessages(String topic,String clusterId,int size){
+    public  List<messageModel> getMessages(String topic,String clusterIp,int size){
         List<messageModel> messages = new ArrayList<>();
-        Consumer<String, String> kafkaConsumer =this.createConsumer(clusterId);
+        Consumer<String, String> kafkaConsumer =this.createConsumer(clusterIp);
         TopicPartition partition = new TopicPartition(topic, 0);
 
 
@@ -118,9 +118,9 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
     }
 
     @Override
-    public  List<messageModel> getMessages(String topic,String clusterId,int size,long start, long end){
+    public  List<messageModel> getMessages(String topic,String clusterIp,int size,long start, long end){
          List<messageModel> messages = new ArrayList<>();
-        Consumer<String, String> kafkaConsumer =this.createConsumer(clusterId);
+        Consumer<String, String> kafkaConsumer =this.createConsumer(clusterIp);
         TopicPartition partition = new TopicPartition(topic, 0);
         long beginningOffset = kafkaConsumer.offsetsForTimes(
                 Collections.singletonMap(partition, start))
@@ -143,9 +143,9 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
     }
 
     @Override
-    public  List<messageModel> getLatestMessages(String topic,String clusterId,int size){
+    public  List<messageModel> getLatestMessages(String topic,String clusterIp,int size){
         List<messageModel> messages = new ArrayList<>();
-       final  var records = getLatestRecords(topic,size,clusterId);
+       final  var records = getLatestRecords(topic,size,clusterIp);
        for(ConsumerRecord<String, String> record : records){
            messages.add(new messageModel(record.partition(),record.offset(),record.value(),record.key(),
                    headersToMap(record.headers())
@@ -156,8 +156,8 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
 
 
     private  List<ConsumerRecord<String, String>> getLatestRecords(String topic,
-                                                                   int count,String clusterId) {
-        Consumer<String, String> kafkaConsumer =this.createConsumer(clusterId);
+                                                                   int count,String clusterIp) {
+        Consumer<String, String> kafkaConsumer =this.createConsumer(clusterIp);
 
         final var partitionInfoSet = kafkaConsumer.partitionsFor(topic);
         final var partitions = partitionInfoSet.stream()
@@ -198,12 +198,12 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
                 .collect(Collectors.toList());
     }
 
-    private Map<String, topicModel> getTopicMetadata(String cluserId, Consumer<String,String> consumer,AdminClient adminClient,String... topics) {
-        final var topicsMap = getTopicInformation(topics,cluserId,consumer);
+    private Map<String, topicModel> getTopicMetadata(String clusterIp, Consumer<String,String> consumer,AdminClient adminClient,String... topics) {
+        final var topicsMap = getTopicInformation(topics,clusterIp,consumer);
         final var retrievedTopicNames = topicsMap.keySet();
         Map<String, Config> topicConfigs = new HashMap<>();
         try {
-            topicConfigs = describeTopicConfigs(retrievedTopicNames,cluserId,adminClient);
+            topicConfigs = describeTopicConfigs(retrievedTopicNames,clusterIp,adminClient);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -226,15 +226,15 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         return topicsMap;
     }
 
-    private Map<Integer, topicPartitionModel> getTopicPartitionSizes(topicModel topic,String clusterId,Consumer<String,String> consumer) {
-        return getPartitionSize(topic.getName(),clusterId,consumer);
+    private Map<Integer, topicPartitionModel> getTopicPartitionSizes(topicModel topic,String clusterIp,Consumer<String,String> consumer) {
+        return getPartitionSize(topic.getName(),clusterIp,consumer);
     }
 
-    private Consumer<String, String> createConsumer(String clusterId) {
+    private Consumer<String, String> createConsumer(String clusterIp) {
 
         final Properties props = new Properties();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
-                clusterId);
+                clusterIp);
         props.put(ConsumerConfig.GROUP_ID_CONFIG,
                 "KafkaExampleConsumer");
 
@@ -253,15 +253,15 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         return consumer;
     }
 
-    private AdminClient getAdminClient(String clusterId) {
+    private AdminClient getAdminClient(String clusterIp) {
 
         Properties config = new Properties();
-        config.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG,clusterId);
+        config.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG,clusterIp);
         config.put(AdminClientConfig.REQUEST_TIMEOUT_MS_CONFIG, 30000);
         return AdminClient.create(config);
     }
 
-    synchronized Map<Integer, topicPartitionModel> getPartitionSize(String topic,String clusterId,Consumer<String,String> kafkaConsumer) {
+    synchronized Map<Integer, topicPartitionModel> getPartitionSize(String topic,String clusterIp,Consumer<String,String> kafkaConsumer) {
 
         final var partitionInfoSet = kafkaConsumer.partitionsFor(topic);
         kafkaConsumer.assign(partitionInfoSet.stream()
@@ -271,7 +271,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
 
         kafkaConsumer.poll(Duration.ofMillis(0));
         final Set<TopicPartition> assignedPartitionList = kafkaConsumer.assignment();
-        final topicModel topicVO = getTopicInfo(topic,clusterId,kafkaConsumer);
+        final topicModel topicVO = getTopicInfo(topic,clusterIp,kafkaConsumer);
         final Map<Integer, topicPartitionModel> partitionMap = topicVO.getPartitionMap();
 
         kafkaConsumer.seekToBeginning(assignedPartitionList);
@@ -294,7 +294,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         return partitionMap;
     }
 
-    private topicModel getTopicInfo(String topic,String clusterId,Consumer<String,String> kafkaConsumer) {
+    private topicModel getTopicInfo(String topic,String clusterIp,Consumer<String,String> kafkaConsumer) {
         final var partitionInfoList = kafkaConsumer.partitionsFor(topic);
         final var topicModel = new topicModel(topic);
         final var partitions = new TreeMap<Integer, topicPartitionModel>();
@@ -322,7 +322,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         return topicModel;
     }
 
-    synchronized Map<String, topicModel> getTopicInformation(String[] topics, String clusterId, Consumer<String,String> kafkaConsumer ) {
+    synchronized Map<String, topicModel> getTopicInformation(String[] topics, String clusterIp, Consumer<String,String> kafkaConsumer ) {
         final var topicSet = kafkaConsumer.listTopics().keySet();
 
         if (topics.length == 0) {
@@ -332,13 +332,13 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
 
         for (var topic : topics) {
             if (topicSet.contains(topic)) {
-                topicModelMap.put(topic, getTopicInfo(topic,clusterId,kafkaConsumer));
+                topicModelMap.put(topic, getTopicInfo(topic,clusterIp,kafkaConsumer));
             }
         }
         return topicModelMap;
     }
 
-    Map<String, Config> describeTopicConfigs(Set<String> topicNames,String clusterId,AdminClient adminClient )  {
+    Map<String, Config> describeTopicConfigs(Set<String> topicNames,String clusterIp,AdminClient adminClient )  {
         final var resources = topicNames.stream()
                 .map(topic -> new ConfigResource(ConfigResource.Type.TOPIC, topic))
                 .collect(Collectors.toList());
@@ -362,7 +362,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         return configsByTopic;
     }
 
-    Set<String> listConsumerGroups(String clusterId,AdminClient adminClient) {
+    Set<String> listConsumerGroups(String clusterIp,AdminClient adminClient) {
         final Collection<ConsumerGroupListing> groupListing;
         try {
             groupListing = adminClient.listConsumerGroups().all().get();
@@ -374,11 +374,11 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         return groupListing.stream().map(ConsumerGroupListing::groupId).collect(Collectors.toSet());
     }
 
-    private ConsumerGroupOffsets resolveOffsets(String groupId,String clusterId,AdminClient adminClient) {
-        return new ConsumerGroupOffsets(groupId,listConsumerGroupOffsetsIfAuthorized(groupId,clusterId,adminClient));
+    private ConsumerGroupOffsets resolveOffsets(String groupId,String clusterIp,AdminClient adminClient) {
+        return new ConsumerGroupOffsets(groupId,listConsumerGroupOffsetsIfAuthorized(groupId,clusterIp,adminClient));
     }
 
-    Map<TopicPartition, OffsetAndMetadata> listConsumerGroupOffsetsIfAuthorized(String groupId,String clusterId,AdminClient adminClient) {
+    Map<TopicPartition, OffsetAndMetadata> listConsumerGroupOffsetsIfAuthorized(String groupId,String clusterIp,AdminClient adminClient) {
         final var offsets = adminClient.listConsumerGroupOffsets(groupId);
         try {
             return offsets.partitionsToOffsetAndMetadata().get();
@@ -392,11 +392,11 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         }
     }
 
-    private List<ConsumerGroupOffsets> getConsumerOffsets(Set<String> topics,String clusterId,AdminClient adminClient) {
-        final var consumerGroups = listConsumerGroups(clusterId,adminClient);
+    private List<ConsumerGroupOffsets> getConsumerOffsets(Set<String> topics,String clusterIp,AdminClient adminClient) {
+        final var consumerGroups = listConsumerGroups(clusterIp,adminClient);
         return consumerGroups.stream()
                 .map(c-> {
-                    return  resolveOffsets(c,clusterId,adminClient);
+                    return  resolveOffsets(c,clusterIp,adminClient);
                 })
                 .map(offsets -> offsets.forTopics(topics))
                 .filter(not(ConsumerGroupOffsets::isEmpty))

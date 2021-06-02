@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { AddNewComponent } from '../add-new/add-new.component';
 import { KafkaCluster } from '../core/models/kafka-cluster.model';
 import { AdminService } from '../core/services/admin.service';
 
@@ -11,7 +13,7 @@ export class HomeComponent implements OnInit {
   public clusters: KafkaCluster[] = [];
   first = 0;
   rows = 5;
-  constructor(private adminService: AdminService) { }
+  constructor(private adminService: AdminService, public dialog: MatDialog) { }
   
   ngOnInit(): void {
     this.adminService.getAll()
@@ -21,7 +23,14 @@ export class HomeComponent implements OnInit {
   }
 
   public addNewCluster(): void{
-    alert("Under Dev")
+    const dialogRef = this.dialog.open(AddNewComponent, {
+      width: '250px',
+      data: {}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+    });
   }
 
 }

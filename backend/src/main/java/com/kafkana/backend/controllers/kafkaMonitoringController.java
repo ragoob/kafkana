@@ -28,53 +28,53 @@ public class kafkaMonitoringController {
 
 
     @GetMapping("/summary")
-    clusterSummaryModel getClusterSummary(@RequestHeader("clusterId") String clusterId) throws InterruptedException {
-        final  var topics = this.kafkaMonitorService.getTopics(clusterId);
+    clusterSummaryModel getClusterSummary(@RequestHeader("clusterIp") String clusterIp) throws InterruptedException {
+        final  var topics = this.kafkaMonitorService.getTopics(clusterIp);
         return  this.kafkaMonitorService.getClusterSummary(topics);
     }
 
     @GetMapping("/topics")
-    List<topicModel> getTopics(@RequestHeader(value = "clusterId") String clusterId){
-       return this.kafkaMonitorService.getTopics(clusterId);
+    List<topicModel> getTopics(@RequestHeader(value = "clusterIp") String clusterIp){
+       return this.kafkaMonitorService.getTopics(clusterIp);
 
     }
 
     @GetMapping("/topics/{name:.+}")
-    Optional<topicModel> getTopic(@RequestHeader(value = "clusterId") String clusterId, @PathVariable(value = "name") String name){
-        return this.kafkaMonitorService.getTopic(name,clusterId);
+    Optional<topicModel> getTopic(@RequestHeader(value = "clusterIp") String clusterIp, @PathVariable(value = "name") String name){
+        return this.kafkaMonitorService.getTopic(name,clusterIp);
 
     }
 
     @GetMapping("/consumers")
-    List<consumerModel> getConsumers(@RequestHeader(value = "clusterId") String clusterId){
-        final  var topics = this.kafkaMonitorService.getTopics(clusterId);
-        return this.kafkaMonitorService.getConsumers(topics,clusterId);
+    List<consumerModel> getConsumers(@RequestHeader(value = "clusterIp") String clusterIp){
+        final  var topics = this.kafkaMonitorService.getTopics(clusterIp);
+        return this.kafkaMonitorService.getConsumers(topics,clusterIp);
     }
 
     @GetMapping("/messages/{name:.+}")
-    List<messageModel> getMessages(@RequestHeader(value = "clusterId") String clusterId, @PathVariable(value = "name") String name,
+    List<messageModel> getMessages(@RequestHeader(value = "clusterIp") String clusterIp, @PathVariable(value = "name") String name,
                                    @RequestParam(name = "size", required = false) Integer size,
                                    @RequestParam(name = "start", required = false) Long  start,
                                    @RequestParam(name = "end", required = false) Long  end
                                    ){
         final int count = (size != null? size : 200);
         if(start == null || end == null){
-            return this.kafkaMonitorService.getMessages(name,clusterId,count);
+            return this.kafkaMonitorService.getMessages(name,clusterIp,count);
         }
         else{
-            return this.kafkaMonitorService.getMessages(name,clusterId,count,start,end);
+            return this.kafkaMonitorService.getMessages(name,clusterIp,count,start,end);
         }
 
     }
 
     @GetMapping("/getLatestMessages/{name:.+}")
-    List<messageModel> getLatestMessages(@RequestHeader(value = "clusterId") String clusterId, @PathVariable(value = "name") String name,
+    List<messageModel> getLatestMessages(@RequestHeader(value = "clusterIp") String clusterIp, @PathVariable(value = "name") String name,
                                    @RequestParam(name = "size", required = false) Integer size
 
     ){
         final int count = (size != null? size : 200);
 
-            return this.kafkaMonitorService.getLatestMessages(name,clusterId,count);
+            return this.kafkaMonitorService.getLatestMessages(name,clusterIp,count);
 
     }
 

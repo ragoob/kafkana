@@ -5,22 +5,31 @@ import { KafkaCluster } from "../models/kafka-cluster.model";
 
 @Injectable()
 export class AdminService{
-    constructor(private http: HttpClient, @Inject(API_BASE_URL) private baseUrl?: string){
+    constructor(){
     }
 
     getAll(): Promise<KafkaCluster[]>{
-      return  this.http.get <KafkaCluster[]>(`${this.baseUrl}/admin`)
-        .toPromise();
+      return new Promise((resolve,reject)=>{
+          const list = localStorage.getItem("CLUSTER_LIST")?? "[]";
+          resolve(JSON.parse(list));
+      });
     }
 
-    create(model: KafkaCluster): Promise<Object>{
-        return this.http.post(`${this.baseUrl}/admin`,model)
-        .toPromise();
+    create(model: KafkaCluster): Promise<void>{
+        return new Promise((resolve,reject)=> {
+            const list = JSON.parse(localStorage.getItem("CLUSTER_LIST") ?? "[]") as KafkaCluster[];
+            list.push(model);
+            resolve(localStorage.setItem("CLUSTER_LIST",JSON.stringify(list)));
+        })
     }
 
-    delete(id: number): Promise<Object> {
-        return this.http.delete(`${this.baseUrl}/admin/${id}`)
-            .toPromise();
+    delete(id: string): Promise<void> {
+       return new Promise((resolve,reject)=>{
+           const list = JSON.parse(localStorage.getItem("CLUSTER_LIST") ?? "[]") as KafkaCluster[];
+           const index = list.findIndex(l=> l.id === id);
+           list.splice(index,1);
+           resolve(localStorage.setItem("CLUSTER_LIST", JSON.stringify(list)));
+       })
     }
 
 
