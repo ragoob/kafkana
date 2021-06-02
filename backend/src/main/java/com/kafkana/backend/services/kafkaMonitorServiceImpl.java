@@ -28,8 +28,7 @@ import static java.util.function.Predicate.not;
 
 @Service
 public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
-    @Autowired
-    private kafkaClusterRepository kafkaClusterRepository;
+
     private static final Logger LOG = LoggerFactory.getLogger(kafkaMonitorServiceImpl.class);
     @Override
     public clusterSummaryModel getClusterSummary(Collection<topicModel> topics) {
@@ -232,13 +231,10 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
     }
 
     private Consumer<String, String> createConsumer(String clusterId) {
-        Optional<kafkaCluster> cluster = this.kafkaClusterRepository.getById(clusterId);
-        if(cluster.isEmpty()){
-            throw new NullPointerException("Cluster not found");
-        }
+
         final Properties props = new Properties();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
-                cluster.get().getBootStrapServers());
+                clusterId);
         props.put(ConsumerConfig.GROUP_ID_CONFIG,
                 "KafkaExampleConsumer");
 
@@ -258,12 +254,9 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
     }
 
     private AdminClient getAdminClient(String clusterId) {
-        Optional<kafkaCluster> cluster = this.kafkaClusterRepository.getById(clusterId);
-        if(cluster.isEmpty()){
-            throw new NullPointerException("Cluster not found");
-        }
+
         Properties config = new Properties();
-        config.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, cluster.get().getBootStrapServers());
+        config.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG,clusterId);
         config.put(AdminClientConfig.REQUEST_TIMEOUT_MS_CONFIG, 30000);
         return AdminClient.create(config);
     }

@@ -18,7 +18,7 @@ import java.util.Optional;
 
 @RestController()
 @CrossOrigin()
-@RequestMapping("/api/monitoring/{clusterId}")
+@RequestMapping("/api/monitoring")
 public class kafkaMonitoringController {
     @Autowired
     private kafkaMonitorService kafkaMonitorService ;
@@ -28,31 +28,31 @@ public class kafkaMonitoringController {
 
 
     @GetMapping("/summary")
-    clusterSummaryModel getClusterSummary(@PathVariable(value = "clusterId") String clusterId) throws InterruptedException {
+    clusterSummaryModel getClusterSummary(@RequestHeader("clusterId") String clusterId) throws InterruptedException {
         final  var topics = this.kafkaMonitorService.getTopics(clusterId);
         return  this.kafkaMonitorService.getClusterSummary(topics);
     }
 
     @GetMapping("/topics")
-    List<topicModel> getTopics(@PathVariable(value = "clusterId") String clusterId){
+    List<topicModel> getTopics(@RequestHeader(value = "clusterId") String clusterId){
        return this.kafkaMonitorService.getTopics(clusterId);
 
     }
 
     @GetMapping("/topics/{name:.+}")
-    Optional<topicModel> getTopic(@PathVariable(value = "clusterId") String clusterId, @PathVariable(value = "name") String name){
+    Optional<topicModel> getTopic(@RequestHeader(value = "clusterId") String clusterId, @PathVariable(value = "name") String name){
         return this.kafkaMonitorService.getTopic(name,clusterId);
 
     }
 
     @GetMapping("/consumers")
-    List<consumerModel> getConsumers(@PathVariable(value = "clusterId") String clusterId){
+    List<consumerModel> getConsumers(@RequestHeader(value = "clusterId") String clusterId){
         final  var topics = this.kafkaMonitorService.getTopics(clusterId);
         return this.kafkaMonitorService.getConsumers(topics,clusterId);
     }
 
     @GetMapping("/messages/{name:.+}")
-    List<messageModel> getMessages(@PathVariable(value = "clusterId") String clusterId, @PathVariable(value = "name") String name,
+    List<messageModel> getMessages(@RequestHeader(value = "clusterId") String clusterId, @PathVariable(value = "name") String name,
                                    @RequestParam(name = "size", required = false) Integer size,
                                    @RequestParam(name = "start", required = false) Long  start,
                                    @RequestParam(name = "end", required = false) Long  end
@@ -68,7 +68,7 @@ public class kafkaMonitoringController {
     }
 
     @GetMapping("/getLatestMessages/{name:.+}")
-    List<messageModel> getLatestMessages(@PathVariable(value = "clusterId") String clusterId, @PathVariable(value = "name") String name,
+    List<messageModel> getLatestMessages(@RequestHeader(value = "clusterId") String clusterId, @PathVariable(value = "name") String name,
                                    @RequestParam(name = "size", required = false) Integer size
 
     ){

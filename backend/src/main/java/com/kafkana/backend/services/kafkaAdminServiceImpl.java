@@ -11,8 +11,6 @@ import java.util.concurrent.ExecutionException;
 
 @Service
 public class kafkaAdminServiceImpl implements kafkaAdminService {
-    @Autowired
-    private kafkaClusterRepository kafkaClusterRepository;
 
     @Override
     public void create(createTopicModel model,String clusterId) {
@@ -25,12 +23,8 @@ public class kafkaAdminServiceImpl implements kafkaAdminService {
     }
 
     private AdminClient getAdminClient(String clusterId) {
-        Optional<kafkaCluster> cluster = this.kafkaClusterRepository.getById(clusterId);
-        if(cluster.isEmpty()){
-            throw new NullPointerException("Cluster not found");
-        }
         Properties config = new Properties();
-        config.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, cluster.get().getBootStrapServers());
+        config.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, clusterId);
         config.put(AdminClientConfig.REQUEST_TIMEOUT_MS_CONFIG, 30000);
         AdminClient admin = AdminClient.create(config);
 
