@@ -17,13 +17,19 @@ import { MatMenuModule } from '@angular/material/menu';
 import { RouterModule } from '@angular/router';
 import { API_BASE_URL } from './core/constants';
 import { AdminLayoutComponent } from './layouts/admin-layout.component';
+import { HomeComponent } from './home/home.component';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { TableModule } from 'primeng/table';
+import { AdminService } from './core/services/admin.service';
 
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    AdminLayoutComponent
+    AdminLayoutComponent,
+    HomeComponent
     
     
   ],
@@ -41,9 +47,12 @@ import { AdminLayoutComponent } from './layouts/admin-layout.component';
     MatGridListModule,
     MatCardModule,
     MatMenuModule,
-    RouterModule
+    RouterModule,
+    ButtonModule,
+    InputTextModule,
+    TableModule,
   ],
-  providers: [{ provide: API_BASE_URL, useValue: environment.baseURL }],
+  providers: [{ provide: API_BASE_URL, useValue: environment.baseURL }, AdminService],
 
   bootstrap: [AppComponent]
 })

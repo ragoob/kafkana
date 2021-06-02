@@ -1,4 +1,6 @@
-
+    <label>Message Count : 
+        <input type="number" #countInput class="form-control"  (change)="filterBySize(countInput.value)"/>
+    </label>
     <p-table [value]="messages" dataKey="key"  [loading]="messages.length == 0">
         <ng-template pTemplate="header">
             <tr>
@@ -37,7 +39,19 @@
             <tr>
                 <td colspan="7">
                     <div class="p-p-3" *ngIf="message?.fromatedMessage">
-                       formated msg
+                        <table  class="table table-bordered">
+                            <tbody>
+                                <tr *ngFor="let map of message?.fromatedMessage | keyvalue">
+                                    <td>
+                                        {{map.key}}
+                                    </td>
+                                    <td>
+                                        {{map.value}}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                      
                      </div>
                      <div *ngIf="!message?.fromatedMessage">
                         {{message?.message}}

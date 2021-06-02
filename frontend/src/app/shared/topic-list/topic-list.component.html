@@ -43,14 +43,15 @@
                               ></button>
                         </td>
                         <td>
-                        
-                            <button pButton pRipple icon="pi pi-arrow" (click)="details(topic?.name)"
-                                class="p-button-rounded p-button-warning"></button>
+                          
+                      <a [routerLink]="['/topic-details',clusterId,topic?.name]" routerLinkActive="router-link-active">Details</a>
+
+                           
                         </td>
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="paginatorleft">
-                    <p-button type="button" icon="pi pi-plus" styleClass="p-button-text"></p-button>
+                    <p-button type="button" (click)="addNewTopic()" icon="pi pi-plus" styleClass="p-button-text"></p-button>
                 </ng-template>
                
             </p-table>

@@ -1,0 +1,45 @@
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Clusters List</h5>
+
+            </div>
+            <div class="card-body">
+                <p-table #dt1  [paginator]="true" [rows]="rows"
+                     [value]="clusters"
+                    [showCurrentPageReport]="true" 
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                    [rowsPerPageOptions]="[5,10,25,50,200,500,1000]">
+                  
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>Name</th>
+                            <th>Bootstrap</th>
+                           
+                            <th></th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-item>
+                        <tr>
+                            <td>{{item?.id}}</td>
+                            <td>{{item?.bootStrapServers}}</td>
+                           
+                            
+                            <td>
+
+                            <a [routerLink]="['/dashboard',item?.id]" routerLinkActive="router-link-active" >Dashboard</a>
+                            </td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="paginatorleft">
+                        <p-button type="button" (click)="addNewCluster()" icon="pi pi-plus" styleClass="p-button-text"></p-button>
+                    </ng-template>
+
+                </p-table>
+
+            </div>
+
+        </div>
+    </div>
+</div>

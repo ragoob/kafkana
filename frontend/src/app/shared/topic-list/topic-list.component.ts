@@ -63,4 +63,8 @@ export class TopicListComponent implements OnInit, OnDestroy {
     this.router.navigate(['/topic-details',this.clusterId,name]);
   }
 
+  public addNewTopic(): void{
+    alert("Under dev")
+  }
+
 }

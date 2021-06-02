@@ -34,4 +34,12 @@ export class TopicMessagesComponent implements OnInit {
       })
   }
 
+  public filterBySize(input: string) {
+    const  size: number = parseInt(input);
+    this.monitoringService.getMessages(this.topic?.name ?? "", this.clusterId, size)
+      .then(data => {
+        this.messages = data;
+      })
+  }
+
 }

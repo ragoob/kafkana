@@ -21,4 +21,6 @@ export class TopicPartition{
     offlineReplicas: PartitionReplica[];
     leader?: Brokers;
     preferredLeader?: Brokers;
+    underReplicated?: boolean;
+    leaderPreferred?: boolean;
 }

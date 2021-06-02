@@ -48,9 +48,60 @@
                     </li>
 
                     <li [ngbNavItem]="2">
-                        <a ngbNavLink>Offsets</a>
+                        <a ngbNavLink>partitions</a>
                         <ng-template ngbNavContent>
-                    
+                          <table class="table">
+                              <thead>
+                                  <tr>
+                                      <th>
+                                          Broker
+                                      </th>
+                                    <th>
+                                        Replicas Count
+                                    </th>
+                                    <th>
+                                        ISR Count
+                                    </th>
+                                    <th>
+                                       Size
+                                    </th>
+                                    <th>
+                                        Offset
+                                    </th>
+                                    <th>
+                                        Under replica ?
+                                    </th>
+                                    <th>
+                                        Leader preferred ?
+                                    </th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  <tr *ngFor="let item of topic?.partitions">
+                                     <td>
+                                         {{item.id}}
+                                     </td>
+                                    <td>
+                                        {{item?.replicas?.length}}
+                                    </td>
+                                    <td>
+                                        {{item?.inSyncReplicas?.length}}
+                                    </td>
+                                    <td>
+                                        {{item.size}}
+                                    </td>
+                                    <td>
+                                        {{item.firstOffset}}
+                                    </td>
+                                    <td>
+                                        {{item.underReplicated}}
+                                    </td>
+                                    <td>
+                                        {{item.leaderPreferred}}
+                                    </td>
+                                  </tr>
+                              </tbody>
+                          </table>
                     
                         </ng-template>
                     

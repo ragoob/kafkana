@@ -1,23 +1,25 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterContentChecked, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ReplaySubject } from 'rxjs';
+import { ReplaySubject, fromEvent  } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { Topic } from '../../core/models/topic.model';
 import { KafkaMonitorService } from '../../core/services/kafka-monitor.service';
+import { debounceTime } from 'rxjs/operators';
 
 @Component({
   selector: 'app-topic-details',
   templateUrl: './topic-details.component.html',
   styleUrls: ['./topic-details.component.scss']
 })
-export class TopicDetailsComponent implements OnInit, OnDestroy{
+export class TopicDetailsComponent implements OnInit, OnDestroy {
+  @ViewChild('countInput', { static: true }) countInput?: ElementRef ;
+
   clusterId: string = "";
   private destoryed$: ReplaySubject<any> = new ReplaySubject(1);
   public topic?: Topic
   active: number = 1;
   constructor(private monitoringService: KafkaMonitorService, private route: ActivatedRoute) { }
-
-  
+ 
 
   ngOnDestroy(): void {
     this.destoryed$.complete();
@@ -28,7 +30,7 @@ export class TopicDetailsComponent implements OnInit, OnDestroy{
       pipe(takeUntil(this.destoryed$))
       .subscribe(params => {
         this.clusterId = params.id;
-        this.loadTopic(params.id, params.topicId);
+        this.loadTopic(params.topicId,params.id,);
        
       })
   }
@@ -39,5 +41,7 @@ export class TopicDetailsComponent implements OnInit, OnDestroy{
         this.topic = data;
       })
   }
+
+  
 
 }

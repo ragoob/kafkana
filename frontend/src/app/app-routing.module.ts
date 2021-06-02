@@ -1,11 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { HomeComponent } from './home/home.component';
 import { AdminLayoutComponent } from './layouts/admin-layout.component';
 
 export const AppRoutes: Routes = [
   {
     path: '',
-    redirectTo: 'dashboard',
+    component: HomeComponent,
     pathMatch: 'full',
   }, {
     path: '',
@@ -20,7 +21,7 @@ export const AppRoutes: Routes = [
   },
   {
     path: '**',
-    redirectTo: 'dashboard'
+    redirectTo: ''
   }
 ]
 @NgModule({

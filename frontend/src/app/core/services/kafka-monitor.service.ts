@@ -28,8 +28,10 @@ export class KafkaMonitorService   {
             .toPromise();
     }
 
-    getMessages(topic: string, clusterId: string): Promise<Message[]>{
-        return this.http.get<Message[]>(`${this.baseUrl}/monitoring/${clusterId}/messages/${topic}`)
+    getMessages(topic: string, clusterId: string,size?: number): Promise<Message[]>{
+        const url = size ? `${this.baseUrl}/monitoring/${clusterId}/getLatestMessages/${topic}?size=${size}` : `${this.baseUrl}/monitoring/${clusterId}/getLatestMessages/${topic}`;
+        
+        return this.http.get<Message[]>(url)
             .pipe(map(m=> {
                m.forEach(msg=> {
                    if (msg) {
@@ -40,12 +42,34 @@ export class KafkaMonitorService   {
                        }
 
                        if(!msg.key){
-                           msg.key = 'None ' + msg.timestamp
+                           msg.key = 'None'
                        }
                    }
                  
                });
                return m;
+            }))
+            .toPromise();
+    }
+
+    getLatestMessages(topic: string, clusterId: string): Promise<Message[]> {
+        return this.http.get<Message[]>(`${this.baseUrl}/monitoring/${clusterId}/getLatestMessages/${topic}`)
+            .pipe(map(m => {
+                m.forEach(msg => {
+                    if (msg) {
+                        try {
+                            msg.fromatedMessage = JSON.parse(msg.message);
+                        } catch (error) {
+                            msg.fromatedMessage = null;
+                        }
+
+                        if (!msg.key) {
+                            msg.key = 'None ' + msg.timestamp
+                        }
+                    }
+
+                });
+                return m;
             }))
             .toPromise();
     }
