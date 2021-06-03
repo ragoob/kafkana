@@ -270,12 +270,8 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
                 clusterIp);
         props.put(ConsumerConfig.GROUP_ID_CONFIG,
-                "KafkaExampleConsumer");
+                "KAFKA_CONSUMER_" + clusterIp.replace(".","-").replace(":","-"));
 
-        props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG,
-                30000);
-        props.put(ConsumerConfig.DEFAULT_API_TIMEOUT_MS_CONFIG,
-                30000);
 
 
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
@@ -291,7 +287,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
 
         Properties config = new Properties();
         config.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG,clusterIp);
-        config.put(AdminClientConfig.REQUEST_TIMEOUT_MS_CONFIG, 30000);
+        config.put(AdminClientConfig.CLIENT_ID_CONFIG,"ADMIN_CLIENT-" + clusterIp.replace(".","-").replace(":","-"));
         return AdminClient.create(config);
     }
 

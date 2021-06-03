@@ -2,6 +2,7 @@ package com.kafkana.backend.services;
 import com.kafkana.backend.abstraction.kafkaAdminService;
 import com.kafkana.backend.models.*;
 import com.kafkana.backend.repositories.kafkaClusterRepository;
+import org.apache.commons.compress.archivers.sevenz.CLI;
 import org.apache.kafka.clients.admin.*;
 import org.apache.kafka.common.config.ConfigResource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ public class kafkaAdminServiceImpl implements kafkaAdminService {
     private AdminClient getAdminClient(String clusterIp) {
         Properties config = new Properties();
         config.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, clusterIp);
-        config.put(AdminClientConfig.REQUEST_TIMEOUT_MS_CONFIG, 30000);
+        config.put(AdminClientConfig.CLIENT_ID_CONFIG,"ADMIN_CLIENT-" + clusterIp.replace(".","-").replace(":","-"));
         AdminClient admin = AdminClient.create(config);
 
         return  admin;
