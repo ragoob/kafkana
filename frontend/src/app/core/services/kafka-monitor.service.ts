@@ -6,32 +6,38 @@ import { Topic } from "../models/topic.model";
 import { map} from 'rxjs/operators'
 import { Consumer } from "../models/consumer-model";
 import { API_BASE_URL } from "../constants";
+import { AdminService } from "./admin.service";
+import { KafkaCluster } from "../models/kafka-cluster.model";
 @Injectable()
 export class KafkaMonitorService   {
   
-    constructor(private http: HttpClient, @Inject(API_BASE_URL) private baseUrl?: string) {
+    constructor(private http: HttpClient,
+        private readonly adminService: AdminService,
+        @Inject(API_BASE_URL) private baseUrl?: string
+        
+    ) {
 
     }
 
-    getSummary(clusterIp: string): Promise<ClusterSummary>{
-        return this.http.get<ClusterSummary>(`${this.baseUrl}/monitoring/summary`, this.header(clusterIp))
+    getSummary(clusterId: string): Promise<ClusterSummary>{
+        return this.http.get<ClusterSummary>(`${this.baseUrl}/monitoring/summary`, this.header(clusterId))
         .toPromise();
     }
 
-    getTopics(clusterIp: string): Promise<Topic[]>{
-        return this.http.get<Topic[]>(`${this.baseUrl}/monitoring/topics`, this.header(clusterIp))
+    getTopics(clusterId: string): Promise<Topic[]>{
+        return this.http.get<Topic[]>(`${this.baseUrl}/monitoring/topics`, this.header(clusterId))
             .toPromise();
     }
 
-    getTopic(topicName: string ,clusterIp: string): Promise<Topic> {
-        return this.http.get<Topic>(`${this.baseUrl}/monitoring/topics/${topicName}`, this.header(clusterIp))
+    getTopic(topicName: string ,clusterId: string): Promise<Topic> {
+        return this.http.get<Topic>(`${this.baseUrl}/monitoring/topics/${topicName}`, this.header(clusterId))
             .toPromise();
     }
 
-    getMessages(topic: string, clusterIp: string,size?: number): Promise<Message[]>{
+    getMessages(topic: string, clusterId: string,size?: number): Promise<Message[]>{
         const url = size ? `${this.baseUrl}/monitoring/getLatestMessages/${topic}?size=${size}` : `${this.baseUrl}/monitoring/getLatestMessages/${topic}`;
         
-        return this.http.get<Message[]>(url, this.header(clusterIp))
+        return this.http.get<Message[]>(url, this.header(clusterId))
             .pipe(map(m=> {
                m.forEach(msg=> {
                    if (msg) {
@@ -52,9 +58,9 @@ export class KafkaMonitorService   {
             .toPromise();
     }
 
-    getLatestMessages(topic: string, clusterIp: string): Promise<Message[]> {
+    getLatestMessages(topic: string, clusterId: string): Promise<Message[]> {
         return this.http.get<Message[]>(`${this.baseUrl}/monitoring/getLatestMessages/${topic}`,
-            this.header(clusterIp)
+            this.header(clusterId)
         )
             .pipe(map(m => {
                 m.forEach(msg => {
@@ -76,14 +82,14 @@ export class KafkaMonitorService   {
             .toPromise();
     }
 
-    getConsumers(clusterIp: string): Promise<Consumer[]>{
-        return this.http.get<Consumer[]>(`${this.baseUrl}/monitoring/consumers`, this.header(clusterIp))
+    getConsumers(clusterId: string): Promise<Consumer[]>{
+        return this.http.get<Consumer[]>(`${this.baseUrl}/monitoring/consumers`, this.header(clusterId))
             .toPromise();
     }
 
-    private header(clusterIp: string): {} {
-        const headers = new HttpHeaders();
-        headers.append('clusterIp', clusterIp);
+    private header(clusterId: string): {} {
+        const cluster = this.adminService.findByid(clusterId);
+        const headers = new HttpHeaders({ 'clusterIp': cluster.bootStrapServers });
         const options = { headers: headers };
         return options;
     }

@@ -1,6 +1,6 @@
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
+ <div class="container-fluid">
+        <div class="row">
+             <div class="card">
             <div class="card-header">
                 <h5 class="card-title">Clusters List</h5>
 
@@ -18,6 +18,7 @@
                             <th>Bootstrap</th>
                            
                             <th></th>
+                            <th></th>
                         </tr>
                     </ng-template>
                     <ng-template pTemplate="body" let-item>
@@ -25,21 +26,24 @@
                             <td>{{item?.id}}</td>
                             <td>{{item?.bootStrapServers}}</td>
                            
-                            
                             <td>
-
-                            <a [routerLink]="['/dashboard',item?.id]" routerLinkActive="router-link-active" >Dashboard</a>
+                                 <button pButton pRipple icon="pi pi-trash" (click)="delete(item?.id)" class="p-button-rounded p-button-warning"
+                              ></button>
+                            </td>
+                            <td>
+                           
+                            <a (click)="dashboard(item?.id)" class="link-primary" routerLinkActive="router-link-active" >Dashboard</a>
                             </td>
                         </tr>
                     </ng-template>
                     <ng-template pTemplate="paginatorleft">
                         <p-button type="button" (click)="addNewCluster()" icon="pi pi-plus" styleClass="p-button-text"></p-button>
                     </ng-template>
-
+                   
                 </p-table>
 
             </div>
 
         </div>
-    </div>
-</div>
+        </div>
+

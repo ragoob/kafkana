@@ -15,6 +15,11 @@ export class AdminService{
       });
     }
 
+    findByid(id: string): KafkaCluster  {
+        const list = JSON.parse(localStorage.getItem("CLUSTER_LIST") ?? "[]") as KafkaCluster[];
+        return list.find(l => l.id === id) ?? new KafkaCluster;
+    }
+
     create(model: KafkaCluster): Promise<void>{
         return new Promise((resolve,reject)=> {
             const list = JSON.parse(localStorage.getItem("CLUSTER_LIST") ?? "[]") as KafkaCluster[];
@@ -30,6 +35,15 @@ export class AdminService{
            list.splice(index,1);
            resolve(localStorage.setItem("CLUSTER_LIST", JSON.stringify(list)));
        })
+    }
+
+    getCurrent(): string{
+        const cluster = localStorage.getItem("CURRENT_CLUSTER") ?? "";
+        return cluster;
+    }
+
+    setCurrent(id?: string){
+        localStorage.setItem("CURRENT_CLUSTER",id?? "");
     }
 
 

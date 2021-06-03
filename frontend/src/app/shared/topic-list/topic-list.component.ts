@@ -30,6 +30,7 @@ export class TopicListComponent implements OnInit, OnDestroy {
     this.route.params.
       pipe(takeUntil(this.destoryed$))
       .subscribe(params => {
+        
         this.clusterId = params.id;
         this.loadTopics(params.id);
       })

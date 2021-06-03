@@ -22,8 +22,11 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { TableModule } from 'primeng/table';
 import { AdminService } from './core/services/admin.service';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialogModule, MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
 import { AddNewComponent } from './add-new/add-new.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { SideBarComponent } from './side-bar/side-bar.component';
+import { NavComponent } from './nav/nav.component';
 
 
 
@@ -32,7 +35,9 @@ import { AddNewComponent } from './add-new/add-new.component';
     AppComponent,
     AdminLayoutComponent,
     HomeComponent,
-    AddNewComponent
+    AddNewComponent,
+    SideBarComponent,
+    NavComponent
     
     
   ],
@@ -54,11 +59,13 @@ import { AddNewComponent } from './add-new/add-new.component';
     ButtonModule,
     InputTextModule,
     TableModule,
-    MatDialogModule
+    MatDialogModule,
+    FormsModule,
+    ReactiveFormsModule
 
   ],
-  providers: [{ provide: API_BASE_URL, useValue: environment.baseURL }, AdminService],
-
+  providers: [{ provide: API_BASE_URL, useValue: environment.baseURL }, AdminService, { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: true, direction: 'ltr' } }],
+  entryComponents: [AddNewComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
