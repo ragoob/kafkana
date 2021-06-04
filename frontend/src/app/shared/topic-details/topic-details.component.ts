@@ -39,6 +39,8 @@ export class TopicDetailsComponent implements OnInit, OnDestroy {
     this.monitoringService.getTopic(topicName,clusterId)
       .then(data => {
         this.topic = data;
+      }).catch(error=> {
+        this.topic = new Topic();
       })
   }
 

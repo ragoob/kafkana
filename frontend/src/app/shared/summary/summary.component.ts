@@ -1,9 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ReplaySubject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { filter, takeUntil } from 'rxjs/operators';
 import { ClusterSummary } from '../../core/models/cluster-summary.model';
 import { KafkaMonitorService } from '../../core/services/kafka-monitor.service';
+import { LoadingService } from '../../core/services/loading.service';
 
 @Component({
   selector: 'app-summary',
@@ -14,7 +15,10 @@ export class SummaryComponent implements OnInit ,OnDestroy{
   clusterId: string = "";
   private destoryed$: ReplaySubject<any> = new ReplaySubject(1);
   public summary?: ClusterSummary
-  constructor(private monitoringService: KafkaMonitorService, private route: ActivatedRoute,private router: Router) { }
+  constructor(private monitoringService: KafkaMonitorService, 
+    private route: ActivatedRoute,private router: Router,
+    private loader: LoadingService
+    ) { }
 
   ngOnDestroy(): void {
     this.destoryed$.complete();
@@ -26,13 +30,20 @@ export class SummaryComponent implements OnInit ,OnDestroy{
     .subscribe(params=> {
       this.clusterId = params.id;
       this.loadSummary(params.id);
-    })
+    });
+
+   
   }
 
   private loadSummary(clusterId: string){
+    this.loader.change('SUMMARY_LIST', false);
     this.monitoringService.getSummary(clusterId)
     .then(data=> {
       this.summary = data;
+      this.loader.change('SUMMARY_LIST', true);
+    }).catch(error=> {
+      this.summary = undefined;
+      this.loader.change('SUMMARY_LIST', true);
     })
   }
 

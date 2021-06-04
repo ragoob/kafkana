@@ -19,14 +19,14 @@
                 *ngIf="
                   addNewForm.controls['id'].invalid &&
                   (addNewForm.controls['id'].dirty ||
-                    addNewForm.controls['id'].touched)
+                    addNewForm.controls['id'].touched) && isSubmit
                 "
                 class="alert alert-danger"
               >
                 <div  *ngIf="
               addNewForm.controls['id'].invalid &&
               (addNewForm.controls['id'].dirty ||
-                addNewForm.controls['id'].touched)
+                addNewForm.controls['id'].touched) && isSubmit
             ">
                   Name is required.
                 </div>
@@ -48,6 +48,7 @@
                   addNewForm.controls['bootStrapServers'].invalid &&
                   (addNewForm.controls['bootStrapServers'].dirty ||
                     addNewForm.controls['bootStrapServers'].touched)
+                     && isSubmit
                   
                 "
                 class="alert alert-danger"
@@ -55,7 +56,7 @@
                 <div  *ngIf="
               addNewForm.controls['bootStrapServers'].invalid &&
               (addNewForm.controls['bootStrapServers'].dirty ||
-                addNewForm.controls['bootStrapServers'].touched)
+                addNewForm.controls['bootStrapServers'].touched) && isSubmit
             ">
                   Boot-Strap Servers is required.
                 </div>

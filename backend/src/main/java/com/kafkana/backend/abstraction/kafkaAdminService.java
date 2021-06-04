@@ -11,4 +11,6 @@ public interface kafkaAdminService {
     ArrayList<brokers> getConfig(String clusterId);
     HashMap<String,String> getConfig(String clusterId, String id);
     ArrayList<brokers> getBrokers(String clusterId);
+    boolean IsHealth(String clusterIp);
+    void  deleteConsumer(String clusterIp, String id);
 }

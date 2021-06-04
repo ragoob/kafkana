@@ -6,12 +6,14 @@ import com.kafkana.backend.models.clusterSummaryModel;
 import com.kafkana.backend.models.consumerModel;
 import com.kafkana.backend.models.messageModel;
 import com.kafkana.backend.models.topicModel;
+import org.apache.kafka.clients.admin.AdminClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.ws.rs.PathParam;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -57,27 +59,20 @@ public class kafkaMonitoringController {
                                    @RequestParam(name = "start", required = false) Long  start,
                                    @RequestParam(name = "end", required = false) Long  end
                                    ){
-        final int count = (size != null? size : 200);
-        if(start == null || end == null){
-            return this.kafkaMonitorService.getMessages(name,clusterIp,count);
+        final int count = (size != null? size : 200) -1;
+        if(start == null && end == null){
+            return this.kafkaMonitorService.getLatestMessages(name,clusterIp,count);
+        }
+        else if(end == null){
+            return this.kafkaMonitorService.getMessages(name,clusterIp,count,start);
+        }
+        else if(start == null){
+            return this.kafkaMonitorService.getMessagesUntilTime(name,clusterIp,count,end);
         }
         else{
+
             return this.kafkaMonitorService.getMessages(name,clusterIp,count,start,end);
         }
 
     }
-
-    @GetMapping("/getLatestMessages/{name:.+}")
-    List<messageModel> getLatestMessages(@RequestHeader(value = "clusterIp") String clusterIp, @PathVariable(value = "name") String name,
-                                   @RequestParam(name = "size", required = false) Integer size
-
-    ){
-        final int count = (size != null? size : 200);
-
-            return this.kafkaMonitorService.getLatestMessages(name,clusterIp,count);
-
-    }
-
-
-
 }

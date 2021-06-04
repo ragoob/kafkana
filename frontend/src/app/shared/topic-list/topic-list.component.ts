@@ -2,10 +2,10 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
 import { ReplaySubject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { filter, takeUntil } from 'rxjs/operators';
 import { Topic } from '../../core/models/topic.model';
-import { KafkaAdminService } from '../../core/services/kafka-admin.service';
 import { KafkaMonitorService } from '../../core/services/kafka-monitor.service';
+import { LoadingService } from '../../core/services/loading.service';
 
 @Component({
   selector: 'app-topic-list',
@@ -20,8 +20,10 @@ export class TopicListComponent implements OnInit, OnDestroy {
   public topics: Topic[] = [];
   private destoryed$: ReplaySubject<any> = new ReplaySubject(1);
   constructor(private monitoringService: KafkaMonitorService, private confirmationService: ConfirmationService, 
-    private kafkaAdminService: KafkaAdminService, 
-    private route: ActivatedRoute, private router: Router) { }
+    private route: ActivatedRoute, private router: Router,
+    private loader: LoadingService
+    
+    ) { }
   ngOnDestroy(): void {
     this.destoryed$.complete();
   }
@@ -30,18 +32,28 @@ export class TopicListComponent implements OnInit, OnDestroy {
     this.route.params.
       pipe(takeUntil(this.destoryed$))
       .subscribe(params => {
-        
         this.clusterId = params.id;
         this.loadTopics(params.id);
+      });
+
+
+    this.loader.loaded$
+      .pipe(takeUntil(this.destoryed$),
+        filter(data => data.context === 'TOPIC_LIST')
+      ).subscribe(d => {
+        this.loaded = d.loaded;
       })
   }
 
   private loadTopics(clusterId: string) {
-    this.loaded = false;
+    this.loader.change('TOPIC_LIST', false);
     this.monitoringService.getTopics(clusterId)
       .then(data => {
         this.topics = data;
-        this.loaded = true;
+        this.loader.change('TOPIC_LIST', true);
+      }).catch(error=> {
+        this.loader.change('TOPIC_LIST', true);
+        this.topics  = [];
       })
   }
 

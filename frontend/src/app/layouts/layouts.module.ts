@@ -19,6 +19,10 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { BrokersDetailsComponent } from '../shared/brokers-details/brokers-details.component';
 import { TopicDetailsComponent } from '../shared/topic-details/topic-details.component';
 import { TopicMessagesComponent } from '../shared/topic-messages/topic-messages.component';
+import { LoadingService } from '../core/services/loading.service';
+import { CalendarModule } from 'primeng/calendar';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { FormsModule } from '@angular/forms';
 
  const AdminLayoutRoutes: Routes = [
   { path: 'dashboard/:id', component: DashboardComponent },
@@ -46,9 +50,12 @@ import { TopicMessagesComponent } from '../shared/topic-messages/topic-messages.
     InputTextModule,
     TableModule,
     ConfirmDialogModule,
-    MatTabsModule
+    MatTabsModule,
+    CalendarModule,
+    InputNumberModule,
+    FormsModule
     
   ],
-  providers: [KafkaMonitorService, KafkaAdminService, ConfirmationService]
+  providers: [KafkaMonitorService, KafkaAdminService, ConfirmationService, LoadingService]
 })
 export class LayoutsModule { }

@@ -26,7 +26,9 @@ public class kafkaAdminServiceImpl implements kafkaAdminService {
     private AdminClient getAdminClient(String clusterIp) {
         Properties config = new Properties();
         config.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, clusterIp);
-        config.put(AdminClientConfig.CLIENT_ID_CONFIG,"ADMIN_CLIENT-" + clusterIp.replace(".","-").replace(":","-"));
+        UUID uuid = UUID.randomUUID();
+        String uuidAsString = uuid.toString();
+        config.put(AdminClientConfig.CLIENT_ID_CONFIG,"ADMIN_CLIENT-" + uuidAsString);
         AdminClient admin = AdminClient.create(config);
 
         return  admin;
@@ -86,6 +88,26 @@ public class kafkaAdminServiceImpl implements kafkaAdminService {
         return nodes;
     }
 
+    @Override
+    public boolean IsHealth(String clusterIp) {
+        final AdminClient admin = getAdminClient(clusterIp);
+        try{
+          final var topics =  admin.listTopics();
+          return  topics.names().get().size() > 0;
+        } catch (Exception e) {
+            admin.close();
+            return  false;
+
+        }
+
+    }
+
+     @Override
+     public  void  deleteConsumer(String clusterIp, String id){
+         final AdminClient admin = getAdminClient(clusterIp);
+         admin.deleteConsumerGroups(Collections.singleton(id));
+         admin.close();
+     }
 
 
 

@@ -6,7 +6,7 @@
 
             </div>
             <div class="card-body">
-                <p-table #dt1  [paginator]="true" [rows]="rows"
+                <p-table #dt1  [paginator]="true" [rows]="rows" [loading]="!loaded"
                      [value]="clusters"
                     [showCurrentPageReport]="true" 
                     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
@@ -17,7 +17,9 @@
                             <th>Name</th>
                             <th>Bootstrap</th>
                            
-                            <th></th>
+                            <th>
+                                Status
+                            </th>
                             <th></th>
                         </tr>
                     </ng-template>
@@ -25,14 +27,31 @@
                         <tr>
                             <td>{{item?.id}}</td>
                             <td>{{item?.bootStrapServers}}</td>
-                           
                             <td>
-                                 <button pButton pRipple icon="pi pi-trash" (click)="delete(item?.id)" class="p-button-rounded p-button-warning"
-                              ></button>
+                              <span style="cursor: pointer;" (click)="refreshStatus(item?.id)" [ngSwitch]="item?.status">
+                                         
+                                     <i *ngSwitchCase="'HEALTHY'" style="font-size:30px;" class="nc-icon nc-satisfied  text-success"></i> 
+                                
+            
+                              <i  *ngSwitchCase="'UNHEALTHY'" style="font-size:30px;" class="far fa-angry  text-danger"></i> 
+                               
+                                
+                                 <i *ngSwitchDefault style="font-size:30px;" class="nc-icon nc-alert-circle-i  text-warning"></i> 
+                              
+                              </span> 
+                                
+                               
+
                             </td>
+                            
                             <td>
-                           
-                            <a (click)="dashboard(item?.id)"  style="cursor: pointer;" class="link-primary" routerLinkActive="router-link-active" >Dashboard</a>
+                            <button  (click)="delete(item?.id)" class="btn btn-warning"
+                              >
+                               <i class="fa fa-trash"></i>
+                            </button>
+                            <button [disabled]="item?.status !== 'HEALTHY'" (click)="dashboard(item?.id)"  style="cursor: pointer;" class="btn btn-primary" routerLinkActive="router-link-active" >
+                            <i class="fas fa-chart-line"></i>
+                            </button>
                             </td>
                         </tr>
                     </ng-template>

@@ -11,6 +11,7 @@ import { ThrowStmt } from '@angular/compiler';
 })
 export class AddNewComponent  implements OnInit{
   public addNewForm: FormGroup;
+  public isSubmit: boolean =false;
   constructor(
     public dialogRef: MatDialogRef<AddNewComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -31,6 +32,7 @@ export class AddNewComponent  implements OnInit{
   }
 
   close(): void {
+    this.isSubmit = false;
     Object.keys(this.addNewForm.controls).forEach(key => {
       this.addNewForm.get(key)?.markAsUntouched();
     });
@@ -38,6 +40,7 @@ export class AddNewComponent  implements OnInit{
   }
 
   save(): void{
+    this.isSubmit = true;
     Object.keys(this.addNewForm.controls).forEach(key => {
       this.addNewForm.get(key)?.markAsDirty();
     });

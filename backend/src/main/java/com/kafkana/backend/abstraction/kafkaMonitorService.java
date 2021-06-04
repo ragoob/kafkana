@@ -14,4 +14,6 @@ public interface kafkaMonitorService {
     List<messageModel> getMessages(String topic, String clusterId, int size);
     List<messageModel> getMessages(String topic,String clusterId,int size,long start, long end);
     List<messageModel> getLatestMessages(String topic,String clusterId,int size);
+    List<messageModel> getMessages(String topic,String clusterIp,int size,long start);
+    List<messageModel> getMessagesUntilTime(String topic,String clusterIp,int size,long end);
 }

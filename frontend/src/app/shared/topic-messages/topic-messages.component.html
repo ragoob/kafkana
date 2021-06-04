@@ -1,7 +1,35 @@
-    <label>Message Count : 
-        <input type="number" #countInput class="form-control"  (change)="filterBySize(countInput.value)"/>
-    </label>
-    <p-table [value]="messages" dataKey="key"  [loading]="!loaded"  [paginator]="true" [rows]="20" [showCurrentPageReport]="true" >
+    <div class="card" style="background-color: #f8f9fa !important;">
+          <div class="card-body">
+              <div class="row">
+                  <div class="col-lg-3">
+                  <label>From:   <p-calendar [showTime]="true" hourFormat="12" [(ngModel)]="from"></p-calendar></label>
+
+                  </div>
+
+                   <div class="col-lg-3">
+                   <label>To:  <p-calendar [showTime]="true" hourFormat="12" [(ngModel)]="to"></p-calendar></label>
+
+                  </div>
+
+                  <div class="col-lg-3">
+                      <label>Count: <p-inputNumber [(ngModel)]="count"></p-inputNumber></label>
+                  </div>
+                  <div class="col-lg-2">
+                      <button style="margin-top: 0px;" type="button" class="btn btn-default" (click)="search()">
+                          <i class="fas fa-search"></i>
+                      </button>
+                  </div>
+              </div>
+          </div>
+    </div>
+    <p-table #dt [value]="messages" dataKey="key"  [loading]="!loaded"  [paginator]="true" [rows]="20" [showCurrentPageReport]="true" >
+        <ng-template pTemplate="caption">
+        <div class="p-d-flex">
+         <button type="button" pButton pRipple icon="pi pi-file-excel" (click)="exportExcel()" class="p-button-success p-mr-2"  pTooltip="XLS" tooltipPosition="bottom"></button>
+
+            
+        </div>
+    </ng-template>
         <ng-template pTemplate="header">
             <tr>
                 <th></th>

@@ -38,5 +38,15 @@ public class kafkaAdminController {
         return  this.kafkaAdminService.getBrokers(clusterIp);
     }
 
+    @GetMapping("/health-check")
+    boolean healthCheck(@RequestHeader(value = "clusterIp") String clusterIp){
+        return this.kafkaAdminService.IsHealth(clusterIp);
+    }
+
+    @DeleteMapping()
+    @ResponseStatus(HttpStatus.CREATED)
+    void  deleteConsumer(@RequestHeader(value = "clusterIp") String clusterIp,@PathVariable(value = "id") String id ) {
+        this.kafkaAdminService.deleteConsumer(clusterIp,id);
+    }
 
 }

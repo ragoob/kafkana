@@ -1,11 +1,11 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
 import { API_BASE_URL } from "../constants";
 import { KafkaCluster } from "../models/kafka-cluster.model";
 
 @Injectable()
 export class AdminService{
-    constructor(){
+    constructor(private http: HttpClient, @Inject(API_BASE_URL) private baseUrl?: string){
     }
 
     getAll(): Promise<KafkaCluster[]>{
@@ -28,6 +28,18 @@ export class AdminService{
         })
     }
 
+    update(model: KafkaCluster): Promise<void> {
+        return new Promise((resolve, reject) => {
+            const list = JSON.parse(localStorage.getItem("CLUSTER_LIST") ?? "[]") as KafkaCluster[];
+             list.forEach(d=>{
+                 if(d.id === model.id){
+                     Object.assign(d,model);
+                 }
+             })
+            resolve(localStorage.setItem("CLUSTER_LIST", JSON.stringify(list)));
+        })
+    }
+
     delete(id: string): Promise<void> {
        return new Promise((resolve,reject)=>{
            const list = JSON.parse(localStorage.getItem("CLUSTER_LIST") ?? "[]") as KafkaCluster[];
@@ -44,6 +56,19 @@ export class AdminService{
 
     setCurrent(id?: string){
         localStorage.setItem("CURRENT_CLUSTER",id?? "");
+    }
+
+    healthCheck(clusterId: string): Promise<boolean> {
+        return this.http.get<boolean>(`${this.baseUrl}/kafkaAdmin/health-check`
+            , this.header(clusterId)
+        ).toPromise();
+    }
+
+    private header(clusterId: string): {} {
+        const cluster = this.findByid(clusterId);
+        const headers = new HttpHeaders({ 'clusterIp': cluster.bootStrapServers });
+        const options = { headers: headers };
+        return options;
     }
 
 
