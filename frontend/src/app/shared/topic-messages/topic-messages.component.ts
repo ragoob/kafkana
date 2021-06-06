@@ -84,6 +84,7 @@ export class TopicMessagesComponent implements OnInit {
     this.monitoringService.getMessages(this.topic?.name ?? "", this.clusterId, this.count, start,end)
       .then(data => {
         this.messages = data;
+        alert(this.messages.length)
         this.flattenMessageObject();
         this.populateColumns();
         this.populateFilters();

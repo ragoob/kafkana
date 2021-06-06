@@ -125,7 +125,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
             kafkaConsumer.assign(Collections.singleton(partition)); // must assign before seeking
             kafkaConsumer.seek(partition, beginningOffset);
             long startTime = System.currentTimeMillis();
-            while ( messages.size() < size && (System.currentTimeMillis()-startTime)<5000){
+            while ( messages.size() < size && (System.currentTimeMillis()-startTime)<1000){
                 for (ConsumerRecord<String, String> record : kafkaConsumer.poll(Duration.ofMillis(200))) {
 
                     if(record.timestamp() >= start  && record.timestamp() <= end && messages.size() < size){
@@ -157,7 +157,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
             kafkaConsumer.assign(Collections.singleton(partition)); // must assign before seeking
             kafkaConsumer.seek(partition, beginningOffset);
             long startTime = System.currentTimeMillis();
-            while ((System.currentTimeMillis()-startTime)<5000){
+            while ((System.currentTimeMillis()-startTime)<1000){
                 for (ConsumerRecord<String, String> record : kafkaConsumer.poll(Duration.ofMillis(200))) {
                     if(messages.size() < size){
                         messages.add(new messageModel(record.partition(),record.offset(),record.value(),record.key(),
@@ -186,7 +186,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
             kafkaConsumer.seekToBeginning(Collections.singleton(partition));
 
             long startTime = System.currentTimeMillis();
-            while (messages.size() < size && (System.currentTimeMillis()-startTime)<5000){
+            while (messages.size() < size && (System.currentTimeMillis()-startTime)<1000){
                 for (ConsumerRecord<String, String> record : kafkaConsumer.poll(Duration.ofMillis(200))) {
 
                     if(record.timestamp() <= end && messages.size() < size){
@@ -242,7 +242,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
                    = partitions.stream().collect(Collectors.toMap(p -> p , p -> new ArrayList<>(count)));
 
            long startTime = System.currentTimeMillis();
-           while ((System.currentTimeMillis()-startTime)<5000) {
+           while ((System.currentTimeMillis()-startTime)<1000) {
                final var polled = kafkaConsumer.poll(Duration.ofMillis(200));
                for (var partition : polled.partitions()) {
                    var records = polled.records(partition);
