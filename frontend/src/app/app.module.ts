@@ -27,6 +27,7 @@ import { AddNewComponent } from './add-new/add-new.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SideBarComponent } from './side-bar/side-bar.component';
 import { NavComponent } from './nav/nav.component';
+import { PayloadFilterComponent } from './payload-filter/payload-filter.component';
 
 
 
@@ -37,7 +38,8 @@ import { NavComponent } from './nav/nav.component';
     HomeComponent,
     AddNewComponent,
     SideBarComponent,
-    NavComponent
+    NavComponent,
+    PayloadFilterComponent
     
     
   ],
@@ -65,7 +67,7 @@ import { NavComponent } from './nav/nav.component';
 
   ],
   providers: [{ provide: API_BASE_URL, useValue: environment.baseURL }, AdminService, { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: true, direction: 'ltr' } }],
-  entryComponents: [AddNewComponent],
+  entryComponents: [AddNewComponent, PayloadFilterComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

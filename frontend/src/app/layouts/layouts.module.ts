@@ -23,6 +23,8 @@ import { LoadingService } from '../core/services/loading.service';
 import { CalendarModule } from 'primeng/calendar';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { FormsModule } from '@angular/forms';
+import { PayloadFilterComponent } from '../payload-filter/payload-filter.component';
+import { MatDialogModule } from '@angular/material/dialog';
 
  const AdminLayoutRoutes: Routes = [
   { path: 'dashboard/:id', component: DashboardComponent },
@@ -53,9 +55,11 @@ import { FormsModule } from '@angular/forms';
     MatTabsModule,
     CalendarModule,
     InputNumberModule,
-    FormsModule
+    FormsModule,
+    MatDialogModule
     
   ],
+  entryComponents: [PayloadFilterComponent],
   providers: [KafkaMonitorService, KafkaAdminService, ConfirmationService, LoadingService]
 })
 export class LayoutsModule { }

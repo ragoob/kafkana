@@ -278,3 +278,87 @@ animation-duration: 3s;
 .sidebar .nav-link.active {
   color: #6bd098 !important;
 }
+
+
+
+.kt-mat-dialog-container__wrapper .mat-dialog-container .kt-portlet .kt-portlet__body{
+    max-height: 100% !important;
+    overflow: visible !important;
+}
+
+.kt-mat-dialog-container__wrapper {
+	.mat-dialog-container {
+	   	padding: 0;
+	   	overflow-x: hidden;
+
+	   	.kt-portlet {
+	       	margin-bottom: 0;
+	    	
+	       	.kt-portlet__body {
+	       		overflow: auto;
+	       		max-height: 60vh;
+	       	}
+	   	}
+	}
+}
+
+.kt-mat-dialog-container__wrapper .mat-dialog-container {
+	padding: 0;
+	overflow-x: hidden;
+
+	.kt-portlet {
+		margin-bottom: 0;
+	}
+
+	.alert {
+		border-radius: 0 !important;
+		width: 1032px;
+	}
+}
+
+
+
+.cdk-overlay-container {
+    position: fixed;
+    z-index: 1000;
+}
+.cdk-global-overlay-wrapper, .cdk-overlay-container {
+    //pointer-events: none;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.cdk-global-overlay-wrapper {
+    display: -webkit-box;
+    display: flex;
+    position: absolute;
+    z-index: 1000;
+}
+
+.cdk-overlay-backdrop {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    pointer-events: auto;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-transition: opacity .4s cubic-bezier(.25,.8,.25,1);
+    transition: opacity .4s cubic-bezier(.25,.8,.25,1);
+    opacity: 0;
+}
+
+.cdk-overlay-backdrop.cdk-overlay-backdrop-showing {
+    opacity: 1;
+}
+
+.cdk-overlay-dark-backdrop {
+    background: rgba(0,0,0,.32);
+}
+
+.cdk-overlay-container:empty{
+  display: none;
+}

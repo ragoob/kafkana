@@ -12,9 +12,13 @@
                   </div>
 
                   <div class="col-lg-3">
-                      <label>Count: <p-inputNumber [(ngModel)]="count"></p-inputNumber></label>
+                      <label>Count: <p-inputNumber placeholder="Default value 200" aria-placeholder="Default value 200" [(ngModel)]="count"></p-inputNumber></label>
+                     
                   </div>
                   <div class="col-lg-2">
+                       <button  style="margin-top: 0px;" [disabled]="messages.length === 0" type="button"  class="btn btn-link" (click)="moreFilters()">
+                      More filters
+                    </button>
                       <button style="margin-top: 0px;" type="button" class="btn btn-default" (click)="search()">
                           <i class="fas fa-search"></i>
                       </button>

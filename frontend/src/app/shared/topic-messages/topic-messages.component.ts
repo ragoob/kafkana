@@ -4,6 +4,8 @@ import { Message } from '../../core/models/message.model';
 import { Topic } from '../../core/models/topic.model';
 import { KafkaMonitorService } from '../../core/services/kafka-monitor.service';
 import * as FileSaver from 'file-saver';
+import { MatDialog } from '@angular/material/dialog';
+import { PayloadFilterComponent } from '../../payload-filter/payload-filter.component';
 @Component({
   selector: 'app-topic-messages',
   templateUrl: './topic-messages.component.html',
@@ -19,7 +21,9 @@ export class TopicMessagesComponent implements OnInit {
   public from?: Date;
   public to?: Date;
   public count?: number;
-  constructor(private monitoringService: KafkaMonitorService) { }
+  public Filters: string[] = [];
+  public filterModel: any = {};
+  constructor(private monitoringService: KafkaMonitorService, public dialog: MatDialog) { }
 
 
 
@@ -73,9 +77,41 @@ export class TopicMessagesComponent implements OnInit {
     this.monitoringService.getMessages(this.topic?.name ?? "", this.clusterId, this.count, start,end)
       .then(data => {
         this.messages = data;
+        if(this.filterModel){
+          Object.keys(this.filterModel)
+          .forEach(key=> {
+            if(key && this.filterModel[key]){
+              this.messages = this.messages.filter(d=> d.fromatedMessage &&  d.fromatedMessage[key] == this.filterModel[key]);
+            }
+          })
+        }
         this.loaded = true;
       })
    
   }
 
+  public moreFilters(){
+    if(this.messages.length > 0){
+      const item = this.messages[0].fromatedMessage;
+      if(item){
+        this.Filters = Object.keys(item);
+
+        const dialogRef = this.dialog.open(PayloadFilterComponent, {
+          disableClose: true,
+          data: { filters: this.Filters,topic: this.topic?.name, filterModel: this.filterModel },
+          width: '60%',
+          panelClass: 'kt-mat-dialog-container__wrapper'
+        });
+        dialogRef.afterClosed().subscribe(res => {
+          if (!res) {
+            return;
+          }
+          else{
+            this.filterModel = res;
+          }
+       
+      });
+    }
+  }
+  }
 }

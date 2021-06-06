@@ -35,10 +35,7 @@ export class HomeComponent implements OnInit {
   public addNewCluster(): void{
     const dialogRef = this.dialog.open(AddNewComponent, {
       width: '50%',
-      position: {
-        top: '0px',
-        left: '0px'
-      },
+      panelClass: 'kt-mat-dialog-container__wrapper',
       data: {}
     });
 
