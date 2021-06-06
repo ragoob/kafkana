@@ -16,7 +16,7 @@
                      
                   </div>
                   <div class="col-lg-2">
-                       <button  style="margin-top: 0px;" [disabled]="messages.length === 0" type="button"  class="btn btn-link" (click)="moreFilters()">
+                       <button  style="margin-top: 0px;" [disabled]="messages.length === 0 && Filters.length === 0" type="button"  class="btn btn-link" (click)="moreFilters()">
                       More filters
                     </button>
                       <button style="margin-top: 0px;" type="button" class="btn btn-default" (click)="search()">
