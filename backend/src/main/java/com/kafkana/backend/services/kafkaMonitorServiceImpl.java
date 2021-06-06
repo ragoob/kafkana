@@ -241,16 +241,13 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
            final Map<TopicPartition, List<ConsumerRecord<String, String>>> rawRecords
                    = partitions.stream().collect(Collectors.toMap(p -> p , p -> new ArrayList<>(count)));
 
-           var moreRecords = true;
            long startTime = System.currentTimeMillis();
-           while (moreRecords &&   (System.currentTimeMillis()-startTime)<5000) {
+           while ((System.currentTimeMillis()-startTime)<5000) {
                final var polled = kafkaConsumer.poll(Duration.ofMillis(200));
-               moreRecords = false;
                for (var partition : polled.partitions()) {
                    var records = polled.records(partition);
                    if (!records.isEmpty()) {
                        rawRecords.get(partition).addAll(records);
-                      moreRecords = records.get(records.size() - 1).offset() < latestOffsets.get(partition) - 1;
                    }
                }
            }
