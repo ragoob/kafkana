@@ -21,8 +21,11 @@ export class TopicMessagesComponent implements OnInit {
   public from?: Date;
   public to?: Date;
   public count?: number;
-  public Filters: string[] = [];
+  public filters: string[] = [];
   public filterModel: any = {};
+  public selectedColumns: any[] = [];
+  public columns: any[] = [];
+  public allowDetails: boolean = false;
   constructor(private monitoringService: KafkaMonitorService, public dialog: MatDialog) { }
 
 
@@ -32,19 +35,23 @@ export class TopicMessagesComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadmessages(this.topic?.name ?? "", this.clusterId);
-  }
-
-  private loadmessages(topicName: string, clusterId: string) {
-    this.loaded = false;
-    this.monitoringService.getMessages(topicName, clusterId)
-      .then(data => {
-        this.messages = data;
-        this.loaded = true;
-      })
+    const defaultSelectedColumns = [
+      'timestamp',
+      'partition',
+      'offset',
+      'key'
+    ];
+    this.selectedColumns = localStorage.getItem(`Selected_Columns_${this.topic?.name}`) != null 
+      && (JSON.parse(localStorage.getItem(`Selected_Columns_${this.topic?.name}`) ?? "[]") as any[]).length > 0 ?
+      JSON.parse(localStorage.getItem(`Selected_Columns_${this.topic?.name}`) ?? "[]") as any [] : 
+      defaultSelectedColumns;
+    this.search();
   }
 
  
+  public changeSelectionColumns(event: any){
+    localStorage.setItem(`Selected_Columns_${this.topic?.name}`,JSON.stringify(this.selectedColumns));
+  }
   public exportExcel() {
     const msgs = this.messages
       .filter(msg => msg.message && msg.fromatedMessage)
@@ -77,17 +84,56 @@ export class TopicMessagesComponent implements OnInit {
     this.monitoringService.getMessages(this.topic?.name ?? "", this.clusterId, this.count, start,end)
       .then(data => {
         this.messages = data;
-        if(this.filterModel){
-          Object.keys(this.filterModel)
-          .forEach(key=> {
-            if(key && this.filterModel[key]){
-              this.messages = this.messages.filter(d=> d.fromatedMessage &&  d.fromatedMessage[key] == this.filterModel[key]);
-            }
-          })
-        }
+        this.flattenMessageObject();
+        this.populateColumns();
+        this.populateFilters();
+
         this.loaded = true;
       })
    
+  }
+
+  private populateFilters(){
+    if (this.filterModel) {
+      Object.keys(this.filterModel)
+        .forEach(key => {
+          if (key && this.filterModel[key]) {
+            this.messages = this.messages.filter(d => d.fromatedMessage && d.fromatedMessage[key] == this.filterModel[key]);
+          }
+        })
+    };
+
+  }
+
+  private flattenMessageObject(){
+    this.messages.forEach(msg=> {
+      if(msg.fromatedMessage){
+        Object.keys(msg.fromatedMessage)
+        .forEach(key=> {
+         (msg as any)[key] = msg.fromatedMessage[key];
+        })
+      }
+    })
+  }
+
+  populateColumns(){
+    this.messages.forEach(msg=> {
+      if(msg){
+        Object.keys(msg).forEach(key=> {
+          if (this.columns.findIndex(res => res == key) == -1) {
+            if (key === 'fromatedMessage' && msg.fromatedMessage){
+               Object.keys(msg.fromatedMessage)
+               .forEach(msgKey=> {
+                 this.columns.push(msgKey);
+               })
+            }
+            else{
+              this.columns.push(key);
+            }
+          }
+        })
+      }
+    })
   }
 
   public moreFilters(){
@@ -96,16 +142,16 @@ export class TopicMessagesComponent implements OnInit {
         if(msg.fromatedMessage){
           Object.keys(msg.fromatedMessage)
           .forEach(key=> {
-            if (this.Filters.findIndex(res => res == key) == -1){
-              this.Filters.push(key);
+            if (this.filters.findIndex(res => res == key) == -1){
+              this.filters.push(key);
             }
           })
         }
       })
-      if (this.Filters.length > 0){
+      if (this.filters.length > 0){
         const dialogRef = this.dialog.open(PayloadFilterComponent, {
           disableClose: true,
-          data: { filters: this.Filters,topic: this.topic?.name, filterModel: this.filterModel },
+          data: { filters: this.filters,topic: this.topic?.name, filterModel: this.filterModel },
           width: '60%',
           panelClass: 'kt-mat-dialog-container__wrapper'
         });

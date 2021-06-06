@@ -16,7 +16,7 @@
                      
                   </div>
                   <div class="col-lg-2">
-                       <button  style="margin-top: 0px;" [disabled]="messages.length === 0 && Filters.length === 0" type="button"  class="btn btn-link" (click)="moreFilters()">
+                       <button  style="margin-top: 0px;" [disabled]="messages.length === 0 && filters.length === 0" type="button"  class="btn btn-link" (click)="moreFilters()">
                       More filters
                     </button>
                       <button style="margin-top: 0px;" type="button" class="btn btn-default" (click)="search()">
@@ -24,9 +24,26 @@
                       </button>
                   </div>
               </div>
+              <div class="row">
+                  <div class="col-lg-5">
+                      <label>Selected Columns: 
+                        
+
+                      </label>
+
+                        <p-multiSelect [options]="columns" (onChange)="changeSelectionColumns($event)"  [virtualScroll]="true" [itemSize]="30" [style]="{'width':'100%'}" [(ngModel)]="selectedColumns"></p-multiSelect>
+                  </div>
+                  <div class="col-lg-2">
+                       <label style="margin-top:30px">Show Details:
+                        <p-checkbox [(ngModel)]="allowDetails" [binary]="true" inputId="binary"></p-checkbox>
+                      </label>
+                     
+
+                  </div>
+              </div>
           </div>
     </div>
-    <p-table #dt [value]="messages" dataKey="key"  [loading]="!loaded"  [paginator]="true" [rows]="20" [showCurrentPageReport]="true" >
+    <p-table #dt [value]="messages" dataKey="timestamp"  [loading]="!loaded"  [paginator]="true" [rows]="20" [showCurrentPageReport]="true" >
         <ng-template pTemplate="caption">
         <div class="p-d-flex">
          <button type="button" pButton pRipple icon="pi pi-file-excel" (click)="exportExcel()" class="p-button-success p-mr-2"  pTooltip="XLS" tooltipPosition="bottom"></button>
@@ -36,38 +53,32 @@
     </ng-template>
         <ng-template pTemplate="header">
             <tr>
-                <th></th>
-                <th>
-                    Key
-                </th>
-                <th>partition</th>
-                <th>
-                    offset
-                </th>
-                <th>
-                    timestamp
+                <th *ngIf="allowDetails"></th>
+                
+               <th *ngFor="let item of selectedColumns">
+                     {{item}}
                 </th>
                 
+            
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-message let-expanded="expanded">
             <tr>
-                <td>
+                <td *ngIf="allowDetails">
                     <button type="button" pButton pRipple [pRowToggler]="message"
                         class="p-button-text p-button-rounded p-button-plain"
                         [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
                 </td>
-                <td>{{message?.key}}</td>
-                <td>
-                    {{message?.partition}}
+
+                <td *ngFor="let item of selectedColumns">
+                   {{message[item]}}
                 </td>
-                <td>{{message?.offset}}</td>
-                <td>{{message?.timestamp | date :'dd-MMM-yy h:mm:ss'}}</td>
-              
+                
+            
                 
             </tr>
         </ng-template>
-        <ng-template pTemplate="rowexpansion" let-message>
+        <ng-template  pTemplate="rowexpansion" let-message>
             <tr>
                 <td colspan="7">
                     <div class="p-p-3" *ngIf="message?.fromatedMessage">

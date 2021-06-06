@@ -11,7 +11,6 @@ public interface kafkaMonitorService {
     List<topicModel> getTopics(String clusterId);
     Optional<topicModel> getTopic(String topic, String clusterId);
     List<consumerModel> getConsumers(Collection<topicModel> topicModels, String clusterId);
-    List<messageModel> getMessages(String topic, String clusterId, int size);
     List<messageModel> getMessages(String topic,String clusterId,int size,long start, long end);
     List<messageModel> getLatestMessages(String topic,String clusterId,int size);
     List<messageModel> getMessages(String topic,String clusterIp,int size,long start);

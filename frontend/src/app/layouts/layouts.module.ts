@@ -25,6 +25,8 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { FormsModule } from '@angular/forms';
 import { PayloadFilterComponent } from '../payload-filter/payload-filter.component';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { CheckboxModule } from 'primeng/checkbox';
 
  const AdminLayoutRoutes: Routes = [
   { path: 'dashboard/:id', component: DashboardComponent },
@@ -56,7 +58,9 @@ import { MatDialogModule } from '@angular/material/dialog';
     CalendarModule,
     InputNumberModule,
     FormsModule,
-    MatDialogModule
+    MatDialogModule,
+    MultiSelectModule,
+    CheckboxModule
     
   ],
   entryComponents: [PayloadFilterComponent],
