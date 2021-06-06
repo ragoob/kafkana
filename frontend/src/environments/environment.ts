@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  baseURL: "http://gapi-dev.aptar.mobi/api",
+  baseURL: "",
   hideMenu: true
 };
 
