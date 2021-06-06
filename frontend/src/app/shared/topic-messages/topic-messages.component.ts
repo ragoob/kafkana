@@ -92,10 +92,17 @@ export class TopicMessagesComponent implements OnInit {
 
   public moreFilters(){
     if(this.messages.length > 0){
-      const item = this.messages[0].fromatedMessage;
-      if(item){
-        this.Filters = Object.keys(item);
-
+      this.messages.forEach(msg=> {
+        if(msg.fromatedMessage){
+          Object.keys(msg.fromatedMessage)
+          .forEach(key=> {
+            if (this.Filters.findIndex(res => res == key) == -1){
+              this.Filters.push(key);
+            }
+          })
+        }
+      })
+      if (this.Filters.length > 0){
         const dialogRef = this.dialog.open(PayloadFilterComponent, {
           disableClose: true,
           data: { filters: this.Filters,topic: this.topic?.name, filterModel: this.filterModel },
