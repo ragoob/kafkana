@@ -59,7 +59,7 @@ public class kafkaMonitoringController {
                                    @RequestParam(name = "start", required = false) Long  start,
                                    @RequestParam(name = "end", required = false) Long  end
                                    ){
-        final int count = (size != null? size : 200) -1;
+        final int count = (size != null? size : 200);
         if(start == null && end == null){
             return this.kafkaMonitorService.getLatestMessages(name,clusterIp,count);
         }

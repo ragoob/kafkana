@@ -118,14 +118,15 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         try{
             kafkaConsumer.assign(Collections.singleton(partition));
             kafkaConsumer.seekToBeginning(Collections.singleton(partition));
-            while (messages.size() < size){
+            long startTime = System.currentTimeMillis();
+            while (messages.size() < size && (System.currentTimeMillis()-startTime)<5000){
                 for (ConsumerRecord<String, String> record : kafkaConsumer.poll(Duration.ofMillis(200))) {
-                    if (messages.size() >= size) {
-                        break;
-                    }
-                    messages.add(new messageModel(record.partition(),record.offset(),record.value(),record.key(),
-                            headersToMap(record.headers())
-                            ,new Date(record.timestamp())));
+                   if(messages.size() < size){
+                       messages.add(new messageModel(record.partition(),record.offset(),record.value(),record.key(),
+                               headersToMap(record.headers())
+                               ,new Date(record.timestamp())));
+                   }
+
 
                 }
             }
@@ -152,10 +153,10 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
             kafkaConsumer.assign(Collections.singleton(partition)); // must assign before seeking
             kafkaConsumer.seek(partition, beginningOffset);
             long startTime = System.currentTimeMillis();
-            while ( messages.size() < size && (System.currentTimeMillis()-startTime)<10000){
+            while ( messages.size() < size && (System.currentTimeMillis()-startTime)<5000){
                 for (ConsumerRecord<String, String> record : kafkaConsumer.poll(Duration.ofMillis(200))) {
 
-                    if(record.timestamp() >= start  && record.timestamp() <= end){
+                    if(record.timestamp() >= start  && record.timestamp() <= end && messages.size() < size){
                         messages.add(new messageModel(record.partition(),record.offset(),record.value(),record.key(),
                                 headersToMap(record.headers())
                                 ,new Date(record.timestamp())));
@@ -184,11 +185,14 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
             kafkaConsumer.assign(Collections.singleton(partition)); // must assign before seeking
             kafkaConsumer.seek(partition, beginningOffset);
             long startTime = System.currentTimeMillis();
-            while ( messages.size() < size && (System.currentTimeMillis()-startTime)<10000){
+            while ((System.currentTimeMillis()-startTime)<5000){
                 for (ConsumerRecord<String, String> record : kafkaConsumer.poll(Duration.ofMillis(200))) {
-                    messages.add(new messageModel(record.partition(),record.offset(),record.value(),record.key(),
-                            headersToMap(record.headers())
-                            ,new Date(record.timestamp())));
+                    if(messages.size() < size){
+                        messages.add(new messageModel(record.partition(),record.offset(),record.value(),record.key(),
+                                headersToMap(record.headers())
+                                ,new Date(record.timestamp())));
+                    }
+
 
                 }
             }
@@ -210,10 +214,10 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
             kafkaConsumer.seekToBeginning(Collections.singleton(partition));
 
             long startTime = System.currentTimeMillis();
-            while (messages.size() < size && (System.currentTimeMillis()-startTime)<10000){
+            while (messages.size() < size && (System.currentTimeMillis()-startTime)<5000){
                 for (ConsumerRecord<String, String> record : kafkaConsumer.poll(Duration.ofMillis(200))) {
 
-                    if(record.timestamp() <= end){
+                    if(record.timestamp() <= end && messages.size() < size){
                         messages.add(new messageModel(record.partition(),record.offset(),record.value(),record.key(),
                                 headersToMap(record.headers())
                                 ,new Date(record.timestamp())));
@@ -234,9 +238,12 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         List<messageModel> messages = new ArrayList<>();
        final  var records = getLatestRecords(topic,size,clusterIp);
        for(ConsumerRecord<String, String> record : records){
-           messages.add(new messageModel(record.partition(),record.offset(),record.value(),record.key(),
-                   headersToMap(record.headers())
-                   ,new Date(record.timestamp())));
+           if(messages.size()< size){
+               messages.add(new messageModel(record.partition(),record.offset(),record.value(),record.key(),
+                       headersToMap(record.headers())
+                       ,new Date(record.timestamp())));
+           }
+
        }
        return  messages;
     }
@@ -264,7 +271,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
 
            var moreRecords = true;
            long startTime = System.currentTimeMillis();
-           while (moreRecords &&   (System.currentTimeMillis()-startTime)<10000) {
+           while (moreRecords &&   (System.currentTimeMillis()-startTime)<5000) {
                final var polled = kafkaConsumer.poll(Duration.ofMillis(200));
                moreRecords = false;
                for (var partition : polled.partitions()) {
