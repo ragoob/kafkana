@@ -57,18 +57,19 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
                 })
                 .orElseGet(clusterSummaryModel::new);
         topicSummary.setTopicCount(topics.size());
-        topicSummary.setPreferredReplicaPercent(topics.isEmpty() ? 0 : topicSummary.getPreferredReplicaPercent() / topics.size());
+        topicSummary.setPreferredReplicaPercent(topics.isEmpty() ? 0
+                : topicSummary.getPreferredReplicaPercent() / topics.size());
         topicSummary.setBrokerCount(topicSummary.getExpectedBrokerIds().size());
         topicSummary.setTimeStamp(new Date());
         return topicSummary;
     }
     @Override
-    public List<topicModel> getTopics(String clusterIp) {
+    public List<topicModel> getTopics(String clusterIp, boolean showDefaultConfig) {
         final  var kafkaConsumer= createConsumer(clusterIp);
         final  var admin = getAdminClient(clusterIp);
         try{
 
-            final var topics = getTopicMetadata(kafkaConsumer,admin).values().stream()
+            final var topics = getTopicMetadata(kafkaConsumer,admin,showDefaultConfig).values().stream()
                     .sorted(Comparator.comparing(topicModel::getName))
                     .collect(Collectors.toList());
             kafkaConsumer.close();
@@ -81,12 +82,12 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         }
     }
     @Override
-    public Optional<topicModel> getTopic(String topic,String clusterIp) {
+    public Optional<topicModel> getTopic(String topic,String clusterIp,boolean showDefaultConfig) {
         final  var kafkaConsumer= createConsumer(clusterIp);
         final  var admin = getAdminClient(clusterIp);
         
         try{
-            final var topicModel = Optional.ofNullable(getTopicMetadata(kafkaConsumer,admin).get(topic));
+            final var topicModel = Optional.ofNullable(getTopicMetadata(kafkaConsumer,admin,showDefaultConfig).get(topic));
             topicModel.ifPresent(model -> model.setPartitions(getTopicPartitionSizes(model,kafkaConsumer)));
             kafkaConsumer.close();
             admin.close();
@@ -213,7 +214,6 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
                        headersToMap(record.headers())
                        ,new Date(record.timestamp())));
            }
-
        }
        return  messages;
     }
@@ -267,7 +267,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
        }
     }
 
-    private Map<String, topicModel> getTopicMetadata( Consumer<String,String> consumer,AdminClient adminClient,String... topics) {
+    private Map<String, topicModel> getTopicMetadata( Consumer<String,String> consumer,AdminClient adminClient,boolean showDefaultConfig,String... topics) {
         final var topicsMap = getTopicInformation(topics,consumer);
         final var retrievedTopicNames = topicsMap.keySet();
         Map<String, Config> topicConfigs = new HashMap<>();
@@ -282,8 +282,8 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
             if (config != null) {
                 final var configMap = new TreeMap<String, String>();
                 for (var configEntry : config.entries()) {
-                    if (configEntry.source() != ConfigEntry.ConfigSource.DEFAULT_CONFIG &&
-                            configEntry.source() != ConfigEntry.ConfigSource.STATIC_BROKER_CONFIG) {
+                    if ((configEntry.source() != ConfigEntry.ConfigSource.DEFAULT_CONFIG &&
+                            configEntry.source() != ConfigEntry.ConfigSource.STATIC_BROKER_CONFIG) || showDefaultConfig) {
                         configMap.put(configEntry.name(), configEntry.value());
                     }
                 }

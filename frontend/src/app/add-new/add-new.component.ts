@@ -9,7 +9,7 @@ import { ThrowStmt } from '@angular/compiler';
   templateUrl: './add-new.component.html',
   styleUrls: ['./add-new.component.scss']
 })
-export class AddNewComponent  implements OnInit{
+export class AddNewComponent {
   public addNewForm: FormGroup;
   public isSubmit: boolean =false;
   constructor(
@@ -24,19 +24,16 @@ export class AddNewComponent  implements OnInit{
       id: ['', Validators.required],
       bootStrapServers: ['', Validators.required]
     });
-    }
-  ngOnInit(): void {
-   
-
     
-  }
+    }
+  
 
   close(): void {
     this.isSubmit = false;
     Object.keys(this.addNewForm.controls).forEach(key => {
       this.addNewForm.get(key)?.markAsUntouched();
     });
-    this.dialogRef.close();
+    this.dialogRef.close({ clusterId: this.addNewForm.controls["id"].value});
   }
 
   save(): void{

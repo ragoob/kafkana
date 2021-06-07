@@ -31,25 +31,25 @@ public class kafkaMonitoringController {
 
     @GetMapping("/summary")
     clusterSummaryModel getClusterSummary(@RequestHeader("clusterIp") String clusterIp) throws InterruptedException {
-        final  var topics = this.kafkaMonitorService.getTopics(clusterIp);
+        final  var topics = this.kafkaMonitorService.getTopics(clusterIp,false);
         return  this.kafkaMonitorService.getClusterSummary(topics);
     }
 
     @GetMapping("/topics")
     List<topicModel> getTopics(@RequestHeader(value = "clusterIp") String clusterIp){
-       return this.kafkaMonitorService.getTopics(clusterIp);
+       return this.kafkaMonitorService.getTopics(clusterIp,false);
 
     }
 
     @GetMapping("/topics/{name:.+}")
-    Optional<topicModel> getTopic(@RequestHeader(value = "clusterIp") String clusterIp, @PathVariable(value = "name") String name){
-        return this.kafkaMonitorService.getTopic(name,clusterIp);
-
+    Optional<topicModel> getTopic(@RequestHeader(value = "clusterIp") String clusterIp, @PathVariable(value = "name") String name, @RequestParam(value = "showDefaultConfig",required = false) Boolean showDefaultConfig){
+        final boolean ShowDefaultConfigFlag = (showDefaultConfig != null? showDefaultConfig : false);
+        return this.kafkaMonitorService.getTopic(name,clusterIp,ShowDefaultConfigFlag);
     }
 
     @GetMapping("/consumers")
     List<consumerModel> getConsumers(@RequestHeader(value = "clusterIp") String clusterIp){
-        final  var topics = this.kafkaMonitorService.getTopics(clusterIp);
+        final  var topics = this.kafkaMonitorService.getTopics(clusterIp,false);
         return this.kafkaMonitorService.getConsumers(topics,clusterIp);
     }
 
@@ -70,7 +70,6 @@ public class kafkaMonitoringController {
             return this.kafkaMonitorService.getMessagesUntilTime(name,clusterIp,count,end);
         }
         else{
-
             return this.kafkaMonitorService.getMessages(name,clusterIp,count,start,end);
         }
 
