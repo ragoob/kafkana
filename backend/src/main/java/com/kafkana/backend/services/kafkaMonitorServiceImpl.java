@@ -159,13 +159,11 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
             long startTime = System.currentTimeMillis();
             while ((System.currentTimeMillis()-startTime)<1000){
                 for (ConsumerRecord<String, String> record : kafkaConsumer.poll(Duration.ofMillis(200))) {
-                    if(messages.size() < size){
-                        messages.add(new messageModel(record.partition(),record.offset(),record.value(),record.key(),
+                    if(messages.size() < size) {
+                        messages.add(new messageModel(record.partition(), record.offset(), record.value(), record.key(),
                                 headersToMap(record.headers())
-                                ,new Date(record.timestamp())));
+                                , new Date(record.timestamp())));
                     }
-
-
                 }
             }
             kafkaConsumer.close();
