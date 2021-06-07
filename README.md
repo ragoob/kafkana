@@ -1,6 +1,10 @@
 # kafkana
 Real time and management  dashboard  for multiple kafka clusters 
 
+![Alt Text](https://github.com/ragoob/kafkana/blob/main/kafkana-gif.gif?raw=true)
+
+
+
 # Features
  - Support multiple clusters with in-memorydb
  - List of brokers with configuration map
