@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 
 @RestController()
-@CrossOrigin()
+@CrossOrigin
 @RequestMapping("/api/admin")
 public class administrationController {
     @Autowired

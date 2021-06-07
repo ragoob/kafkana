@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController()
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+@CrossOrigin
 @RequestMapping("/api/monitoring")
 public class kafkaMonitoringController {
     @Autowired

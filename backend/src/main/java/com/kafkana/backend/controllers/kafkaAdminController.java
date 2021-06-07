@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 @RestController()
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+@CrossOrigin
 @RequestMapping("/api/kafkaAdmin")
 public class kafkaAdminController {
     @Autowired
