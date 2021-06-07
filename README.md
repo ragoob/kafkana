@@ -3,7 +3,7 @@ Real time and management  dashboard  for multiple kafka clusters
 
 
 # Features
- - Support multiple clusters with in-memorydb
+ - Support multiple clusters stored in your browser local-storage 
  - List of brokers with configuration map
  - List of topics with details about replica - ISR etc..
  - List of consumers and consumer groups with details
