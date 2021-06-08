@@ -40,11 +40,18 @@ export class HomeComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-       this.load();
+       if(result){
+         this.refreshStatus(result.clusterId);
+       }
     });
   }
 
   public dashboard(id: string) : void{
+    const cluster = this.adminService.findByid(id);
+  
+    if(cluster.status !== ClusterStatus.HEALTHY){
+      return;
+    }
     this.adminService.setCurrent(id);
     this.router.navigate(['dashboard',id]);
   }

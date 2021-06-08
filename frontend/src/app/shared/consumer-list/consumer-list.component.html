@@ -1,12 +1,4 @@
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title">Consumers List</h5>
-
-            </div>
-            <div class="card-body">
-                <p-table #dt1 [globalFilterFields]="['name']" [value]="consumers" [paginator]="true" [rows]="rows"
+    <p-table #dt1 [autoLayout]="true"  [globalFilterFields]="['name']" [value]="consumers" [paginator]="true" [rows]="rows"
                     [showCurrentPageReport]="true" [loading]="!loaded"
                     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                     [rowsPerPageOptions]="[5,10,25,50,200,500,1000]">
@@ -34,12 +26,8 @@
                            
                         </tr>
                     </ng-template>
-                    
+                     <ng-template pTemplate="paginatorleft">
+                   
+                </ng-template>
                  
                 </p-table>
-
-            </div>
-
-        </div>
-    </div>
-</div>

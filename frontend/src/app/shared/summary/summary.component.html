@@ -11,8 +11,9 @@
         </app-summary-card>
     </div>
     <div class="col-lg-3 col-md-6 col-sm-6">
-        <app-summary-card [title]="'Preferred Replicated'" [timeStamp]="summary?.timeStamp" [value]="summary?.preferredReplicaPercent"
+        <app-summary-card [title]="'Preferred Replicated'" [isPercentage]="true" [timeStamp]="summary?.timeStamp" [value]="summary?.preferredReplicaPercent"
             [icon]="'nc-layout-11 text-success'">
         </app-summary-card>
     </div>
 </div>
+

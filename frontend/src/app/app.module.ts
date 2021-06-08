@@ -40,8 +40,6 @@ import { PayloadFilterComponent } from './payload-filter/payload-filter.componen
     SideBarComponent,
     NavComponent,
     PayloadFilterComponent
-    
-    
   ],
   imports: [
     BrowserModule,
@@ -64,6 +62,7 @@ import { PayloadFilterComponent } from './payload-filter/payload-filter.componen
     MatDialogModule,
     FormsModule,
     ReactiveFormsModule
+    
 
   ],
   providers: [{ provide: API_BASE_URL, useValue: environment.baseURL }, AdminService, { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: true, direction: 'ltr' } }],

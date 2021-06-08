@@ -28,12 +28,12 @@ export class AddNewComponent {
     }
   
 
-  close(): void {
+  close(result: any): void {
     this.isSubmit = false;
     Object.keys(this.addNewForm.controls).forEach(key => {
       this.addNewForm.get(key)?.markAsUntouched();
     });
-    this.dialogRef.close({ clusterId: this.addNewForm.controls["id"].value});
+    this.dialogRef.close(result);
   }
 
   save(): void{
@@ -44,7 +44,7 @@ export class AddNewComponent {
     if(this.addNewForm.valid){
       this.adminService.create(this.addNewForm.value)
         .then(() => {
-          this.close();
+          this.close({ clusterId: this.addNewForm.controls["id"].value });
         })
     }
     

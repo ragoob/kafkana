@@ -70,7 +70,7 @@ public class topicModel  implements Comparable<topicModel>{
      */
     public long getAvailableSize() {
         return partitions.values().stream()
-                .map(p -> p.getSize() - p.getFirstOffset())
+                .map(p -> p.getFirstOffset() - p.getSize())
                 .reduce(0L, Long::sum);
     }
 

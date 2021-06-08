@@ -14,7 +14,7 @@ import { LoadingService } from '../../core/services/loading.service';
 export class SummaryComponent implements OnInit ,OnDestroy{
   clusterId: string = "";
   private destoryed$: ReplaySubject<any> = new ReplaySubject(1);
-  public summary?: ClusterSummary
+  public summary?: ClusterSummary | null
   constructor(private monitoringService: KafkaMonitorService, 
     private route: ActivatedRoute,private router: Router,
     private loader: LoadingService
@@ -42,7 +42,7 @@ export class SummaryComponent implements OnInit ,OnDestroy{
       this.summary = data;
       this.loader.change('SUMMARY_LIST', true);
     }).catch(error=> {
-      this.summary = undefined;
+      this.summary = null;
       this.loader.change('SUMMARY_LIST', true);
     })
   }

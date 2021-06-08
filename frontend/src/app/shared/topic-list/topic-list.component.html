@@ -1,13 +1,4 @@
-
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title">Topics List</h5>
-               
-            </div>
-            <div class="card-body">
-            <p-table #dt1  [globalFilterFields]="['name']" [value]="topics" [paginator]="true" [rows]="rows" [showCurrentPageReport]="true" 
+  <p-table #dt1 [autoLayout]="true"  [globalFilterFields]="['name']" [value]="topics" [paginator]="true" [rows]="rows" [showCurrentPageReport]="true" 
                 [loading]="!loaded"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                 [rowsPerPageOptions]="[5,10,25,50,200,500,1000]">
@@ -25,18 +16,14 @@
                     <tr>
                         <th>Name</th>
                         <th>Partitions</th>
-                        <th>Available Size</th>
-                        <th>Total Size</th>
                         <th></th>
                         <th></th>
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-topic>
-                    <tr>
+                    <tr (click)="details(topic?.name)" class="clickable-row">
                         <td>{{topic?.name}}</td>
                         <td>{{topic?.partitions?.length}}</td>
-                        <td>{{topic?.availableSize}}</td>
-                        <td>{{topic?.totalSize}}</td>
                         <td>
                           
                             <button pButton pRipple icon="pi pi-trash" (click)="deleteTopic(topic?.name)" class="p-button-rounded p-button-warning"
@@ -44,10 +31,7 @@
                         </td>
                         <td>
                           
-                      <a [routerLink]="['/topic-details',clusterId,topic?.name]" routerLinkActive="router-link-active">Details</a>
-
-                           
-                        </td>
+                     
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="paginatorleft">
@@ -55,11 +39,3 @@
                 </ng-template>
                
             </p-table>
-
-            </div>
-          
-        </div>
-    </div>
-</div>
-
-<p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>

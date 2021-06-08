@@ -30,7 +30,7 @@ export class KafkaMonitorService   {
     }
 
     getTopic(topicName: string ,clusterId: string): Promise<Topic> {
-        return this.http.get<Topic>(`${this.baseUrl}/monitoring/topics/${topicName}`, this.header(clusterId))
+        return this.http.get<Topic>(`${this.baseUrl}/monitoring/topics/${topicName}?showDefaultConfig=true`, this.header(clusterId))
             .toPromise();
     }
 

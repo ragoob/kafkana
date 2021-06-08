@@ -8,6 +8,7 @@ import com.kafkana.backend.models.messageModel;
 import com.kafkana.backend.models.topicModel;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.ws.rs.PathParam;
@@ -30,13 +31,23 @@ public class kafkaMonitoringController {
 
 
     @GetMapping("/summary")
-    clusterSummaryModel getClusterSummary(@RequestHeader("clusterIp") String clusterIp) throws InterruptedException {
+    @Cacheable(value="summary",
+            key="{#clusterIp}"
+            , condition="#refresh == false")
+    clusterSummaryModel getClusterSummary(@RequestHeader("clusterIp") String clusterIp,
+                                          @RequestParam(name = "refresh", required = false) Boolean  refresh
+                                          ) throws InterruptedException {
         final  var topics = this.kafkaMonitorService.getTopics(clusterIp,false);
         return  this.kafkaMonitorService.getClusterSummary(topics);
     }
 
     @GetMapping("/topics")
-    List<topicModel> getTopics(@RequestHeader(value = "clusterIp") String clusterIp){
+    @Cacheable(value="topics",
+            key="{#clusterIp}"
+            , condition="#refresh == false")
+    List<topicModel> getTopics(@RequestHeader(value = "clusterIp") String clusterIp,
+                               @RequestParam(name = "refresh", required = false) Boolean  refresh
+                               ){
        return this.kafkaMonitorService.getTopics(clusterIp,false);
 
     }
@@ -48,7 +59,12 @@ public class kafkaMonitoringController {
     }
 
     @GetMapping("/consumers")
-    List<consumerModel> getConsumers(@RequestHeader(value = "clusterIp") String clusterIp){
+    @Cacheable(value="consumers",
+            key="{#clusterIp}"
+            , condition="#refresh == false")
+    List<consumerModel> getConsumers(@RequestHeader(value = "clusterIp") String clusterIp,
+                                     @RequestParam(name = "refresh", required = false) Boolean  refresh
+                                     ){
         final  var topics = this.kafkaMonitorService.getTopics(clusterIp,false);
         return this.kafkaMonitorService.getConsumers(topics,clusterIp);
     }

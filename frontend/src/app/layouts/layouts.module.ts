@@ -27,6 +27,7 @@ import { PayloadFilterComponent } from '../payload-filter/payload-filter.compone
 import { MatDialogModule } from '@angular/material/dialog';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { CheckboxModule } from 'primeng/checkbox';
+import { PercentagePipe } from '../core/pipes/percentage.pipe';
 
  const AdminLayoutRoutes: Routes = [
   { path: 'dashboard/:id', component: DashboardComponent },
@@ -43,7 +44,9 @@ import { CheckboxModule } from 'primeng/checkbox';
     ConsumerListComponent,
     BrokersDetailsComponent,
     TopicDetailsComponent,
-    TopicMessagesComponent
+    TopicMessagesComponent,
+    PercentagePipe
+    
   ],
   imports: [
     CommonModule,
@@ -61,6 +64,7 @@ import { CheckboxModule } from 'primeng/checkbox';
     MatDialogModule,
     MultiSelectModule,
     CheckboxModule
+    
     
   ],
   entryComponents: [PayloadFilterComponent],

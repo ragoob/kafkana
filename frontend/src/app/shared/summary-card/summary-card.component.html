@@ -10,7 +10,8 @@
             <div class="col-7 col-md-8">
                 <div class="numbers">
                     <p class="card-category">{{title}}</p>
-                    <p class="card-title">{{value}}
+                    <p *ngIf="!isPercentage && value != null"  class="card-title">{{value}}  
+                    <p *ngIf="isPercentage && value != null"   class="card-title">{{value | percentage}}
                     <p>
                 </div>
             </div>

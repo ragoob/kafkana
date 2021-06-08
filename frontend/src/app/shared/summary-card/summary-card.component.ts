@@ -14,6 +14,7 @@ export class SummaryCardComponent implements OnInit {
   @Input('title') title: string = "";
   @Input('icon') icon?: string;
   @Input('timeStamp') timeStamp?: Date
+  @Input('isPercentage') isPercentage : boolean = false;
   public loaded: boolean = false;
   constructor(private loader: LoadingService) { }
 

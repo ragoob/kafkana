@@ -24,9 +24,9 @@
                         </tr>
                     </ng-template>
                     <ng-template pTemplate="body" let-item>
-                        <tr>
-                            <td>{{item?.id}}</td>
-                            <td>{{item?.bootStrapServers}}</td>
+                        <tr  >
+                            <td [ngClass]="{'clickable-row': item?.status == 'HEALTHY'}" (click)="dashboard(item?.id)">{{item?.id}}</td>
+                            <td [ngClass]="{'clickable-row': item?.status == 'HEALTHY'}"  (click)="dashboard(item?.id)">{{item?.bootStrapServers}}</td>
                             <td>
                               <span style="cursor: pointer;" (click)="refreshStatus(item?.id)" [ngSwitch]="item?.status">
                                          
@@ -49,9 +49,7 @@
                               >
                                <i class="fa fa-trash"></i>
                             </button>
-                            <button [disabled]="item?.status !== 'HEALTHY'" (click)="dashboard(item?.id)"  style="cursor: pointer;" class="btn btn-primary" routerLinkActive="router-link-active" >
-                            <i class="fas fa-chart-line"></i>
-                            </button>
+                         
                             </td>
                         </tr>
                     </ng-template>

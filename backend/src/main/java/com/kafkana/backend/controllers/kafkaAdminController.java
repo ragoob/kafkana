@@ -3,6 +3,7 @@ import com.kafkana.backend.abstraction.kafkaAdminService;
 import com.kafkana.backend.models.brokers;
 import com.kafkana.backend.models.createTopicModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,12 +30,22 @@ public class kafkaAdminController {
     }
 
     @GetMapping("/config/{nodeId}")
-    HashMap<String,String> getConfig(@RequestHeader(value = "clusterIp") String clusterIp,@PathVariable(value = "nodeId") String nodeId){
+    @Cacheable(value="nodeConfig",
+            key="{#clusterIp, #nodeId}"
+            , condition="#refresh == false")
+    HashMap<String,String> getConfig(@RequestHeader(value = "clusterIp") String clusterIp,@PathVariable(value = "nodeId") String nodeId,
+     @RequestParam(name = "refresh", required = false) Boolean  refresh
+    ){
         return  this.kafkaAdminService.getConfig(clusterIp,nodeId);
     }
 
     @GetMapping("/nodes")
-    ArrayList<brokers> getNodes(@RequestHeader(value = "clusterIp") String clusterIp){
+    @Cacheable(value="nodes",
+            key="{#clusterIp}"
+            , condition="#refresh == false")
+    ArrayList<brokers> getNodes(@RequestHeader(value = "clusterIp") String clusterIp,
+                                @RequestParam(name = "refresh", required = false) Boolean  refresh
+                                ){
         return  this.kafkaAdminService.getBrokers(clusterIp);
     }
 
