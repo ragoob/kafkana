@@ -19,13 +19,13 @@ export class KafkaMonitorService   {
 
     }
 
-    getSummary(clusterId: string): Promise<ClusterSummary>{
-        return this.http.get<ClusterSummary>(`${this.baseUrl}/monitoring/summary`, this.header(clusterId))
+    getSummary(clusterId: string, refresh: boolean = false): Promise<ClusterSummary>{
+        return this.http.get<ClusterSummary>(`${this.baseUrl}/monitoring/summary?refresh=${refresh}`, this.header(clusterId))
         .toPromise();
     }
 
-    getTopics(clusterId: string): Promise<Topic[]>{
-        return this.http.get<Topic[]>(`${this.baseUrl}/monitoring/topics`, this.header(clusterId))
+    getTopics(clusterId: string, refresh: boolean = false): Promise<Topic[]>{
+        return this.http.get<Topic[]>(`${this.baseUrl}/monitoring/topics?refresh=${refresh}`, this.header(clusterId))
             .toPromise();
     }
 
@@ -67,8 +67,8 @@ export class KafkaMonitorService   {
             .toPromise();
     }
 
-    getConsumers(clusterId: string): Promise<Consumer[]>{
-        return this.http.get<Consumer[]>(`${this.baseUrl}/monitoring/consumers`, this.header(clusterId))
+    getConsumers(clusterId: string, refresh: boolean = false): Promise<Consumer[]>{
+        return this.http.get<Consumer[]>(`${this.baseUrl}/monitoring/consumers?refresh=${refresh}`, this.header(clusterId))
             .toPromise();
     }
 

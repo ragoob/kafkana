@@ -23,14 +23,14 @@ export class KafkaAdminService  {
         return this.http.delete<any>(`${this.baseUrl}/kafkaAdmin/${name}`, this.header(clusterId)).toPromise();
     }
 
-    getConfig(nodeId: string, clusterId: string): Promise<Map<string,string>>{
-        return this.http.get<Map<string, string>>(`${this.baseUrl}/kafkaAdmin/config/${nodeId}`
+    getConfig(nodeId: string, clusterId: string, refresh:boolean = false): Promise<Map<string,string>>{
+        return this.http.get<Map<string, string>>(`${this.baseUrl}/kafkaAdmin/config/${nodeId}?refresh=${refresh}`
             , this.header(clusterId)
         ).toPromise();
     }
 
-    getNodes(clusterId: string): Promise<Brokers[]> {
-        return this.http.get<Brokers[]>(`${this.baseUrl}/kafkaAdmin/nodes`
+    getNodes(clusterId: string, refresh: boolean = false): Promise<Brokers[]> {
+        return this.http.get<Brokers[]>(`${this.baseUrl}/kafkaAdmin/nodes?refresh=${refresh}`
             , this.header(clusterId)
         ).toPromise();
     }

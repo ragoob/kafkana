@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  baseURL: "https://localhost:8080/api",
+  baseURL: "https://kafka-ui-api.aptar.dev/api",
   hideMenu: true
 };
 
