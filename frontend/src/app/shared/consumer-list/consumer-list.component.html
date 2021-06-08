@@ -10,6 +10,8 @@
                                 <input pInputText type="text" #search
                                     (input)="dt1.filterGlobal(search.value, 'contains')" placeholder="Search keyword" />
                             </span>
+
+                              <p-button  title="force reload" class="force-reload-btn" (click)="loadConsumers(clusterId,true)" icon="pi pi-refresh"></p-button>
                         </div>
                     </ng-template>
                     <ng-template pTemplate="header">

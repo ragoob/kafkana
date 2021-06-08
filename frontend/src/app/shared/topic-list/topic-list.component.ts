@@ -45,9 +45,9 @@ export class TopicListComponent implements OnInit, OnDestroy {
       })
   }
 
-  private loadTopics(clusterId: string) {
+  public loadTopics(clusterId: string,refresh: boolean = false) {
     this.loader.change('TOPIC_LIST', false);
-    this.monitoringService.getTopics(clusterId)
+    this.monitoringService.getTopics(clusterId, refresh)
       .then(data => {
         this.topics = data;
         this.loader.change('TOPIC_LIST', true);

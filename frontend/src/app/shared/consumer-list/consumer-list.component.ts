@@ -44,9 +44,9 @@ export class ConsumerListComponent implements OnInit , OnDestroy{
       })
   }
 
-  private loadConsumers(clusterId: string) {
+  public loadConsumers(clusterId: string,refresh: boolean = false) {
     this.loader.change('CONSUMER_LIST',false);
-    this.monitoringService.getConsumers(clusterId)
+    this.monitoringService.getConsumers(clusterId, refresh)
       .then(data => {
         this.consumers = data;
         this.loader.change('CONSUMER_LIST',true);

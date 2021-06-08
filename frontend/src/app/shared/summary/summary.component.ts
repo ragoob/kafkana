@@ -35,9 +35,9 @@ export class SummaryComponent implements OnInit ,OnDestroy{
    
   }
 
-  private loadSummary(clusterId: string){
+  public loadSummary(clusterId: string,refresh: boolean =false){
     this.loader.change('SUMMARY_LIST', false);
-    this.monitoringService.getSummary(clusterId)
+    this.monitoringService.getSummary(clusterId, refresh)
     .then(data=> {
       this.summary = data;
       this.loader.change('SUMMARY_LIST', true);

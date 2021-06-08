@@ -15,6 +15,7 @@ export class SummaryCardComponent implements OnInit {
   @Input('icon') icon?: string;
   @Input('timeStamp') timeStamp?: Date
   @Input('isPercentage') isPercentage : boolean = false;
+  @Output('refresh') refresh: EventEmitter<any> = new EventEmitter();
   public loaded: boolean = false;
   constructor(private loader: LoadingService) { }
 
@@ -25,6 +26,12 @@ export class SummaryCardComponent implements OnInit {
       ).subscribe(d => {
         this.loaded = d.loaded;
       })
+  }
+
+  public forceReload(){
+    if(this.refresh){
+      this.refresh.emit();
+    }
   }
 
  
