@@ -31,24 +31,19 @@ public class kafkaMonitoringController {
 
 
     @GetMapping("/summary")
-    @Cacheable(value="summary",
-            key="{#clusterIp}"
-            , condition="#refresh == false")
     clusterSummaryModel getClusterSummary(@RequestHeader("clusterIp") String clusterIp,
                                           @RequestParam(name = "refresh", required = false) Boolean  refresh
                                           ) throws InterruptedException {
-        final  var topics = this.kafkaMonitorService.getTopics(clusterIp,false);
-        return  this.kafkaMonitorService.getClusterSummary(topics);
+        boolean refreshFlag = refresh != null ? refresh : false;
+        return  this.kafkaMonitorService.getClusterSummary(clusterIp,refreshFlag);
     }
 
     @GetMapping("/topics")
-    @Cacheable(value="topics",
-            key="{#clusterIp}"
-            , condition="#refresh == false")
     List<topicModel> getTopics(@RequestHeader(value = "clusterIp") String clusterIp,
                                @RequestParam(name = "refresh", required = false) Boolean  refresh
                                ){
-       return this.kafkaMonitorService.getTopics(clusterIp,false);
+        boolean refreshFlag = refresh != null ? refresh : false;
+       return this.kafkaMonitorService.getTopics(clusterIp,false,refreshFlag);
 
     }
 
@@ -59,14 +54,12 @@ public class kafkaMonitoringController {
     }
 
     @GetMapping("/consumers")
-    @Cacheable(value="consumers",
-            key="{#clusterIp}"
-            , condition="#refresh == false")
     List<consumerModel> getConsumers(@RequestHeader(value = "clusterIp") String clusterIp,
                                      @RequestParam(name = "refresh", required = false) Boolean  refresh
                                      ){
-        final  var topics = this.kafkaMonitorService.getTopics(clusterIp,false);
-        return this.kafkaMonitorService.getConsumers(topics,clusterIp);
+        boolean refreshFlag = refresh != null ? refresh : false;
+        final  var topics = this.kafkaMonitorService.getTopics(clusterIp,false,refreshFlag);
+        return this.kafkaMonitorService.getConsumers(topics,clusterIp,refreshFlag);
     }
 
     @GetMapping("/messages/{name:.+}")

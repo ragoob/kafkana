@@ -14,6 +14,7 @@ import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -29,7 +30,11 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
 
     private static final Logger LOG = LoggerFactory.getLogger(kafkaMonitorServiceImpl.class);
     @Override
-    public clusterSummaryModel getClusterSummary(Collection<topicModel> topics) {
+    @Cacheable(value="summary",
+            key="{#clusterIp}"
+            , condition="#refresh == false")
+    public clusterSummaryModel getClusterSummary(String clusterIp,boolean refresh) {
+        Collection<topicModel> topics = this.getTopics(clusterIp,false,refresh);
         final var topicSummary = topics.stream()
                 .map(topic -> {
                     final var summary = new clusterSummaryModel();
@@ -64,7 +69,10 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         return topicSummary;
     }
     @Override
-    public List<topicModel> getTopics(String clusterIp, boolean showDefaultConfig) {
+    @Cacheable(value="topics",
+            key="{#clusterIp}"
+            , condition="#refresh == false")
+    public List<topicModel> getTopics(String clusterIp, boolean showDefaultConfig,boolean refresh) {
         final  var kafkaConsumer= createConsumer(clusterIp);
         final  var admin = getAdminClient(clusterIp);
         try{
@@ -99,7 +107,10 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         }
     }
     @Override
-    public List<consumerModel> getConsumers(Collection<topicModel> topicModels,String clusterIp) {
+    @Cacheable(value="consumers",
+            key="{#clusterIp}"
+            , condition="#refresh == false")
+    public List<consumerModel> getConsumers(Collection<topicModel> topicModels,String clusterIp,boolean refresh) {
         final  var admin = getAdminClient(clusterIp);
         final var topics = topicModels.stream().map(topicModel::getName).collect(Collectors.toSet());
          try{

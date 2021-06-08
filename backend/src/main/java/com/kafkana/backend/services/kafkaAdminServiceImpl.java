@@ -6,6 +6,7 @@ import org.apache.commons.compress.archivers.sevenz.CLI;
 import org.apache.kafka.clients.admin.*;
 import org.apache.kafka.common.config.ConfigResource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -44,7 +45,10 @@ public class kafkaAdminServiceImpl implements kafkaAdminService {
     }
 
     @Override
-    public ArrayList<brokers> getConfig(String clusterIp) {
+    @Cacheable(value="configs",
+            key="{#clusterIp}"
+            , condition="#refresh == false")
+    public ArrayList<brokers> getConfig(String clusterIp,boolean refresh) {
         ArrayList<brokers> configs = new ArrayList<>();
         try (final AdminClient admin = getAdminClient(clusterIp)){
          final  var clusterDescription =  admin.describeCluster();
@@ -70,7 +74,10 @@ public class kafkaAdminServiceImpl implements kafkaAdminService {
     }
 
     @Override
-    public ArrayList<brokers> getBrokers(String clusterIp) {
+    @Cacheable(value="brokers",
+            key="{#clusterIp}"
+            , condition="#refresh == false")
+    public ArrayList<brokers> getBrokers(String clusterIp,boolean refresh) {
         ArrayList<brokers> nodes = new ArrayList<>();
 
         try (final AdminClient admin = getAdminClient(clusterIp)){

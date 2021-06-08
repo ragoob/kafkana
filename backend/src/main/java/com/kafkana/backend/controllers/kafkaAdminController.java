@@ -30,9 +30,6 @@ public class kafkaAdminController {
     }
 
     @GetMapping("/config/{nodeId}")
-    @Cacheable(value="nodeConfig",
-            key="{#clusterIp, #nodeId}"
-            , condition="#refresh == false")
     HashMap<String,String> getConfig(@RequestHeader(value = "clusterIp") String clusterIp,@PathVariable(value = "nodeId") String nodeId,
      @RequestParam(name = "refresh", required = false) Boolean  refresh
     ){
@@ -40,13 +37,11 @@ public class kafkaAdminController {
     }
 
     @GetMapping("/nodes")
-    @Cacheable(value="nodes",
-            key="{#clusterIp}"
-            , condition="#refresh == false")
     ArrayList<brokers> getNodes(@RequestHeader(value = "clusterIp") String clusterIp,
                                 @RequestParam(name = "refresh", required = false) Boolean  refresh
                                 ){
-        return  this.kafkaAdminService.getBrokers(clusterIp);
+        boolean refreshFlag = refresh != null ? refresh : false;
+        return  this.kafkaAdminService.getBrokers(clusterIp,refreshFlag);
     }
 
     @GetMapping("/health-check")
