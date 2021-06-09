@@ -14,8 +14,6 @@ import java.util.concurrent.ExecutionException;
 
 @Service
 public class kafkaAdminServiceImpl implements kafkaAdminService {
-    @Autowired
-    CacheManager cacheManager;
     @Override
     public void create(createTopicModel model,String clusterIp) {
         try (final AdminClient admin = getAdminClient(clusterIp)){
@@ -48,12 +46,8 @@ public class kafkaAdminServiceImpl implements kafkaAdminService {
 
     @Override
     @Cacheable(value="configs",
-            key="{#clusterIp}"
-            , condition="#refresh == false")
+            key="{#clusterIp}")
     public ArrayList<brokers> getConfig(String clusterIp,boolean refresh) {
-        if(refresh){
-            cacheManager.getCache("configs").evict(clusterIp);
-        }
         ArrayList<brokers> configs = new ArrayList<>();
         try (final AdminClient admin = getAdminClient(clusterIp)){
          final  var clusterDescription =  admin.describeCluster();
@@ -83,9 +77,6 @@ public class kafkaAdminServiceImpl implements kafkaAdminService {
             key="{#clusterIp}"
             , condition="#refresh == false")
     public ArrayList<brokers> getBrokers(String clusterIp,boolean refresh) {
-        if(refresh){
-            cacheManager.getCache("brokers").evict(clusterIp);
-        }
         ArrayList<brokers> nodes = new ArrayList<>();
 
         try (final AdminClient admin = getAdminClient(clusterIp)){
