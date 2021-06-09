@@ -6,6 +6,7 @@ import org.apache.commons.compress.archivers.sevenz.CLI;
 import org.apache.kafka.clients.admin.*;
 import org.apache.kafka.common.config.ConfigResource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import java.util.*;
@@ -13,7 +14,8 @@ import java.util.concurrent.ExecutionException;
 
 @Service
 public class kafkaAdminServiceImpl implements kafkaAdminService {
-
+    @Autowired
+    CacheManager cacheManager;
     @Override
     public void create(createTopicModel model,String clusterIp) {
         try (final AdminClient admin = getAdminClient(clusterIp)){
@@ -49,6 +51,9 @@ public class kafkaAdminServiceImpl implements kafkaAdminService {
             key="{#clusterIp}"
             , condition="#refresh == false")
     public ArrayList<brokers> getConfig(String clusterIp,boolean refresh) {
+        if(refresh){
+            cacheManager.getCache("configs").evict(clusterIp);
+        }
         ArrayList<brokers> configs = new ArrayList<>();
         try (final AdminClient admin = getAdminClient(clusterIp)){
          final  var clusterDescription =  admin.describeCluster();
@@ -78,6 +83,9 @@ public class kafkaAdminServiceImpl implements kafkaAdminService {
             key="{#clusterIp}"
             , condition="#refresh == false")
     public ArrayList<brokers> getBrokers(String clusterIp,boolean refresh) {
+        if(refresh){
+            cacheManager.getCache("brokers").evict(clusterIp);
+        }
         ArrayList<brokers> nodes = new ArrayList<>();
 
         try (final AdminClient admin = getAdminClient(clusterIp)){

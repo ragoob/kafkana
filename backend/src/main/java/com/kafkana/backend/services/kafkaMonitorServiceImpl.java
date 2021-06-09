@@ -14,6 +14,8 @@ import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -27,13 +29,17 @@ import static java.util.function.Predicate.not;
 
 @Service
 public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
-
+    @Autowired
+    CacheManager cacheManager;
     private static final Logger LOG = LoggerFactory.getLogger(kafkaMonitorServiceImpl.class);
     @Override
     @Cacheable(value="summary",
             key="{#clusterIp}"
             , condition="#refresh == false")
     public clusterSummaryModel getClusterSummary(String clusterIp,boolean refresh) {
+        if(refresh){
+            cacheManager.getCache("summary").evict(clusterIp);
+        }
         Collection<topicModel> topics = this.getTopics(clusterIp,false,refresh);
         final var topicSummary = topics.stream()
                 .map(topic -> {
@@ -73,6 +79,9 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
             key="{#clusterIp}"
             , condition="#refresh == false")
     public List<topicModel> getTopics(String clusterIp, boolean showDefaultConfig,boolean refresh) {
+        if(refresh){
+            cacheManager.getCache("topics").evict(clusterIp);
+        }
         final  var kafkaConsumer= createConsumer(clusterIp);
         final  var admin = getAdminClient(clusterIp);
         try{
@@ -111,6 +120,9 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
             key="{#clusterIp}"
             , condition="#refresh == false")
     public List<consumerModel> getConsumers(Collection<topicModel> topicModels,String clusterIp,boolean refresh) {
+        if(refresh){
+            cacheManager.getCache("consumers").evict(clusterIp);
+        }
         final  var admin = getAdminClient(clusterIp);
         final var topics = topicModels.stream().map(topicModel::getName).collect(Collectors.toSet());
          try{
