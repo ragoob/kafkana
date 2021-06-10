@@ -190,15 +190,9 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         List<messageModel> messages = new ArrayList<>();
         Consumer<String, String> kafkaConsumer =this.createConsumer(clusterIp);
         try{
-            TopicPartition partition0 = new TopicPartition(topic, 0);
-            TopicPartition partition1 = new TopicPartition(topic, 1);
-            TopicPartition partition3 = new TopicPartition(topic, 3);
-            Collection<TopicPartition> partitions = new HashSet<>();
-            partitions.add(partition0);
-            partitions.add(partition1);
-            partitions.add(partition3);
-            kafkaConsumer.assign(partitions); // must assign before seeking
-            kafkaConsumer.seekToBeginning(partitions);
+            TopicPartition partition = new TopicPartition(topic, 0);
+            kafkaConsumer.assign(Collections.singleton(partition)); // must assign before seeking
+            kafkaConsumer.seekToBeginning(Collections.singleton(partition));
 
             long startTime = System.currentTimeMillis();
             while (messages.size() < size && (System.currentTimeMillis()-startTime)<1000){
@@ -223,28 +217,15 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
     @Override
     public  List<messageModel> getLatestMessages(String topic,String clusterIp,int size){
         List<messageModel> messages = new ArrayList<>();
-        Consumer<String, String> kafkaConsumer =this.createConsumer(clusterIp);
-        try{
-            kafkaConsumer.seekToBeginning(kafkaConsumer.assignment());
-
-            long startTime = System.currentTimeMillis();
-            while ((System.currentTimeMillis()-startTime)<5000){
-                for (ConsumerRecord<String, String> record : kafkaConsumer.poll(Duration.ofMillis(200))) {
-
-                    if(messages.size() < size){
-                        messages.add(new messageModel(record.partition(),record.offset(),record.value(),record.key(),
-                                headersToMap(record.headers())
-                                ,new Date(record.timestamp())));
-                    }
-
-                }
-            }
-            kafkaConsumer.close();
-            return  messages;
-        }catch (Exception ex){
-            kafkaConsumer.close();
-            return  new ArrayList<>();
-        }
+       final  var records = getLatestRecords(topic,size,clusterIp);
+       for(ConsumerRecord<String, String> record : records){
+           if(messages.size()< size){
+               messages.add(new messageModel(record.partition(),record.offset(),record.value(),record.key(),
+                       headersToMap(record.headers())
+                       ,new Date(record.timestamp())));
+           }
+       }
+       return  messages;
     }
 
 
@@ -259,7 +240,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
                    .collect(Collectors.toList());
            kafkaConsumer.assign(partitions);
            final var latestOffsets = kafkaConsumer.endOffsets(partitions);
-
+           System.out.println("partitions Count " + partitions.size() + "in topic " + topic);
            for (var partition : partitions) {
                final var latestOffset = Math.max(0, latestOffsets.get(partition) - 1);
                kafkaConsumer.seek(partition, Math.max(0, latestOffset - count));
@@ -273,9 +254,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
                final var polled = kafkaConsumer.poll(Duration.ofMillis(200));
                for (var partition : polled.partitions()) {
                    var records = polled.records(partition);
-                   if (!records.isEmpty()) {
-                       rawRecords.get(partition).addAll(records);
-                   }
+                   rawRecords.get(partition).addAll(records);
                }
            }
 
