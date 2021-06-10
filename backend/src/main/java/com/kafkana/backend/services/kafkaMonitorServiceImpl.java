@@ -223,15 +223,36 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
     @Override
     public  List<messageModel> getLatestMessages(String topic,String clusterIp,int size){
         List<messageModel> messages = new ArrayList<>();
-       final  var records = getLatestRecords(topic,size,clusterIp);
-       for(ConsumerRecord<String, String> record : records){
-           if(messages.size()< size){
-               messages.add(new messageModel(record.partition(),record.offset(),record.value(),record.key(),
-                       headersToMap(record.headers())
-                       ,new Date(record.timestamp())));
-           }
-       }
-       return  messages;
+        Consumer<String, String> kafkaConsumer =this.createConsumer(clusterIp);
+        try{
+            TopicPartition partition0 = new TopicPartition(topic, 0);
+            TopicPartition partition1 = new TopicPartition(topic, 1);
+            TopicPartition partition3 = new TopicPartition(topic, 3);
+            Collection<TopicPartition> partitions = new HashSet<>();
+            partitions.add(partition0);
+            partitions.add(partition1);
+            partitions.add(partition3);
+            kafkaConsumer.assign(partitions); // must assign before seeking
+            kafkaConsumer.seekToBeginning(partitions);
+
+            long startTime = System.currentTimeMillis();
+            while (messages.size() < size && (System.currentTimeMillis()-startTime)<1000){
+                for (ConsumerRecord<String, String> record : kafkaConsumer.poll(Duration.ofMillis(200))) {
+
+                    if(messages.size() < size){
+                        messages.add(new messageModel(record.partition(),record.offset(),record.value(),record.key(),
+                                headersToMap(record.headers())
+                                ,new Date(record.timestamp())));
+                    }
+
+                }
+            }
+            kafkaConsumer.close();
+            return  messages;
+        }catch (Exception ex){
+            kafkaConsumer.close();
+            return  new ArrayList<>();
+        }
     }
 
 
