@@ -217,15 +217,33 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
     @Override
     public  List<messageModel> getLatestMessages(String topic,String clusterIp,int size){
         List<messageModel> messages = new ArrayList<>();
-       final  var records = getLatestRecords(topic,size,clusterIp);
-       for(ConsumerRecord<String, String> record : records){
-           if(messages.size()< size){
-               messages.add(new messageModel(record.partition(),record.offset(),record.value(),record.key(),
-                       headersToMap(record.headers())
-                       ,new Date(record.timestamp())));
-           }
-       }
-       return  messages;
+        Consumer<String, String> kafkaConsumer =this.createConsumer(clusterIp);
+        try{
+            TopicPartition partition = new TopicPartition(topic, 0);
+            kafkaConsumer.assign(Collections.singleton(partition)); // must assign before seeking
+            kafkaConsumer.seekToBeginning(Collections.singleton(partition));
+
+            boolean more = true;
+            while (more){
+                for (ConsumerRecord<String, String> record : kafkaConsumer.poll(Duration.ofMillis(200))) {
+
+                    if(messages.size() < size){
+                        messages.add(new messageModel(record.partition(),record.offset(),record.value(),record.key(),
+                                headersToMap(record.headers())
+                                ,new Date(record.timestamp())));
+                    }
+                    else{
+                        more = false;
+                    }
+
+                }
+            }
+            kafkaConsumer.close();
+            return  messages;
+        }catch (Exception ex){
+            kafkaConsumer.close();
+            return  new ArrayList<>();
+        }
     }
 
 
