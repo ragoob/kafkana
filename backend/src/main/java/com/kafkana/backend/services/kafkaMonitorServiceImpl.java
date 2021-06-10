@@ -14,8 +14,6 @@ import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +29,7 @@ import static java.util.function.Predicate.not;
 public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
     private static final Logger LOG = LoggerFactory.getLogger(kafkaMonitorServiceImpl.class);
     @Override
-    @Cacheable(value="summary",
+    @Cacheable(cacheNames="summary",
             key="{#clusterIp}"
             , condition="#refresh == false")
     public clusterSummaryModel getClusterSummary(String clusterIp,boolean refresh) {
@@ -70,7 +68,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         return topicSummary;
     }
     @Override
-    @Cacheable(value="topics",
+    @Cacheable(cacheNames="topics",
             key="{#clusterIp}"
             , condition="#refresh == false")
     public List<topicModel> getTopics(String clusterIp, boolean showDefaultConfig,boolean refresh) {
@@ -108,7 +106,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         }
     }
     @Override
-    @Cacheable(value="consumers",
+    @Cacheable(cacheNames="consumers",
             key="{#clusterIp}"
             , condition="#refresh == false")
     public List<consumerModel> getConsumers(Collection<topicModel> topicModels,String clusterIp,boolean refresh) {
@@ -192,9 +190,15 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         List<messageModel> messages = new ArrayList<>();
         Consumer<String, String> kafkaConsumer =this.createConsumer(clusterIp);
         try{
-            TopicPartition partition = new TopicPartition(topic, 0);
-            kafkaConsumer.assign(Collections.singleton(partition)); // must assign before seeking
-            kafkaConsumer.seekToBeginning(Collections.singleton(partition));
+            TopicPartition partition0 = new TopicPartition(topic, 0);
+            TopicPartition partition1 = new TopicPartition(topic, 1);
+            TopicPartition partition3 = new TopicPartition(topic, 3);
+            Collection<TopicPartition> partitions = new HashSet<>();
+            partitions.add(partition0);
+            partitions.add(partition1);
+            partitions.add(partition3);
+            kafkaConsumer.assign(partitions); // must assign before seeking
+            kafkaConsumer.seekToBeginning(partitions);
 
             long startTime = System.currentTimeMillis();
             while (messages.size() < size && (System.currentTimeMillis()-startTime)<1000){

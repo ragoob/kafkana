@@ -1,12 +1,8 @@
 package com.kafkana.backend.services;
 import com.kafkana.backend.abstraction.kafkaAdminService;
 import com.kafkana.backend.models.*;
-import com.kafkana.backend.repositories.kafkaClusterRepository;
-import org.apache.commons.compress.archivers.sevenz.CLI;
 import org.apache.kafka.clients.admin.*;
 import org.apache.kafka.common.config.ConfigResource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import java.util.*;
@@ -73,7 +69,7 @@ public class kafkaAdminServiceImpl implements kafkaAdminService {
     }
 
     @Override
-    @Cacheable(value="brokers",
+    @Cacheable(cacheNames="brokers",
             key="{#clusterIp}"
             , condition="#refresh == false")
     public ArrayList<brokers> getBrokers(String clusterIp,boolean refresh) {
