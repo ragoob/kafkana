@@ -225,15 +225,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         List<messageModel> messages = new ArrayList<>();
         Consumer<String, String> kafkaConsumer =this.createConsumer(clusterIp);
         try{
-            TopicPartition partition0 = new TopicPartition(topic, 0);
-            TopicPartition partition1 = new TopicPartition(topic, 1);
-            TopicPartition partition3 = new TopicPartition(topic, 3);
-            Collection<TopicPartition> partitions = new HashSet<>();
-            partitions.add(partition0);
-            partitions.add(partition1);
-            partitions.add(partition3);
-            kafkaConsumer.assign(partitions); // must assign before seeking
-            kafkaConsumer.seekToBeginning(partitions);
+            kafkaConsumer.seekToBeginning(kafkaConsumer.assignment());
 
             long startTime = System.currentTimeMillis();
             while (messages.size() < size && (System.currentTimeMillis()-startTime)<1000){
