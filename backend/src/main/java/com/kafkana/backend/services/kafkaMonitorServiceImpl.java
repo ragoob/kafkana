@@ -228,7 +228,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
             kafkaConsumer.seekToBeginning(kafkaConsumer.assignment());
 
             long startTime = System.currentTimeMillis();
-            while (messages.size() < size && (System.currentTimeMillis()-startTime)<1000){
+            while ((System.currentTimeMillis()-startTime)<5000){
                 for (ConsumerRecord<String, String> record : kafkaConsumer.poll(Duration.ofMillis(200))) {
 
                     if(messages.size() < size){
