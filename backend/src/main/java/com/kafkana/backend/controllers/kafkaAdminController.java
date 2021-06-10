@@ -3,6 +3,7 @@ import com.kafkana.backend.abstraction.kafkaAdminService;
 import com.kafkana.backend.models.brokers;
 import com.kafkana.backend.models.createTopicModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,8 @@ import java.util.HashMap;
 public class kafkaAdminController {
     @Autowired
     private kafkaAdminService kafkaAdminService;
+    @Autowired
+    CacheManager cacheManager;
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
@@ -33,6 +36,7 @@ public class kafkaAdminController {
     HashMap<String,String> getConfig(@RequestHeader(value = "clusterIp") String clusterIp,@PathVariable(value = "nodeId") String nodeId,
      @RequestParam(name = "refresh", required = false) Boolean  refresh
     ){
+
         return  this.kafkaAdminService.getConfig(clusterIp,nodeId);
     }
 
@@ -41,6 +45,9 @@ public class kafkaAdminController {
                                 @RequestParam(name = "refresh", required = false) Boolean  refresh
                                 ){
         boolean refreshFlag = refresh != null ? refresh : false;
+        if(refreshFlag){
+            cacheManager.getCache("brokers").evict(clusterIp);
+        }
         return  this.kafkaAdminService.getBrokers(clusterIp,refreshFlag);
     }
 

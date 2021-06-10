@@ -8,6 +8,7 @@ import com.kafkana.backend.models.messageModel;
 import com.kafkana.backend.models.topicModel;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,12 +30,18 @@ public class kafkaMonitoringController {
     @Autowired
     private kafkaAdminService kafkaAdminService;
 
+    @Autowired
+    CacheManager cacheManager;
 
     @GetMapping("/summary")
     clusterSummaryModel getClusterSummary(@RequestHeader("clusterIp") String clusterIp,
                                           @RequestParam(name = "refresh", required = false) Boolean  refresh
                                           ) throws InterruptedException {
         boolean refreshFlag = refresh != null ? refresh : false;
+
+        if(refreshFlag){
+            cacheManager.getCache("summary").evict(clusterIp);
+        }
         return  this.kafkaMonitorService.getClusterSummary(clusterIp,refreshFlag);
     }
 
@@ -43,6 +50,9 @@ public class kafkaMonitoringController {
                                @RequestParam(name = "refresh", required = false) Boolean  refresh
                                ){
         boolean refreshFlag = refresh != null ? refresh : false;
+        if(refreshFlag){
+            cacheManager.getCache("topics").evict(clusterIp);
+        }
        return this.kafkaMonitorService.getTopics(clusterIp,false,refreshFlag);
 
     }
@@ -50,6 +60,7 @@ public class kafkaMonitoringController {
     @GetMapping("/topics/{name:.+}")
     Optional<topicModel> getTopic(@RequestHeader(value = "clusterIp") String clusterIp, @PathVariable(value = "name") String name, @RequestParam(value = "showDefaultConfig",required = false) Boolean showDefaultConfig){
         final boolean ShowDefaultConfigFlag = (showDefaultConfig != null? showDefaultConfig : false);
+
         return this.kafkaMonitorService.getTopic(name,clusterIp,ShowDefaultConfigFlag);
     }
 
@@ -58,6 +69,9 @@ public class kafkaMonitoringController {
                                      @RequestParam(name = "refresh", required = false) Boolean  refresh
                                      ){
         boolean refreshFlag = refresh != null ? refresh : false;
+        if(refreshFlag){
+            cacheManager.getCache("consumers").evict(clusterIp);
+        }
         final  var topics = this.kafkaMonitorService.getTopics(clusterIp,false,refreshFlag);
         return this.kafkaMonitorService.getConsumers(topics,clusterIp,refreshFlag);
     }
