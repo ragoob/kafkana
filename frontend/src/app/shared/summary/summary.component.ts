@@ -14,6 +14,7 @@ import { LoadingService } from '../../core/services/loading.service';
 export class SummaryComponent implements OnInit ,OnDestroy{
   clusterId: string = "";
   private destoryed$: ReplaySubject<any> = new ReplaySubject(1);
+  public isRefreshing: boolean = false;
   public summary?: ClusterSummary | null
   constructor(private monitoringService: KafkaMonitorService, 
     private route: ActivatedRoute,private router: Router,
@@ -36,11 +37,13 @@ export class SummaryComponent implements OnInit ,OnDestroy{
   }
 
   public loadSummary(clusterId: string,refresh: boolean =false){
+    this.isRefreshing = true;
     this.loader.change('SUMMARY_LIST', false);
     this.monitoringService.getSummary(clusterId, refresh)
     .then(data=> {
       this.summary = data;
       this.loader.change('SUMMARY_LIST', true);
+      this.isRefreshing = false;
     }).catch(error=> {
       this.summary = null;
       this.loader.change('SUMMARY_LIST', true);
@@ -53,5 +56,8 @@ export class SummaryComponent implements OnInit ,OnDestroy{
 
   public topicsList(){
     this.router.navigate(['/topics',this.clusterId]);
+  }
+  public forceReload(){
+    this.loadSummary(this.clusterId, true);
   }
 }

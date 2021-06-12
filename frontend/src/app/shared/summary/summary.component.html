@@ -1,20 +1,31 @@
-
 <div class="row">
-    <div class="col-lg-3 col-md-6 col-sm-6">
-       <app-summary-card [title]="'Topic'" class="clickable" (refresh)="loadSummary(clusterId,true)" (click)="topicsList()" [timeStamp]="summary?.timeStamp" [value]="summary?.topicCount" [icon]="'nc-money-coins text-success'"></app-summary-card>
-    </div>
-    <div class="col-lg-3 col-md-6 col-sm-6">
-        <app-summary-card [title]="'Partition'" (refresh)="loadSummary(clusterId,true)" [timeStamp]="summary?.timeStamp" [value]="summary?.partitionCount" [icon]="'nc-app text-success'">
-        </app-summary-card>
-    </div>
-    <div class="col-lg-3 col-md-6 col-sm-6">
-        <app-summary-card [title]="'Broker'" class="clickable" (refresh)="loadSummary(clusterId,true)" (click)="brokerDetails()" [timeStamp]="summary?.timeStamp" [value]="summary?.brokerCount" [icon]="'nc-laptop text-success'">
-        </app-summary-card>
-    </div>
-    <div class="col-lg-3 col-md-6 col-sm-6">
-        <app-summary-card [title]="'Preferred Replicated'" (refresh)="loadSummary(clusterId,true)" [isPercentage]="true" [timeStamp]="summary?.timeStamp" [value]="summary?.preferredReplicaPercent"
-            [icon]="'nc-layout-11 text-success'">
-        </app-summary-card>
+    <div class="col-lg-12 col-md-12 col-sm-12 text-right">
+        <p-button s styleClass=" p-button-success p-button-text p-ripples" (click)="forceReload()"
+            label="Last update {{ summary?.timeStamp | date :'dd-MMM-yy h:mm:ss'}} " icon="fas fa-refresh" iconPos="right"
+            loadingIcon="fas fa-refresh pi-spin"
+            [loading]="isRefreshing"></p-button>
+            
     </div>
 </div>
 
+<div class="row">
+    <div class="col-lg-3 col-md-6 col-sm-6">
+        <app-summary-card [title]="'Topic'" class="clickable" (click)="topicsList()" [timeStamp]="summary?.timeStamp"
+            [value]="summary?.topicCount" [icon]="'nc-money-coins text-success'"></app-summary-card>
+    </div>
+    <div class="col-lg-3 col-md-6 col-sm-6">
+        <app-summary-card [title]="'Partition'" [timeStamp]="summary?.timeStamp" [value]="summary?.partitionCount"
+            [icon]="'nc-app text-success'">
+        </app-summary-card>
+    </div>
+    <div class="col-lg-3 col-md-6 col-sm-6">
+        <app-summary-card [title]="'Broker'" class="clickable" (click)="brokerDetails()"
+            [timeStamp]="summary?.timeStamp" [value]="summary?.brokerCount" [icon]="'nc-laptop text-success'">
+        </app-summary-card>
+    </div>
+    <div class="col-lg-3 col-md-6 col-sm-6">
+        <app-summary-card [title]="'Preferred Replicated'" [isPercentage]="true" [timeStamp]="summary?.timeStamp"
+            [value]="summary?.preferredReplicaPercent" [icon]="'nc-layout-11 text-success'">
+        </app-summary-card>
+    </div>
+</div>
