@@ -70,8 +70,6 @@ import { ConsumersComponent } from '../pages/consumers/consumers.component';
     MatDialogModule,
     MultiSelectModule,
     CheckboxModule
-    
-    
   ],
   entryComponents: [PayloadFilterComponent],
   providers: [KafkaMonitorService, KafkaAdminService, ConfirmationService, LoadingService]

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ReplaySubject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 import { LoadingService } from '../../core/services/loading.service';
@@ -15,7 +15,6 @@ export class SummaryCardComponent implements OnInit {
   @Input('icon') icon?: string;
   @Input('timeStamp') timeStamp?: Date
   @Input('isPercentage') isPercentage : boolean = false;
-  @Output('refresh') refresh: EventEmitter<any> = new EventEmitter();
   public loaded: boolean = false;
   constructor(private loader: LoadingService) { }
 
@@ -27,14 +26,5 @@ export class SummaryCardComponent implements OnInit {
         this.loaded = d.loaded;
       })
   }
-
-  public forceReload(){
-    if(this.refresh){
-      this.refresh.emit();
-    }
-  }
-
- 
-
 
 }
