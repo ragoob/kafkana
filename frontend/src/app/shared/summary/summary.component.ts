@@ -51,4 +51,7 @@ export class SummaryComponent implements OnInit ,OnDestroy{
     this.router.navigate(['/brokers-details',this.clusterId]);
   }
 
+  public topicsList(){
+    this.router.navigate(['/topics',this.clusterId]);
+  }
 }

@@ -28,9 +28,13 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { CheckboxModule } from 'primeng/checkbox';
 import { PercentagePipe } from '../core/pipes/percentage.pipe';
+import { TopicsComponent } from '../pages/topics/topics.component';
+import { ConsumersComponent } from '../pages/consumers/consumers.component';
 
  const AdminLayoutRoutes: Routes = [
   { path: 'dashboard/:id', component: DashboardComponent },
+  { path: 'topics/:id', component: TopicsComponent },
+  { path: 'consumers/:id', component: ConsumersComponent },
   { path: 'brokers-details/:id', component: BrokersDetailsComponent },
   { path: 'topic-details/:id/:topicId', component: TopicDetailsComponent }
 ];
@@ -38,6 +42,8 @@ import { PercentagePipe } from '../core/pipes/percentage.pipe';
 @NgModule({
   declarations: [
     DashboardComponent,
+    TopicsComponent,
+    ConsumersComponent,
     SummaryComponent,
     SummaryCardComponent,
     TopicListComponent,

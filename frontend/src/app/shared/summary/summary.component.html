@@ -1,14 +1,14 @@
 
 <div class="row">
     <div class="col-lg-3 col-md-6 col-sm-6">
-       <app-summary-card [title]="'Topic'" (refresh)="loadSummary(clusterId,true)"  [timeStamp]="summary?.timeStamp" [value]="summary?.topicCount" [icon]="'nc-money-coins text-success'"></app-summary-card>
+       <app-summary-card [title]="'Topic'" class="clickable" (refresh)="loadSummary(clusterId,true)" (click)="topicsList()" [timeStamp]="summary?.timeStamp" [value]="summary?.topicCount" [icon]="'nc-money-coins text-success'"></app-summary-card>
     </div>
     <div class="col-lg-3 col-md-6 col-sm-6">
         <app-summary-card [title]="'Partition'" (refresh)="loadSummary(clusterId,true)" [timeStamp]="summary?.timeStamp" [value]="summary?.partitionCount" [icon]="'nc-app text-success'">
         </app-summary-card>
     </div>
     <div class="col-lg-3 col-md-6 col-sm-6">
-        <app-summary-card [title]="'Broker'" (refresh)="loadSummary(clusterId,true)" style="cursor: pointer;" (click)="brokerDetails()" [timeStamp]="summary?.timeStamp" [value]="summary?.brokerCount" [icon]="'nc-laptop text-success'">
+        <app-summary-card [title]="'Broker'" class="clickable" (refresh)="loadSummary(clusterId,true)" (click)="brokerDetails()" [timeStamp]="summary?.timeStamp" [value]="summary?.brokerCount" [icon]="'nc-laptop text-success'">
         </app-summary-card>
     </div>
     <div class="col-lg-3 col-md-6 col-sm-6">
