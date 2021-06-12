@@ -35,8 +35,9 @@
                 "src/assets/scss/paper-dashboard.scss",
                 "src/styles.scss",
                 "node_modules/primeicons/primeicons.css",
-                "node_modules/primeng/resources/themes/saga-blue/theme.css",
+                "node_modules/primeng/resources/themes/bootstrap4-dark-blue/theme.css",
                 "node_modules/primeng/resources/primeng.min.css"
+            
             ],
             "scripts": []
           },

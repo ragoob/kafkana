@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -92,7 +91,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
     public Optional<topicModel> getTopic(String topic,String clusterIp,boolean showDefaultConfig) {
         final  var kafkaConsumer= createConsumer(clusterIp);
         final  var admin = getAdminClient(clusterIp);
-        
+
         try{
             final var topicModel = Optional.ofNullable(getTopicMetadata(kafkaConsumer,admin,showDefaultConfig).get(topic));
             topicModel.ifPresent(model -> model.setPartitions(getTopicPartitionSizes(model,kafkaConsumer)));
@@ -219,9 +218,6 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         List<messageModel> messages = new ArrayList<>();
         Consumer<String, String> kafkaConsumer =this.createConsumer(clusterIp);
         try{
-            TopicPartition partition = new TopicPartition(topic, 0);
-            kafkaConsumer.assign(Collections.singleton(partition)); // must assign before seeking
-            kafkaConsumer.seekToBeginning(Collections.singleton(partition));
 
             boolean more = true;
             while (more){
@@ -335,7 +331,6 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
                 "KAFKANA_UI_MONITORING");
         props.put(ConsumerConfig.CLIENT_ID_CONFIG,
                 "KAFKANA_UI_MONITORING-CONUMER-" + uuidAsString);
-
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
                 StringDeserializer.class.getName());
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,

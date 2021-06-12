@@ -1,0 +1,178 @@
+
+
+body{
+    background-color: $dark-body !important;
+}
+
+.bg-light{
+    background-color: $kafkana-dark !important;
+}
+
+.card{
+    color: $kafkana-color !important;
+    background-color: $kafkana-dark !important;
+}
+
+.sidebar .nav-link{
+    color: $kafkana-color !important;
+}
+
+.text-success{
+    color: $kafkna-primary !important;
+} 
+
+.navbar-light .navbar-brand, .navbar-light .navbar-brand:focus, .navbar-light .navbar-brand:hover{
+    color: $kafkana-color !important;
+}
+
+.card-stats .card-body .numbers .card-category{
+    color:  $kafkana-color !important;
+}
+
+.sidebar .nav-link.active{
+      color: $kafkna-primary !important;
+}
+
+.p-datatable {
+     background-color: $kafkana-dark !important;
+}
+
+.p-datatable .p-datatable-header{
+    background-color: $kafkana-dark !important;
+}
+
+.p-datatable .p-datatable-body{
+    background-color: $kafkana-dark !important;
+}
+
+.p-datatable .p-datatable-thead > tr > th{
+    background-color: $kafkana-dark !important;
+}
+
+.p-datatable .p-datatable-tbody > tr > td{
+     background-color: $kafkana-dark !important;
+}
+
+.p-paginator{
+      background-color: $kafkana-dark !important;
+}
+
+.p-paginator .p-paginator-pages .p-paginator-page.p-highlight{
+    background-color: $kafkna-primary !important;
+    border-color: $kafkna-primary !important;
+    color: $kafkana-color !important;
+}
+
+.p-paginator .p-paginator-current{
+     color: $kafkana-color !important;
+}
+
+.p-paginator .p-paginator-pages .p-paginator-page:not(.p-highlight):hover{
+       color: $kafkana-color !important;
+}
+
+.p-paginator .p-paginator-pages .p-paginator-page{
+     color: $kafkana-color !important;
+}
+
+.p-paginator .p-paginator-first, .p-paginator .p-paginator-prev, .p-paginator .p-paginator-next, .p-paginator .p-paginator-last{
+    color: $kafkana-color !important;
+}
+
+.p-button{
+    background-color: $kafkna-primary !important;
+    border-color: $kafkna-primary !important;
+    color: $kafkana-color !important;
+}
+
+.btn-primary{
+background-color: $kafkna-primary !important;
+color: $kafkana-color !important;
+}
+
+table{
+    color:  $kafkana-color !important;
+}
+
+.nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link{
+   background-color: $kafkna-primary !important;
+  color: $kafkana-color !important;
+}
+
+a{
+    color: $kafkana-color !important;
+}
+
+.card-dark{
+  background-color:   $dark-body !important;
+}
+
+.p-datepicker table td > span.p-highlight{
+    background-color: $kafkna-primary !important;
+color: $kafkana-color !important;
+}
+
+.p-datepicker table td.p-datepicker-today > span{
+    color: $kafkana-color !important;
+}
+
+.p-datepicker:not(.p-disabled) table td span:not(.p-highlight):not(.p-disabled):hover{
+      background-color: $kafkna-primary !important;
+}
+
+.p-datepicker .p-timepicker button:enabled:hover{
+     background-color: $kafkna-primary !important;
+}
+
+.p-inputtext:enabled:focus{
+    border-color: $kafkna-primary !important;
+}
+
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight{
+     background-color: $kafkna-primary !important;
+}
+.p-paginator{
+    color: $kafkana-color !important;
+}
+
+.p-dropdown:not(.p-disabled).p-focus {
+ 
+  border-color: $kafkna-primary !important;
+}
+
+.loader-animated-background {
+animation-duration: 3s;
+    animation-fill-mode: forwards;
+    animation-iteration-count: infinite;
+    animation-name: placeHolderShimmer;
+    animation-timing-function: linear;
+    background: $dark-body;
+    background: linear-gradient(to right, #eeeeee 8%, #dddddd 18%, #eeeeee 33%);
+    position: relative;
+    color: $kafkana-dark !important;
+}
+
+.p-checkbox .p-checkbox-box.p-highlight{
+       background-color: $kafkna-primary !important;
+color: $kafkana-color !important;
+}
+
+.card label{
+    color: $kafkana-color !important;
+}
+
+.p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover{
+    border-color: $kafkna-primary !important;
+    background: $kafkna-primary !important;
+}
+
+.p-multiselect-panel .p-multiselect-items .p-multiselect-item.p-highlight{
+       background-color: $kafkna-primary !important;
+color: $kafkana-color !important;
+}
+
+.p-button-danger, .btn-danger{
+  background-color:  #aa3a0e !important;
+  border-color: #dddddd !important;
+}
+

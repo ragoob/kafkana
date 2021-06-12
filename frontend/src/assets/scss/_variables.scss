@@ -275,7 +275,6 @@ $line-height-lg:             54px           !default;
 
 $border-radius-top:        10px 10px 0 0     !default;
 $border-radius-bottom:     0 0 10px 10px     !default;
-
 $dropdown-shadow:          1px 2px 7px 1px rgba(0,0,0,.125);
 $box-shadow-raised:        0px 10px 25px 0px rgba(0, 0, 0, 0.3);
 $box-shadow:               0 2px 2px rgba(204, 197, 185, 0.5);
@@ -401,3 +400,8 @@ $social-behance-state-color:       lighten(#1769ff, 6%) !default;
 $input-color-placeholder: #999 !default;
 
 $zindex-select-dropdown: 1060 !default; // must be higher than a modal background (1050)
+
+$dark-body:  #161d31 !default;
+$kafkana-dark: #283046 !default;
+$kafkna-primary: #7367f0 !default;
+$kafkana-color: #d0d2d6 !default;

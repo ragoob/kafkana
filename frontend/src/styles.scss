@@ -15,9 +15,6 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-body{
-  background-color: #f8f9fa !important;
-}
 .tim-row {
   margin-bottom: 20px;
 }
@@ -217,16 +214,7 @@ body{
   }
 }
 
-.loader-animated-background {
-animation-duration: 3s;
-    animation-fill-mode: forwards;
-    animation-iteration-count: infinite;
-    animation-name: placeHolderShimmer;
-    animation-timing-function: linear;
-    background: #f6f7f8;
-    background: linear-gradient(to right, #eeeeee 8%, #dddddd 18%, #eeeeee 33%);
-    position: relative;
-}
+
 
 @keyframes placeHolderShimmer{
     0%{
@@ -271,13 +259,6 @@ animation-duration: 3s;
   }
 }
 
-.sidebar .nav-link {
-  color: #333;
-}
-
-.sidebar .nav-link.active {
-  color: #6bd098 !important;
-}
 
 
 .kt-portlet{

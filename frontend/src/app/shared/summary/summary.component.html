@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col-lg-12 col-md-12 col-sm-12 text-right">
-        <p-button s styleClass=" p-button-success p-button-text p-ripples" (click)="forceReload()"
+        <p-button s styleClass=" p-button-success p-button-text p-ripples mb-3" (click)="forceReload()"
             label="Last update {{ summary?.timeStamp | date :'dd-MMM-yy h:mm:ss'}} " icon="fas fa-refresh" iconPos="right"
             loadingIcon="fas fa-refresh pi-spin"
             [loading]="!loaded"></p-button>
