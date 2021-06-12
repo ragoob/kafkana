@@ -30,7 +30,6 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { PercentagePipe } from '../core/pipes/percentage.pipe';
 import { TopicsComponent } from '../pages/topics/topics.component';
 import { ConsumersComponent } from '../pages/consumers/consumers.component';
-import {BadgeModule} from 'primeng/badge';
 
  const AdminLayoutRoutes: Routes = [
   { path: 'dashboard/:id', component: DashboardComponent },
@@ -52,7 +51,7 @@ import {BadgeModule} from 'primeng/badge';
     BrokersDetailsComponent,
     TopicDetailsComponent,
     TopicMessagesComponent,
-    PercentagePipe,
+    PercentagePipe
     
   ],
   imports: [
@@ -70,10 +69,7 @@ import {BadgeModule} from 'primeng/badge';
     FormsModule,
     MatDialogModule,
     MultiSelectModule,
-    CheckboxModule,
-    BadgeModule
-    
-    
+    CheckboxModule
   ],
   entryComponents: [PayloadFilterComponent],
   providers: [KafkaMonitorService, KafkaAdminService, ConfirmationService, LoadingService]
