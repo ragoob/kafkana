@@ -3,7 +3,7 @@
         <p-button s styleClass=" p-button-success p-button-text p-ripples" (click)="forceReload()"
             label="Last update {{ summary?.timeStamp | date :'dd-MMM-yy h:mm:ss'}} " icon="fas fa-refresh" iconPos="right"
             loadingIcon="fas fa-refresh pi-spin"
-            [loading]="isRefreshing"></p-button>
+            [loading]="!loaded"></p-button>
             
     </div>
 </div>
