@@ -1,13 +1,27 @@
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { AddNewComponent } from '../add-new/add-new.component';
 import { ClusterStatus, KafkaCluster } from '../core/models/kafka-cluster.model';
 import { AdminService } from '../core/services/admin.service';
+import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
+
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
+  animations: [
+    trigger('listAnimation', [
+      transition('* => *', [
+        query(':enter', [
+          style({ opacity: 0 }),
+          stagger(100, [
+            animate('0.5s', style({ opacity: 1 }))
+          ])
+        ], { optional: true })
+      ])
+    ])
+  ],
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
@@ -15,15 +29,17 @@ export class HomeComponent implements OnInit {
   public clusters: KafkaCluster[] = [];
   first = 0;
   rows = 5;
-  constructor(private adminService: AdminService, public dialog: MatDialog,
-    private router: Router
+  constructor(private adminService: AdminService, public dialog: MatDialog
     ) { }
   
+ 
+    
   ngOnInit(): void {
    this.load();
   }
 
   private load(){
+  
     this.loaded = false;
     this.adminService.getAll()
       .then(data => {
@@ -31,6 +47,7 @@ export class HomeComponent implements OnInit {
         this.loaded = true;
       })
   }
+
 
   public addNewCluster(): void{
     const dialogRef = this.dialog.open(AddNewComponent, {
@@ -41,31 +58,26 @@ export class HomeComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
        if(result){
-         this.refreshStatus(result.clusterId);
+         this.clusters.push(result)
+         this.refreshStatus(result.id);
        }
     });
   }
 
-  public dashboard(id: string) : void{
-    const cluster = this.adminService.findByid(id);
   
-    if(cluster.status !== ClusterStatus.HEALTHY){
-      return;
-    }
-    this.adminService.setCurrent(id);
-    this.router.navigate(['dashboard',id]);
-  }
 
   public delete(id: string){
     this.loaded = false;
      this.adminService.delete(id);
-     this.load();
+     const index = this.clusters.findIndex(c=> c.id == id);
+     this.clusters.splice(index,1);
   }
 
   private update(cluster: KafkaCluster){
-    this.adminService.update(cluster)
-      .then(d => {
-        this.load();
+    this.adminService.update(cluster.id,cluster)
+      .then(() => {
+       const index =  this.clusters.findIndex(c=> c.id === cluster.id);
+        this.clusters[index].status = cluster.status;
       })
   }
 
@@ -80,12 +92,19 @@ export class HomeComponent implements OnInit {
        else{
          cluster.status = ClusterStatus.UNHEALTHY;
        }
-       this.update(cluster);
-
-      
+       
     }).catch(error=>{
       cluster.status = ClusterStatus.UNKOWN;
+     
+    }).finally(()=> {
       this.update(cluster);
     })
   }
+
+  public drop(event: CdkDragDrop<any>) {
+    this.clusters[event.previousContainer.data.index] = event.container.data.item;
+    this.clusters[event.container.data.index] = event.previousContainer.data.item;
+    event.currentIndex = 0;
+  }
+
 }

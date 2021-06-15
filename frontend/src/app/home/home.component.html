@@ -1,66 +1,28 @@
- <div class="container-fluid">
-        <div class="row">
-             <div class="card">
-            <div class="card-header">
-                <h5 class="card-title">Clusters list (Click on the Plus button on the grid footer to add a new cluster)</h5>
-                
+<div class="content back-ground">
+  <div class="section1">
+    <div class="header-container">
+     <h1>KAFKANA</h1>
+    </div>
+    
+    <div class="mountain">
+      <div class="mountain-words" >
+          <app-add-new-cluster-button *ngIf="clusters.length == 0" (click)="addNewCluster()"></app-add-new-cluster-button>
+        <div class="grid-layout"  *ngIf="clusters.length > 0"
+        [@listAnimation]="clusters.length"
+        cdkDropListGroup>
+          <app-add-new-cluster-button (click)="addNewCluster()"></app-add-new-cluster-button>
+          <ng-container *ngFor="let item of clusters; let i = index">
+            <div
+              cdkDropList
+              [cdkDropListData]="{ item: item, index: i }"
+              (cdkDropListDropped)="drop($event)"
+              cdkDropListSortingDisabled="true"
+            >
+              <app-cluster (delete)="delete(item.id)" [item]="item" cdkDrag> </app-cluster>
             </div>
-            <div class="card-body">
-                <p-table #dt1  [paginator]="true" [rows]="rows" [loading]="!loaded"
-                     [value]="clusters"
-                    [showCurrentPageReport]="true" 
-                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-                    [rowsPerPageOptions]="[5,10,25,50,200,500,1000]">
-                  
-                    <ng-template pTemplate="header">
-                        <tr>
-                            <th>Name</th>
-                            <th>Bootstrap</th>
-                           
-                            <th>
-                                Status (click on the emoji to check the cluster availability)
-                            </th>
-                            <th></th>
-                        </tr>
-                    </ng-template>
-                    <ng-template pTemplate="body" let-item>
-                        <tr  >
-                            <td [ngClass]="{'clickable-row': item?.status == 'HEALTHY'}" (click)="dashboard(item?.id)">{{item?.id}}</td>
-                            <td [ngClass]="{'clickable-row': item?.status == 'HEALTHY'}"  (click)="dashboard(item?.id)">{{item?.bootStrapServers}}</td>
-                            <td>
-                              <span style="cursor: pointer;" (click)="refreshStatus(item?.id)" [ngSwitch]="item?.status">
-                                         
-                                     <i *ngSwitchCase="'HEALTHY'" style="font-size:30px;" class="nc-icon nc-satisfied  text-success"></i> 
-                                
-            
-                              <i  *ngSwitchCase="'UNHEALTHY'" style="font-size:30px;" class="far fa-angry  text-danger"></i> 
-                               
-                                
-                                 <i *ngSwitchDefault style="font-size:30px;" class="nc-icon nc-alert-circle-i  text-warning"></i> 
-                              
-                              </span> 
-                                
-                               
-
-                            </td>
-                            
-                            <td>
-                            <button  (click)="delete(item?.id)" class="btn btn-danger"
-                              >
-                               <i class="fa fa-trash"></i>
-                            </button>
-                         
-                            </td>
-                        </tr>
-                    </ng-template>
-                    <ng-template pTemplate="paginatorleft">
-                        <p-button type="button" (click)="addNewCluster()" icon="pi pi-plus" styleClass="p-button-text"></p-button>
-                    </ng-template>
-                   
-                </p-table>
-
-            </div>
-
+          </ng-container>
         </div>
-        </div>
-
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,30 @@
+<div class="card" [ngClass]="{'loader-animated-background': loading}">
+ 
+  <div class="card-body">
+   <h5 class="card-title">{{cluster.id}}</h5>
+     <div  class="card-text clickable" title="Update cluster status" (click)="refreshStatus()">
+       <svg *ngIf="cluster.status === 'HEALTHY'" class="healthy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+     <circle class="healthy__circle" cx="26" cy="26" r="25" fill="none"/>
+      <path class="healthy__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+      </svg>
+
+  <svg *ngIf="cluster.status !== 'HEALTHY'" class="unhealthy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
+  <circle class="unhealthy__circle" cx="26" cy="26" r="25" fill="none"/>
+  <path class="unhealthy__check" fill="none" d="M 10,10 L 30,30 M 30,10 L 10,30"/>
+   </svg>
+     </div>
+    
+  
+                            <button (click)="delete()" type="button" class="btn btn-danger btn-circle"><i class="fa fa-trash"></i>
+                               </button>
+                               
+                              <button (click)="edit()" type="button" class="btn btn-primary btn-circle">   <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            </button>
+
+                              <button [disabled]="cluster.status !== 'HEALTHY'" (click)="dashboard()" type="button" class="btn btn-success btn-circle"><i class="fa fa-arrow-right" aria-hidden="true"></i>
+                            </button>
+                         
+
+
+  </div>
+</div>

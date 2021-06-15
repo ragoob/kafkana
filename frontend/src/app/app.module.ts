@@ -28,6 +28,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SideBarComponent } from './side-bar/side-bar.component';
 import { NavComponent } from './nav/nav.component';
 import { PayloadFilterComponent } from './payload-filter/payload-filter.component';
+import { ClusterComponent } from './cluster/cluster.component';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { AddNewClusterButtonComponent } from './add-new-cluster-button/add-new-cluster-button.component';
 
 
 
@@ -39,7 +42,9 @@ import { PayloadFilterComponent } from './payload-filter/payload-filter.componen
     AddNewComponent,
     SideBarComponent,
     NavComponent,
-    PayloadFilterComponent
+    PayloadFilterComponent,
+    ClusterComponent,
+    AddNewClusterButtonComponent
   ],
   imports: [
     BrowserModule,
@@ -61,7 +66,8 @@ import { PayloadFilterComponent } from './payload-filter/payload-filter.componen
     TableModule,
     MatDialogModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    DragDropModule
     
 
   ],

@@ -9,7 +9,7 @@ import { ThrowStmt } from '@angular/compiler';
   templateUrl: './add-new.component.html',
   styleUrls: ['./add-new.component.scss']
 })
-export class AddNewComponent {
+export class AddNewComponent implements OnInit {
   public addNewForm: FormGroup;
   public isSubmit: boolean =false;
   constructor(
@@ -26,6 +26,12 @@ export class AddNewComponent {
     });
     
     }
+  ngOnInit(): void {
+    if(this.data && this.data.edited){
+      this.addNewForm.controls["id"].setValue(this.data.edited.id);
+      this.addNewForm.controls["bootStrapServers"].setValue(this.data.edited.bootStrapServers);
+    }
+  }
   
 
   close(result: any): void {
@@ -42,10 +48,19 @@ export class AddNewComponent {
       this.addNewForm.get(key)?.markAsDirty();
     });
     if(this.addNewForm.valid){
-      this.adminService.create(this.addNewForm.value)
-        .then(() => {
-          this.close({ clusterId: this.addNewForm.controls["id"].value });
-        })
+      if (this.data && this.data.edited){
+        this.adminService.update(this.data.edited.id,this.addNewForm.value)
+          .then(() => {
+            this.close(this.addNewForm.value);
+          })
+      }
+      
+      else{
+        this.adminService.create(this.addNewForm.value)
+          .then(() => {
+            this.close(this.addNewForm.value);
+          })
+      }
     }
     
   }

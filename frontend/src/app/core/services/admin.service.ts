@@ -28,14 +28,13 @@ export class AdminService{
         })
     }
 
-    update(model: KafkaCluster): Promise<void> {
+    update(id:string ,model: KafkaCluster): Promise<void> {
         return new Promise((resolve, reject) => {
-            const list = JSON.parse(localStorage.getItem("CLUSTER_LIST") ?? "[]") as KafkaCluster[];
-             list.forEach(d=>{
-                 if(d.id === model.id){
-                     Object.assign(d,model);
-                 }
-             })
+            let list = JSON.parse(localStorage.getItem("CLUSTER_LIST") ?? "[]") as KafkaCluster[];
+            const index = list.findIndex(l => l.id == id);
+            list[index].id = model.id;
+            list[index].bootStrapServers = model.bootStrapServers;
+            list[index].status = model.status;
             resolve(localStorage.setItem("CLUSTER_LIST", JSON.stringify(list)));
         })
     }
