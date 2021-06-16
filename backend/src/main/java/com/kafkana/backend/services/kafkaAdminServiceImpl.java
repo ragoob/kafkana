@@ -23,12 +23,12 @@ public class kafkaAdminServiceImpl implements kafkaAdminService {
     private AdminClient getAdminClient(String clusterIp) {
         Properties config = new Properties();
         config.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, clusterIp);
+        config.put(AdminClientConfig.REQUEST_TIMEOUT_MS_CONFIG,20000);
         UUID uuid = UUID.randomUUID();
         String uuidAsString = uuid.toString();
         config.put(AdminClientConfig.CLIENT_ID_CONFIG,"ADMIN_CLIENT-" + uuidAsString);
-        AdminClient admin = AdminClient.create(config);
 
-        return  admin;
+        return AdminClient.create(config);
     }
 
     @Override
@@ -82,9 +82,7 @@ public class kafkaAdminServiceImpl implements kafkaAdminService {
                 HashMap<String,String> config = getBrokersConfig(Integer.toString(c.id()),admin);
                 nodes.add(new brokers(c.id(),c.host(),c.port(),c.rack(),config,controller.id() == c.id()));
             });
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
         return nodes;
@@ -92,15 +90,17 @@ public class kafkaAdminServiceImpl implements kafkaAdminService {
 
     @Override
     public boolean IsHealth(String clusterIp) {
-        final AdminClient admin = getAdminClient(clusterIp);
-        try{
-          final var topics =  admin.listTopics();
-          return  topics.names().get().size() > 0;
+          boolean isHealthy = false;
+        try (AdminClient admin = getAdminClient(clusterIp)) {
+            admin.listTopics();
+            isHealthy = true;
         } catch (Exception e) {
-            admin.close();
-            return  false;
-
+            System.out.println(e.getMessage());
         }
+
+        return isHealthy;
+
+
 
     }
 
