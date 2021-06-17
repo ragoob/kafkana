@@ -68,7 +68,7 @@ public class topicPartitionModel {
     }
 
     public boolean isUnderReplicated() {
-        return inSyncReplicaStream().count() < replicas.size();
+        return inSyncReplicaStream().count() <= replicas.size();
     }
 
     public long getSize() {
