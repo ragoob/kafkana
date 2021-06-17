@@ -18,4 +18,5 @@ public interface kafkaMonitorService {
     List<messageModel> getMessages(String topic,String clusterIp,int size,long start);
     List<messageModel> getMessagesUntilTime(String topic,String clusterIp,int size,long end);
     Map<Integer,Long> getLastOffsetPerPartition(String topic, String clusterIp);
+    Map<String,Map<String,Long>> GetLastOffsetPerPartition(String clusterIp);
 }

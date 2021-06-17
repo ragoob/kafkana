@@ -231,7 +231,31 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         for (var partition : partitions) {
             map.put(partition.partition(), latestOffsets.get(partition));
         }
+        kafkaConsumer.close();
         return  map;
+    }
+
+    @Override
+    public Map<String, Map<String, Long>> GetLastOffsetPerPartition(String clusterIp) {
+        Consumer<String, String> kafkaConsumer =this.createConsumer(clusterIp);
+        Map<String,Map<String,Long>> map = new HashMap<>();
+       final var allTopics = this.getTopics(clusterIp,false,true);
+        allTopics.forEach(topic-> {
+           final var partitionInfoSet = kafkaConsumer.partitionsFor(topic.getName());
+           final var partitions = partitionInfoSet.stream()
+                   .map(partitionInfo -> new TopicPartition(partitionInfo.topic(),
+                           partitionInfo.partition()))
+                   .collect(Collectors.toList());
+           kafkaConsumer.assign(partitions);
+           final var latestOffsets = kafkaConsumer.endOffsets(partitions);
+           Map<String,Long> offsetMap = new HashMap<>();
+           for (var partition : partitions) {
+               offsetMap.put(Integer.toString(partition.partition()), latestOffsets.get(partition));
+           }
+           map.put(topic.getName(),offsetMap);
+       });
+        kafkaConsumer.close();
+       return  map;
     }
 
     @Override
