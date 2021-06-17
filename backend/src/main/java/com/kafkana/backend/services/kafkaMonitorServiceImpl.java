@@ -217,6 +217,10 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
     public  List<messageModel> getLatestMessages(String topic,String clusterIp,int size){
         List<messageModel> messages = new ArrayList<>();
         Consumer<String, String> kafkaConsumer =this.createConsumer(clusterIp);
+        TopicPartition partition = new TopicPartition(topic, 0);
+        kafkaConsumer.assign(Collections.singleton(partition)); // must assign before seeking
+        kafkaConsumer.seekToBeginning(Collections.singleton(partition));
+
         try{
 
             long startTime = System.currentTimeMillis();
