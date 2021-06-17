@@ -63,9 +63,11 @@
                                         ISR Count
                                     </th>
                                     <th>
-                                       last offset(offset size)
+                                      offset size
                                     </th>
-                                   
+                                   <th>
+                                      Last offset
+                                    </th>
                                     <th>
                                         Under replica ?
                                     </th>
@@ -89,6 +91,9 @@
                                         {{item.size}}
                                     </td>
                                    
+                                     <td>
+                                        {{item.size - 1}}
+                                    </td>
                                     <td>
                                         {{item.underReplicated}}
                                     </td>
