@@ -89,7 +89,7 @@ export class TopicMessagesComponent implements OnInit {
         this.populateFilters();
 
         this.loaded = true;
-      })
+      });
    
   }
 

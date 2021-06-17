@@ -53,9 +53,7 @@ public class kafkaAdminServiceImpl implements kafkaAdminService {
              brokers brokers = new brokers(c.id(),c.host(),c.port(),c.rack(),config,controller.id() == c.id());
               configs.add(brokers);
             });
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
         return  configs;
@@ -129,13 +127,11 @@ public class kafkaAdminServiceImpl implements kafkaAdminService {
                      });
             return  config;
 
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
 
-         return  null;
+        return  null;
 
     }
 }

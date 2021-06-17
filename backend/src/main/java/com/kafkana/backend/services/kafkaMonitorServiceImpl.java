@@ -219,8 +219,8 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         Consumer<String, String> kafkaConsumer =this.createConsumer(clusterIp);
         try{
 
-            boolean more = true;
-            while (more){
+            long startTime = System.currentTimeMillis();
+            while (messages.size() < size && (System.currentTimeMillis()-startTime)<1000){
                 for (ConsumerRecord<String, String> record : kafkaConsumer.poll(Duration.ofMillis(200))) {
 
                     if(messages.size() < size){
@@ -228,10 +228,6 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
                                 headersToMap(record.headers())
                                 ,new Date(record.timestamp())));
                     }
-                    else{
-                        more = false;
-                    }
-
                 }
             }
             kafkaConsumer.close();
@@ -330,7 +326,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         props.put(ConsumerConfig.GROUP_ID_CONFIG,
                 "KAFKANA_UI_MONITORING");
         props.put(ConsumerConfig.CLIENT_ID_CONFIG,
-                "KAFKANA_UI_MONITORING-CONUMER-" + uuidAsString);
+                "KAFKANA_UI_MONITORING-CONUMER");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
                 StringDeserializer.class.getName());
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
