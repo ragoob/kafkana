@@ -218,6 +218,19 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
     }
 
     @Override
+    public Map<TopicPartition,Long> getLastOffsetPerPartition(String topic, String clusterIp) {
+        Consumer<String, String> kafkaConsumer =this.createConsumer(clusterIp);
+        final var partitionInfoSet = kafkaConsumer.partitionsFor(topic);
+        final var partitions = partitionInfoSet.stream()
+                .map(partitionInfo -> new TopicPartition(partitionInfo.topic(),
+                        partitionInfo.partition()))
+                .collect(Collectors.toList());
+        kafkaConsumer.assign(partitions);
+        final var latestOffsets = kafkaConsumer.endOffsets(partitions);
+        return  latestOffsets;
+    }
+
+    @Override
     public  List<messageModel> getLatestMessages(String topic,String clusterIp,int size){
         List<messageModel> messages = new ArrayList<>();
         Consumer<String, String> kafkaConsumer =this.createConsumer(clusterIp);

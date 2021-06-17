@@ -7,6 +7,7 @@ import com.kafkana.backend.models.consumerModel;
 import com.kafkana.backend.models.messageModel;
 import com.kafkana.backend.models.topicModel;
 import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
@@ -15,10 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.ws.rs.PathParam;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController()
 @CrossOrigin
@@ -96,5 +94,11 @@ public class kafkaMonitoringController {
             return this.kafkaMonitorService.getMessages(name,clusterIp,count,start,end);
         }
 
+    }
+
+    @GetMapping("/lastOffsets/{name:.+}")
+    Map<TopicPartition,Long> getLastOffsets(@RequestHeader(value = "clusterIp") String clusterIp, @PathVariable(value = "name") String name
+    ){
+        return this.kafkaMonitorService.getLastOffsetPerPartition(name,clusterIp);
     }
 }
