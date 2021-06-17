@@ -97,7 +97,7 @@ public class kafkaMonitoringController {
     }
 
     @GetMapping("/lastOffsets/{name:.+}")
-    Map<TopicPartition,Long> getLastOffsets(@RequestHeader(value = "clusterIp") String clusterIp, @PathVariable(value = "name") String name
+    Map<Integer,Long> getLastOffsets(@RequestHeader(value = "clusterIp") String clusterIp, @PathVariable(value = "name") String name
     ){
         return this.kafkaMonitorService.getLastOffsetPerPartition(name,clusterIp);
     }
