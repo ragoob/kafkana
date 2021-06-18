@@ -38,6 +38,4 @@ public class administrationController {
         this.kafkaClusterRepository.remove(id);
     }
 
-
-
 }

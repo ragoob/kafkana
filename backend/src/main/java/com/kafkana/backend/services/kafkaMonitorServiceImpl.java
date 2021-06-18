@@ -250,7 +250,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
            final var latestOffsets = kafkaConsumer.endOffsets(partitions);
            Map<String,Long> offsetMap = new HashMap<>();
            for (var partition : partitions) {
-               offsetMap.put(Integer.toString(partition.partition()), latestOffsets.get(partition));
+               offsetMap.put(Integer.toString(partition.partition()), (latestOffsets.get(partition) - 1));
            }
            map.put(topic.getName(),offsetMap);
        });

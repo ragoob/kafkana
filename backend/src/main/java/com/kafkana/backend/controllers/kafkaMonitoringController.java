@@ -107,4 +107,5 @@ public class kafkaMonitoringController {
     ){
         return this.kafkaMonitorService.GetLastOffsetPerPartition(clusterIp);
     }
+
 }
