@@ -9,6 +9,6 @@ redis:
   host: ${REDIS_HOST:localhost}
   port: ${REDIS_PORT:6389}
 kafka:
-  allowtopicscreation: ${ALLOW_TOPIC_CREATION:true}
-  allowtopicsdeletion: ${ALLOW_TOPIC_DELETION:true}
-  allowproducemessage: ${ALLOW_PRODUCING:true}
+  allowtopicscreation: ${ALLOW_TOPIC_CREATION:false}
+  allowtopicsdeletion: ${ALLOW_TOPIC_DELETION:false}
+  allowproducemessage: ${ALLOW_PRODUCING:false}
