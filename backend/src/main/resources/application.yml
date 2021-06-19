@@ -4,7 +4,7 @@ spring:
   server:
 port: 8081
 cache:
-  allowed: true
+  allowed: ${ALLOW_CACHE:false}
 redis:
   host: ${REDIS_HOST:localhost}
   port: ${REDIS_PORT:6389}
