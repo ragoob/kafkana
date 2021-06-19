@@ -1,9 +1,10 @@
 package com.kafkana.backend.models;
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class topicPartitionModel {
+public class topicPartitionModel  implements Serializable {
     private final int id;
     private final Map<Integer, PartitionReplica> replicas = new LinkedHashMap<>();
     private Integer leaderId;
@@ -87,7 +88,7 @@ public class topicPartitionModel {
         this.firstOffset = firstOffset;
     }
 
-    public static final class PartitionReplica {
+    public static final class PartitionReplica implements  Serializable {
         private final Integer id;
         private final boolean inSync;
         private final boolean leader;

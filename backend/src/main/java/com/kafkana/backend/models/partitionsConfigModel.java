@@ -1,8 +1,9 @@
 package com.kafkana.backend.models;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class partitionsConfigModel {
+public class partitionsConfigModel  implements Serializable {
     private  String topic;
     private  int partition;
     private ArrayList<Integer>  replicas;

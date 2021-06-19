@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: kafkana
+  server:
+port: 8081
+cache:
+  allowed: true
+redis:
+  host: ${REDIS_HOST:localhost}
+  port: ${REDIS_PORT:6389}
+kafka:
+  allowtopicscreation: ${ALLOW_TOPIC_CREATION:true}
+  allowtopicsdeletion: ${ALLOW_TOPIC_DELETION:true}
+  allowproducemessage: ${ALLOW_PRODUCING:true}

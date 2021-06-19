@@ -1,12 +1,13 @@
 package com.kafkana.backend.models;
 
+import java.io.Serializable;
 import java.security.Timestamp;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class clusterSummaryModel {
+public class clusterSummaryModel implements Serializable {
     private int topicCount;
     private int partitionCount;
     private int underReplicatedCount;

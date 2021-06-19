@@ -179,3 +179,25 @@ color: $kafkana-color !important;
 .btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .btn-primary:active:focus, .btn-primary:active:hover, .btn-primary.active:focus, .btn-primary.active:hover, .show > .btn-primary.dropdown-toggle, .show > .btn-primary.dropdown-toggle:focus, .show > .btn-primary.dropdown-toggle:hover{
      background-color: $kafkna-primary !important;
 }
+
+.form-control{
+    background-color: $kafkana-dark !important;
+    border-color:  #dddddd !important;
+    color: #fff !important;
+}
+
+.mat-dialog-container{
+     
+    background-color: $kafkana-dark !important;
+}
+
+.mat-form-field-flex{
+   background-color:  $kafkna-primary !important;
+
+}
+
+.form-group .input-group-prepend .input-group-text, .form-group .input-group-append .input-group-text, .input-group .input-group-prepend .input-group-text, .input-group .input-group-append .input-group-text{
+    padding: 10px 17px 10px 22px !important;
+    background-color: $kafkna-primary !important;
+    cursor: pointer;
+}

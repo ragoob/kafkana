@@ -1,9 +1,10 @@
 package com.kafkana.backend.models;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class topicModel  implements Comparable<topicModel>{
+public class topicModel  implements Comparable<topicModel>, Serializable {
     private final String name;
 
     private Map<Integer, topicPartitionModel> partitions = new TreeMap<>();

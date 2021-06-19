@@ -9,14 +9,14 @@ import java.util.Map;
 import java.util.Optional;
 
 public interface kafkaMonitorService {
-    clusterSummaryModel getClusterSummary(String clusterIp,boolean refresh);
-    List<topicModel> getTopics(String clusterId,boolean showDefaultConfig,boolean refresh);
+    clusterSummaryModel getClusterSummary(String clusterIp);
+    List<topicModel> getTopics(String clusterId,boolean showDefaultConfig);
     Optional<topicModel> getTopic(String topic, String clusterId,boolean showDefaultConfig);
-    List<consumerModel> getConsumers(Collection<topicModel> topicModels, String clusterId,boolean refresh);
-    List<messageModel> getMessages(String topic,String clusterId,int size,long start, long end);
-    List<messageModel> getLatestMessages(String topic,String clusterId,int size);
-    List<messageModel> getMessages(String topic,String clusterIp,int size,long start);
-    List<messageModel> getMessagesUntilTime(String topic,String clusterIp,int size,long end);
+    List<consumerModel> getConsumers(Collection<topicModel> topicModels, String clusterId);
+    List<messageModel> getMessages(String topic,String clusterId,long size,long start, long end,String sortDirection);
+    List<messageModel> getMessages(String topic,String clusterId,long size,String sortDirection);
+    List<messageModel> getMessages(String topic,String clusterIp,long size,long start,String sortingDirection);
+    List<messageModel> getMessagesUntilTime(String topic,String clusterIp,long size,long end,String sortingDirection);
     Map<Integer,Long> getLastOffsetPerPartition(String topic, String clusterIp);
     Map<String,Map<String,Long>> GetLastOffsetPerPartition(String clusterIp);
 }

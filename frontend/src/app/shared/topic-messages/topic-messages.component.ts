@@ -1,32 +1,47 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { ReplaySubject } from 'rxjs';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { fromEvent, ReplaySubject } from 'rxjs';
 import { Message } from '../../core/models/message.model';
 import { Topic } from '../../core/models/topic.model';
 import { KafkaMonitorService } from '../../core/services/kafka-monitor.service';
 import * as FileSaver from 'file-saver';
 import { MatDialog } from '@angular/material/dialog';
 import { PayloadFilterComponent } from '../../payload-filter/payload-filter.component';
+import { debounceTime, takeUntil, filter } from 'rxjs/operators';
+import { LayoutUtilsService, MessageType } from '../../core/services/layout-utils.service';
 @Component({
   selector: 'app-topic-messages',
   templateUrl: './topic-messages.component.html',
   styleUrls: ['./topic-messages.component.scss']
 })
-export class TopicMessagesComponent implements OnInit {
-
+export class TopicMessagesComponent implements OnInit , AfterViewInit {
+  @ViewChild('countInput') inputElRef?: ElementRef;
   @Input('clusterId') clusterId: string = "";
   private destoryed$: ReplaySubject<any> = new ReplaySubject(1);
   @Input('topic') topic?: Topic
   messages: Message[] = [];
   loaded: boolean = false;
-  public from?: Date;
-  public to?: Date;
-  public count?: number;
+  public from?: Date | null;
+  public to?: Date | null;
+  public count?: number | null;
   public filters: string[] = [];
   public filterModel: any = {};
   public selectedColumns: any[] = [];
   public columns: any[] = [];
   public allowDetails: boolean = false;
-  constructor(private monitoringService: KafkaMonitorService, public dialog: MatDialog) { }
+  constructor(private monitoringService: KafkaMonitorService, public dialog: MatDialog, private cdref: ChangeDetectorRef, private layoutService: LayoutUtilsService) { }
+  ngAfterViewInit(): void {
+    fromEvent(this.inputElRef?.nativeElement, 'keydown')
+      .pipe(
+        takeUntil(this.destoryed$),
+        debounceTime(1000),
+        filter((event: any) => event.keyCode === 13)
+      )
+      .subscribe((event: any) => {
+        this.count = event.target.value;
+        this.search();
+        this.cdref.detectChanges();
+      });
+  }
 
 
 
@@ -48,6 +63,17 @@ export class TopicMessagesComponent implements OnInit {
     this.search();
   }
 
+  public sortByTimeStamp(event: any): void{
+  
+    const sortDir: 'asc' | 'desc' = event.target.value;
+    this.search(sortDir);
+  }
+
+  public clearFilters(): void{
+    this.from = null;
+    this.to = null;
+    this.search();
+  }
  
   public changeSelectionColumns(event: any){
     localStorage.setItem(`Selected_Columns_${this.topic?.name}`,JSON.stringify(this.selectedColumns));
@@ -76,20 +102,22 @@ export class TopicMessagesComponent implements OnInit {
     FileSaver.saveAs(data, fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION);
   }
 
-  public search(){
+  public search(sortDir: 'asc' | 'desc' = 'asc'){
     const start:number | undefined = this.from ? +this.from : undefined;
     const end: number | undefined = this.to ? +this.to : undefined;
-
+    const _count: number = this.count ? this.count : 0;
     this.loaded = false;
-    this.monitoringService.getMessages(this.topic?.name ?? "", this.clusterId, this.count, start,end)
+    this.monitoringService.getMessages(this.topic?.name ?? "", this.clusterId, _count, start, end, sortDir)
       .then(data => {
         this.messages = data;
         this.flattenMessageObject();
         this.populateColumns();
         this.populateFilters();
-
         this.loaded = true;
-      });
+      }).catch((error)=> {
+        this.loaded = true;
+        this.messages = [];
+      })
    
   }
 
@@ -124,7 +152,10 @@ export class TopicMessagesComponent implements OnInit {
             if (key === 'fromatedMessage' && msg.fromatedMessage){
                Object.keys(msg.fromatedMessage)
                .forEach(msgKey=> {
-                 this.columns.push(msgKey);
+                 if(!this.columns.find(c=> c  === msgKey)){
+                   this.columns.push(msgKey);
+                 }
+                
                })
             }
             else{
@@ -161,10 +192,16 @@ export class TopicMessagesComponent implements OnInit {
           }
           else{
             this.filterModel = res;
+            this.search();
           }
        
       });
     }
+      else {
+        this.layoutService.showActionNotification("No more filter avaliable", MessageType.Read, 5000, true, false, undefined, 'top');
+      
+      }
   }
+  
   }
 }

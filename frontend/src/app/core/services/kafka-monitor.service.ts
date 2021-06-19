@@ -34,10 +34,10 @@ export class KafkaMonitorService   {
             .toPromise();
     }
 
-    getMessages(topic: string, clusterId: string,size?: number,start?: number,end?: number): Promise<Message[]>{
+    getMessages(topic: string, clusterId: string,size?: number,start?: number,end?: number,sortDir: 'asc' | 'desc' = 'asc'): Promise<Message[]>{
         
         if(!size){
-            size = 200;
+            size = 0;
         }
         let url = `${this.baseUrl}/monitoring/messages/${topic}?size=${size}`;
         if(start){
@@ -46,6 +46,8 @@ export class KafkaMonitorService   {
         if(end){
             url += `&end=${end}`
         }
+
+        url += `&sortDirection=${sortDir}`
         return this.http.get<Message[]>(url, this.header(clusterId))
             .pipe(map(m=> {
                m.forEach(msg=> {

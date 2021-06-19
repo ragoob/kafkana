@@ -1,10 +1,11 @@
 package com.kafkana.backend.models;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class consumerTopicModel {
+public class consumerTopicModel implements Serializable {
     private final String topic;
     private final Map<Integer, consumerPartitionModel> offsets = new TreeMap<>();
 

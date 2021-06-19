@@ -14,7 +14,6 @@ import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.util.*;
@@ -28,11 +27,8 @@ import static java.util.function.Predicate.not;
 public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
     private static final Logger LOG = LoggerFactory.getLogger(kafkaMonitorServiceImpl.class);
     @Override
-    @Cacheable(cacheNames="summary",
-            key="{#clusterIp}"
-            , condition="#refresh == false")
-    public clusterSummaryModel getClusterSummary(String clusterIp,boolean refresh) {
-        Collection<topicModel> topics = this.getTopics(clusterIp,false,refresh);
+    public clusterSummaryModel getClusterSummary(String clusterIp) {
+        Collection<topicModel> topics = this.getTopics(clusterIp,false);
         final var topicSummary = topics.stream()
                 .map(topic -> {
                     final var summary = new clusterSummaryModel();
@@ -67,10 +63,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         return topicSummary;
     }
     @Override
-    @Cacheable(cacheNames="topics",
-            key="{#clusterIp}"
-            , condition="#refresh == false")
-    public List<topicModel> getTopics(String clusterIp, boolean showDefaultConfig,boolean refresh) {
+    public List<topicModel> getTopics(String clusterIp, boolean showDefaultConfig) {
         final  var kafkaConsumer= createConsumer(clusterIp);
         final  var admin = getAdminClient(clusterIp);
         try{
@@ -105,10 +98,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         }
     }
     @Override
-    @Cacheable(cacheNames="consumers",
-            key="{#clusterIp}"
-            , condition="#refresh == false")
-    public List<consumerModel> getConsumers(Collection<topicModel> topicModels,String clusterIp,boolean refresh) {
+    public List<consumerModel> getConsumers(Collection<topicModel> topicModels,String clusterIp) {
         final  var admin = getAdminClient(clusterIp);
         final var topics = topicModels.stream().map(topicModel::getName).collect(Collectors.toSet());
          try{
@@ -123,99 +113,94 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
 
 
     @Override
-    public  List<messageModel> getMessages(String topic,String clusterIp,int size,long start, long end){
-         List<messageModel> messages = new ArrayList<>();
-        Consumer<String, String> kafkaConsumer =this.createConsumer(clusterIp);
-        try{
-            TopicPartition partition = new TopicPartition(topic, 0);
-            long beginningOffset = kafkaConsumer.offsetsForTimes(
-                    Collections.singletonMap(partition, start))
-                    .get(partition).offset();
-
-            kafkaConsumer.assign(Collections.singleton(partition)); // must assign before seeking
-            kafkaConsumer.seek(partition, beginningOffset);
-            long startTime = System.currentTimeMillis();
-            while ( messages.size() < size && (System.currentTimeMillis()-startTime)<1000){
-                for (ConsumerRecord<String, String> record : kafkaConsumer.poll(Duration.ofMillis(200))) {
-
-                    if(record.timestamp() >= start  && record.timestamp() <= end && messages.size() < size){
-                        messages.add(new messageModel(record.partition(),record.offset(),record.value(),record.key(),
-                                headersToMap(record.headers())
-                                ,new Date(record.timestamp())));
-                    }
-
-                }
+    public  List<messageModel> getMessages(String topic,String clusterIp,long size,long start, long end,String sortingDirection){
+        final var records = getLatestRecords(topic, size,clusterIp,start,end);
+        if (records != null  && records.size() > 0) {
+            final var messages = new ArrayList<messageModel>();
+            for (var record : records) {
+                final var message = new messageModel();
+                message.setPartition(record.partition());
+                message.setOffset(record.offset());
+                message.setKey(record.key());
+                message.setMessage(record.value());
+                message.setHeaders(headersToMap(record.headers()));
+                message.setTimestamp(new Date(record.timestamp()));
+                messages.add(message);
             }
-            kafkaConsumer.close();
-            return  messages;
-        }catch (Exception ex){
-            kafkaConsumer.close();
-            return  new ArrayList<>();
+            return sortingDirection.equals(pollingTypes.DESC) ?  messages.stream().sorted((f1, f2) -> Long.compare(f2.getTimestamp().getTime(), f1.getTimestamp().getTime()))
+                    .collect(Collectors.toList()) : messages;
+        } else {
+            return Collections.emptyList();
         }
     }
 
     @Override
-    public  List<messageModel> getMessages(String topic,String clusterIp,int size,long start){
-        List<messageModel> messages = new ArrayList<>();
-        Consumer<String, String> kafkaConsumer =this.createConsumer(clusterIp);
-        try{
-            TopicPartition partition = new TopicPartition(topic, 0);
-            long beginningOffset = kafkaConsumer.offsetsForTimes(
-                    Collections.singletonMap(partition, start))
-                    .get(partition).offset();
-
-            kafkaConsumer.assign(Collections.singleton(partition)); // must assign before seeking
-            kafkaConsumer.seek(partition, beginningOffset);
-            long startTime = System.currentTimeMillis();
-            while ((System.currentTimeMillis()-startTime)<1000){
-                for (ConsumerRecord<String, String> record : kafkaConsumer.poll(Duration.ofMillis(200))) {
-                    if(messages.size() < size) {
-                        messages.add(new messageModel(record.partition(), record.offset(), record.value(), record.key(),
-                                headersToMap(record.headers())
-                                , new Date(record.timestamp())));
-                    }
-                }
+    public  List<messageModel> getMessages(String topic,String clusterIp,long size,long start,String sortingDirection){
+        final var records = getLatestRecords(topic, size,clusterIp,start);
+        if (records != null && records.size() > 0) {
+            final var messages = new ArrayList<messageModel>();
+            for (var record : records) {
+                final var message = new messageModel();
+                message.setPartition(record.partition());
+                message.setOffset(record.offset());
+                message.setKey(record.key());
+                message.setMessage(record.value());
+                message.setHeaders(headersToMap(record.headers()));
+                message.setTimestamp(new Date(record.timestamp()));
+                messages.add(message);
             }
-            kafkaConsumer.close();
-            return  messages;
-        }catch (Exception ex){
-            kafkaConsumer.close();
-            return  new ArrayList<>();
+            return sortingDirection.equals(pollingTypes.DESC) ?  messages.stream().sorted((f1, f2) -> Long.compare(f2.getTimestamp().getTime(), f1.getTimestamp().getTime()))
+                    .collect(Collectors.toList()) : messages;
+        } else {
+            return Collections.emptyList();
         }
     }
 
     @Override
-    public  List<messageModel> getMessagesUntilTime(String topic,String clusterIp,int size,long end){
-        List<messageModel> messages = new ArrayList<>();
-        Consumer<String, String> kafkaConsumer =this.createConsumer(clusterIp);
-        try{
-            final var partitionInfoSet = kafkaConsumer.partitionsFor(topic);
-            final var partitions = partitionInfoSet.stream()
-                    .map(partitionInfo -> new TopicPartition(partitionInfo.topic(),
-                            partitionInfo.partition()))
-                    .collect(Collectors.toList());
-            kafkaConsumer.assign(partitions);
-
-
-            long startTime = System.currentTimeMillis();
-            while (messages.size() < size && (System.currentTimeMillis()-startTime)<1000){
-                for (ConsumerRecord<String, String> record : kafkaConsumer.poll(Duration.ofMillis(200))) {
-
-                    if(record.timestamp() <= end && messages.size() < size){
-                        messages.add(new messageModel(record.partition(),record.offset(),record.value(),record.key(),
-                                headersToMap(record.headers())
-                                ,new Date(record.timestamp())));
-                    }
-
-                }
+    public  List<messageModel> getMessagesUntilTime(String topic,String clusterIp,long size,long end,String sortingDirection){
+        final var records = getLatestRecordsUntilTime(topic, size,clusterIp,end);
+        if (records != null &&  records.size() > 0) {
+            final var messages = new ArrayList<messageModel>();
+            for (var record : records) {
+                final var message = new messageModel();
+                message.setPartition(record.partition());
+                message.setOffset(record.offset());
+                message.setKey(record.key());
+                message.setMessage(record.value());
+                message.setHeaders(headersToMap(record.headers()));
+                message.setTimestamp(new Date(record.timestamp()));
+                messages.add(message);
             }
-            kafkaConsumer.close();
-            return  messages;
-        }catch (Exception ex){
-            kafkaConsumer.close();
-            return  new ArrayList<>();
+            return sortingDirection.equals(pollingTypes.DESC) ?  messages.stream().sorted((f1, f2) -> Long.compare(f2.getTimestamp().getTime(), f1.getTimestamp().getTime()))
+                    .collect(Collectors.toList()) : messages;
+        } else {
+            return Collections.emptyList();
         }
     }
+
+    @Override
+    public  List<messageModel> getMessages(String topic,String clusterIp,long size,String sortingDirection){
+        final var records = getLatestRecords(topic, size,clusterIp,sortingDirection);
+        if (records != null && records.size() > 0) {
+            final var messages = new ArrayList<messageModel>();
+            for (var record : records) {
+                final var message = new messageModel();
+                message.setPartition(record.partition());
+                message.setOffset(record.offset());
+                message.setKey(record.key());
+                message.setMessage(record.value());
+                message.setHeaders(headersToMap(record.headers()));
+                message.setTimestamp(new Date(record.timestamp()));
+                messages.add(message);
+            }
+            return sortingDirection.equals(pollingTypes.DESC) ?  messages.stream().sorted((f1, f2) -> Long.compare(f2.getTimestamp().getTime(), f1.getTimestamp().getTime()))
+                    .collect(Collectors.toList()) : messages;
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+
 
     @Override
     public Map<Integer,Long> getLastOffsetPerPartition(String topic, String clusterIp) {
@@ -235,11 +220,12 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         return  map;
     }
 
+
     @Override
     public Map<String, Map<String, Long>> GetLastOffsetPerPartition(String clusterIp) {
         Consumer<String, String> kafkaConsumer =this.createConsumer(clusterIp);
         Map<String,Map<String,Long>> map = new HashMap<>();
-       final var allTopics = this.getTopics(clusterIp,false,true);
+       final var allTopics = this.getTopics(clusterIp,false);
         allTopics.forEach(topic-> {
            final var partitionInfoSet = kafkaConsumer.partitionsFor(topic.getName());
            final var partitions = partitionInfoSet.stream()
@@ -258,9 +244,11 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
        return  map;
     }
 
-    @Override
-    public  List<messageModel> getLatestMessages(String topic,String clusterIp,int size){
-        List<messageModel> messages = new ArrayList<>();
+
+
+
+    private  List<ConsumerRecord<String, String>> getLatestRecords(String topic,
+                                                                   long count,String clusterIp, String sortingDirection) {
         Consumer<String, String> kafkaConsumer =this.createConsumer(clusterIp);
         final var partitionInfoSet = kafkaConsumer.partitionsFor(topic);
         final var partitions = partitionInfoSet.stream()
@@ -268,81 +256,191 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
                         partitionInfo.partition()))
                 .collect(Collectors.toList());
         kafkaConsumer.assign(partitions);
-        System.out.println("partitions Count " + partitions.size() + "in topic " + topic);
+        final var latestOffsets = kafkaConsumer.endOffsets(partitions);
+        long totalOffsetsCounts = 0;
         for (var partition : partitions) {
-            kafkaConsumer.seek(partition, 0);
+            final var latestOffset = Math.max(0, latestOffsets.get(partition) - 1);
+            totalOffsetsCounts = totalOffsetsCounts +latestOffset;
+            if(sortingDirection.equals(pollingTypes.DESC)){
+                long size = count == 0 ? latestOffset : count;
+                long startFrom = latestOffset > size  ? latestOffset - size : 0;
+                kafkaConsumer.seek(partition, Math.max(0, startFrom));
+            }
+            else{
+                kafkaConsumer.seek(partition, 0);
+            }
+
         }
 
-        try{
+         List<ConsumerRecord<String, String>> messages = new ArrayList<>();
+        boolean moreRecords = true;
+        int polledOffsets = 0;
+        long size = count > totalOffsetsCounts || count == 0 ? totalOffsetsCounts : count;
+        while (moreRecords) {
+            if(moreRecords){
+            final var polled = kafkaConsumer.poll(Duration.ofMillis(200));
+                var records = polled.records(topic);
+                polledOffsets = polledOffsets +  polled.count();
+                moreRecords = polledOffsets < size  && polledOffsets > 0 &&  polled.count() > 0;
+                records.forEach(record -> {
+                    if(messages.size() < size)
+                        messages.add(record);
+                });
+            }
+            }
 
-            long startTime = System.currentTimeMillis();
-            while ((System.currentTimeMillis()-startTime)<3000) {
-                final var polled = kafkaConsumer.poll(Duration.ofMillis(200));
-                for (var partition : polled.partitions()) {
-                    var records = polled.records(partition);
-                    for(ConsumerRecord<String, String> record: records){
-                        if(messages.size() < size){
-                            messages.add(new messageModel(record.partition(),record.offset(),record.value(),record.key(),
-                                    headersToMap(record.headers())
-                                    ,new Date(record.timestamp())));
-                        }
-                    }
+        kafkaConsumer.close();
+        return  messages;
+    }
+
+    private  List<ConsumerRecord<String, String>> getLatestRecords(String topic,
+                                                                   long count,String clusterIp,long from,long to) {
+        Consumer<String, String> kafkaConsumer =this.createConsumer(clusterIp);
+        final var partitionInfoSet = kafkaConsumer.partitionsFor(topic);
+        final var partitions = partitionInfoSet.stream()
+                .map(partitionInfo -> new TopicPartition(partitionInfo.topic(),
+                        partitionInfo.partition()))
+                .collect(Collectors.toList());
+        kafkaConsumer.assign(partitions);
+        final var latestOffsets = kafkaConsumer.endOffsets(partitions);
+        long totalOffsetsCounts = 0;
+        short seekError = 0;
+        for (var partition : partitions) {
+            final var latestOffset = Math.max(0, latestOffsets.get(partition) - 1);
+            totalOffsetsCounts = totalOffsetsCounts + latestOffset;
+            var timStampMap = new HashMap<TopicPartition,Long>();
+            timStampMap.put(partition,from);
+            var timeStampOffset  = kafkaConsumer.offsetsForTimes(timStampMap);
+            try{
+                kafkaConsumer.seek(partition, timeStampOffset.get(partition).offset());
+            }catch (Exception ex){
+                seekError++;
+                if(seekError == partitions.size()){
+                    kafkaConsumer.close();
+                    return  new ArrayList<>();
                 }
             }
-            kafkaConsumer.close();
-            return  messages;
-        }catch (Exception ex){
-            kafkaConsumer.close();
-            return  new ArrayList<>();
+
         }
+
+        List<ConsumerRecord<String, String>> messages = new ArrayList<>();
+        boolean moreRecords = true;
+        int polledOffsets = 0;
+        long size = count > totalOffsetsCounts || count == 0 ? totalOffsetsCounts : count;
+        while (moreRecords) {
+            if(moreRecords){
+                final var polled = kafkaConsumer.poll(Duration.ofMillis(200));
+                var records = polled.records(topic);
+                polledOffsets = polledOffsets +  polled.count();
+                moreRecords = polledOffsets < size && polledOffsets > 0 && polled.count() > 0;
+                for (var record: records){
+                    if(messages.size() < size && record.timestamp() <= to)
+                        messages.add(record);
+                    else
+                        moreRecords = false;
+                }
+
+            }
+        }
+        kafkaConsumer.close();
+        return  messages;
     }
 
 
     private  List<ConsumerRecord<String, String>> getLatestRecords(String topic,
-                                                                   int count,String clusterIp) {
+                                                                   long count,String clusterIp,long from) {
         Consumer<String, String> kafkaConsumer =this.createConsumer(clusterIp);
-       try{
-           final var partitionInfoSet = kafkaConsumer.partitionsFor(topic);
-           final var partitions = partitionInfoSet.stream()
-                   .map(partitionInfo -> new TopicPartition(partitionInfo.topic(),
-                           partitionInfo.partition()))
-                   .collect(Collectors.toList());
-           kafkaConsumer.assign(partitions);
-           final var latestOffsets = kafkaConsumer.endOffsets(partitions);
-           System.out.println("partitions Count " + partitions.size() + "in topic " + topic);
-           for (var partition : partitions) {
-               final var latestOffset = Math.max(0, latestOffsets.get(partition) - 1);
-               kafkaConsumer.seek(partition, Math.max(0, latestOffset - count));
-           }
+        final var partitionInfoSet = kafkaConsumer.partitionsFor(topic);
+        final var partitions = partitionInfoSet.stream()
+                .map(partitionInfo -> new TopicPartition(partitionInfo.topic(),
+                        partitionInfo.partition()))
+                .collect(Collectors.toList());
+        kafkaConsumer.assign(partitions);
+        final var latestOffsets = kafkaConsumer.endOffsets(partitions);
+        long totalOffsetsCounts = 0;
+        short seekError = 0;
+        for (var partition : partitions) {
+            final var latestOffset = Math.max(0, latestOffsets.get(partition) - 1);
+            totalOffsetsCounts = totalOffsetsCounts + latestOffset;
+            var timStampMap = new HashMap<TopicPartition,Long>();
+            timStampMap.put(partition,from);
+            var timeStampOffset  = kafkaConsumer.offsetsForTimes(timStampMap);
+            try{
+                kafkaConsumer.seek(partition, timeStampOffset.get(partition).offset());
+            }catch (Exception ex){
+                seekError++;
+                if(seekError == partitions.size()){
+                    kafkaConsumer.close();
+                    return  new ArrayList<>();
+                }
+            }
+        }
 
-           final Map<TopicPartition, List<ConsumerRecord<String, String>>> rawRecords
-                   = partitions.stream().collect(Collectors.toMap(p -> p , p -> new ArrayList<>(count)));
+        List<ConsumerRecord<String, String>> messages = new ArrayList<>();
+        boolean moreRecords = true;
+        int polledOffsets = 0;
+        long size = count > totalOffsetsCounts || count == 0 ? totalOffsetsCounts : count;
+        while (moreRecords) {
+            if(moreRecords){
+                final var polled = kafkaConsumer.poll(Duration.ofMillis(200));
+                var records = polled.records(topic);
+                polledOffsets = polledOffsets +  polled.count();
+                moreRecords = polledOffsets < size && polledOffsets > 0 && polled.count() > 0;
+                for (var record: records){
+                    if(messages.size() < size)
+                        messages.add(record);
+                }
 
-           long startTime = System.currentTimeMillis();
-           while ((System.currentTimeMillis()-startTime)<1000) {
-               final var polled = kafkaConsumer.poll(Duration.ofMillis(200));
-               for (var partition : polled.partitions()) {
-                   var records = polled.records(partition);
-                   rawRecords.get(partition).addAll(records);
-               }
-           }
-
-           System.out.println("Closing Kafka consumer ...");
-           kafkaConsumer.close();
-           this.deleteConsumer(clusterIp,kafkaConsumer.groupMetadata().groupId());
-           var flatMapList =  rawRecords
-                   .values()
-                   .stream()
-                   .flatMap(Collection::stream)
-                   .collect(Collectors.toList());
-           System.out.println("Final Size " + flatMapList.size());
-           return  flatMapList;
-       }catch (Exception ex){
-           kafkaConsumer.close();
-           this.deleteConsumer(clusterIp,kafkaConsumer.groupMetadata().groupId());
-           return  new ArrayList<>();
-       }
+            }
+        }
+        kafkaConsumer.close();
+        return  messages;
     }
+
+
+    private  List<ConsumerRecord<String, String>> getLatestRecordsUntilTime(String topic,
+                                                                   long count,String clusterIp,long to) {
+        Consumer<String, String> kafkaConsumer =this.createConsumer(clusterIp);
+        final var partitionInfoSet = kafkaConsumer.partitionsFor(topic);
+        final var partitions = partitionInfoSet.stream()
+                .map(partitionInfo -> new TopicPartition(partitionInfo.topic(),
+                        partitionInfo.partition()))
+                .collect(Collectors.toList());
+        kafkaConsumer.assign(partitions);
+        final var latestOffsets = kafkaConsumer.endOffsets(partitions);
+        long totalOffsetsCounts = 0;
+        for (var partition : partitions) {
+            final var latestOffset = Math.max(0, latestOffsets.get(partition) - 1);
+            totalOffsetsCounts = totalOffsetsCounts + latestOffset;
+            kafkaConsumer.seek(partition, 0);
+        }
+
+        List<ConsumerRecord<String, String>> messages = new ArrayList<>();
+        boolean moreRecords = true;
+        int polledOffsets = 0;
+        long size = count > totalOffsetsCounts || count == 0 ? totalOffsetsCounts : count;
+        while (moreRecords) {
+            if(moreRecords){
+                final var polled = kafkaConsumer.poll(Duration.ofMillis(200));
+                var records = polled.records(topic);
+                polledOffsets = polledOffsets +  polled.count();
+                moreRecords = polledOffsets < size && polledOffsets > 0 && polled.count() > 0;
+                for (var record: records){
+                    if(messages.size() < size && record.timestamp() <= to)
+                        messages.add(record);
+                    else
+                       {
+                           moreRecords = false;
+                           break;
+                       }
+                }
+
+            }
+        }
+        kafkaConsumer.close();
+        return  messages;
+    }
+
 
     private Map<String, topicModel> getTopicMetadata( Consumer<String,String> consumer,AdminClient adminClient,boolean showDefaultConfig,String... topics) {
         final var topicsMap = getTopicInformation(topics,consumer);
@@ -385,7 +483,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         props.put(ConsumerConfig.GROUP_ID_CONFIG,
                 "KAFKANA_UI_MONITORING");
         props.put(ConsumerConfig.CLIENT_ID_CONFIG,
-                "KAFKANA_UI_MONITORING-CONUMER");
+                "KAFKANA_UI_MONITORING-CONUMER-" + UUID.randomUUID());
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
                 StringDeserializer.class.getName());
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,

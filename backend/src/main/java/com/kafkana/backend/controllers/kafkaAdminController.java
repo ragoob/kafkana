@@ -1,10 +1,10 @@
 package com.kafkana.backend.controllers;
 import com.kafkana.backend.abstraction.kafkaAdminService;
+import com.kafkana.backend.configurations.AppConfig;
 import com.kafkana.backend.models.brokers;
 import com.kafkana.backend.models.createTopicModel;
+import jdk.jshell.spi.ExecutionControl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,19 +16,23 @@ import java.util.HashMap;
 @RequestMapping("/api/kafkaAdmin")
 public class kafkaAdminController {
     @Autowired
-    private kafkaAdminService kafkaAdminService;
-    @Autowired
-    CacheManager cacheManager;
+    private AppConfig appConfig;
 
+    @Autowired
+    private kafkaAdminService kafkaAdminService;
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    void  create(@RequestHeader(value = "clusterIp") String clusterIp, @RequestBody() createTopicModel model) {
+    void  create(@RequestHeader(value = "clusterIp") String clusterIp, @RequestBody() createTopicModel model) throws ExecutionControl.NotImplementedException {
+      if(!appConfig.getKafka().isAllowtopicscreation())
+          throw  new ExecutionControl.NotImplementedException("Creating topics is disabled on this instance");
        this.kafkaAdminService.create(model,clusterIp);
     }
 
     @DeleteMapping("/{name}")
     @ResponseStatus(HttpStatus.OK)
-    void  delete(@RequestHeader(value = "clusterIp") String clusterIp, @PathVariable(value = "name") String name) {
+    void  delete(@RequestHeader(value = "clusterIp") String clusterIp, @PathVariable(value = "name") String name) throws ExecutionControl.NotImplementedException {
+        if(!appConfig.getKafka().isAllowtopicscreation())
+            throw  new ExecutionControl.NotImplementedException("deleting topics is disabled on this instance");
         this.kafkaAdminService.delete(new createTopicModel(name),clusterIp);
     }
 
@@ -44,11 +48,7 @@ public class kafkaAdminController {
     ArrayList<brokers> getNodes(@RequestHeader(value = "clusterIp") String clusterIp,
                                 @RequestParam(name = "refresh", required = false) Boolean  refresh
                                 ){
-        boolean refreshFlag = refresh != null ? refresh : false;
-        if(refreshFlag){
-            cacheManager.getCache("brokers").evict(clusterIp);
-        }
-        return  this.kafkaAdminService.getBrokers(clusterIp,refreshFlag);
+        return  this.kafkaAdminService.getBrokers(clusterIp);
     }
 
     @GetMapping("/health-check")

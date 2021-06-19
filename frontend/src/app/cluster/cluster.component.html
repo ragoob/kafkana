@@ -2,7 +2,7 @@
  
   <div class="card-body">
    <h5 class="card-title">{{cluster.id}}</h5>
-     <div  class="card-text clickable" title="Update cluster status" (click)="refreshStatus()">
+     <div  class="card-text clickable" title="Show details" (click)="dashboard()">
        <svg *ngIf="cluster.status === 'HEALTHY'" class="healthy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
      <circle class="healthy__circle" cx="26" cy="26" r="25" fill="none"/>
       <path class="healthy__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
@@ -21,7 +21,7 @@
                               <button (click)="edit()" type="button" class="btn btn-primary btn-circle">   <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
                             </button>
 
-                              <button [disabled]="cluster.status !== 'HEALTHY'" (click)="dashboard()" type="button" class="btn btn-success btn-circle"><i class="fa fa-arrow-right" aria-hidden="true"></i>
+                              <button title="Refresh status"  (click)="refreshStatus()" type="button" class="btn btn-success btn-circle"><i class="fa fa-refresh" aria-hidden="true"></i>
                             </button>
                          
 

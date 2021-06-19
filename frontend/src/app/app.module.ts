@@ -31,6 +31,11 @@ import { PayloadFilterComponent } from './payload-filter/payload-filter.componen
 import { ClusterComponent } from './cluster/cluster.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { AddNewClusterButtonComponent } from './add-new-cluster-button/add-new-cluster-button.component';
+import { TopicCreateComponent } from './shared/topic-create/topic-create.component';
+import { ActionNotificationComponent } from './action-natification/action-notification.component';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { LayoutUtilsService } from './core/services/layout-utils.service';
+import { MapControlComponent } from './map-control/map-control.component';
 
 
 
@@ -44,7 +49,10 @@ import { AddNewClusterButtonComponent } from './add-new-cluster-button/add-new-c
     NavComponent,
     PayloadFilterComponent,
     ClusterComponent,
-    AddNewClusterButtonComponent
+    AddNewClusterButtonComponent,
+    TopicCreateComponent,
+    ActionNotificationComponent,
+    MapControlComponent
   ],
   imports: [
     BrowserModule,
@@ -67,11 +75,12 @@ import { AddNewClusterButtonComponent } from './add-new-cluster-button/add-new-c
     MatDialogModule,
     FormsModule,
     ReactiveFormsModule,
-    DragDropModule
+    DragDropModule,
+    MatSnackBarModule
     
 
   ],
-  providers: [{ provide: API_BASE_URL, useValue: environment.baseURL }, AdminService, { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: true, direction: 'ltr' } }],
+  providers: [{ provide: API_BASE_URL, useValue: environment.baseURL }, LayoutUtilsService, AdminService, { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: true, direction: 'ltr' } }],
   entryComponents: [AddNewComponent, PayloadFilterComponent],
   bootstrap: [AppComponent]
 })

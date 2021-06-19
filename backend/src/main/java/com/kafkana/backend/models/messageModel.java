@@ -1,10 +1,11 @@
 package com.kafkana.backend.models;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class messageModel {
+public class messageModel implements Serializable, Comparable<messageModel> {
     private int partition;
     private long offset;
     private String message;
@@ -70,5 +71,10 @@ public class messageModel {
 
     public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
+    }
+
+    @Override
+    public int compareTo(messageModel o) {
+        return getTimestamp().compareTo(o.getTimestamp());
     }
 }

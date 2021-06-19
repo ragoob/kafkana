@@ -1,21 +1,10 @@
 package com.kafkana.backend.controllers;
-
-import com.kafkana.backend.abstraction.kafkaAdminService;
-import com.kafkana.backend.abstraction.kafkaMonitorService;
-import com.kafkana.backend.models.clusterSummaryModel;
-import com.kafkana.backend.models.consumerModel;
-import com.kafkana.backend.models.messageModel;
-import com.kafkana.backend.models.topicModel;
-import org.apache.kafka.clients.admin.AdminClient;
-import org.apache.kafka.common.TopicPartition;
+import com.kafkana.backend.abstraction.*;
+import com.kafkana.backend.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
-import javax.ws.rs.PathParam;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.*;
 
 @RestController()
@@ -28,19 +17,36 @@ public class kafkaMonitoringController {
     @Autowired
     private kafkaAdminService kafkaAdminService;
 
-    @Autowired
-    CacheManager cacheManager;
+    @Autowired(required = false)
+    private topicsRepository topicsRepository;
+
+    @Autowired(required = false)
+    private summaryRepository summaryRepository;
+
+    @Autowired(required = false)
+    private consumerRepository consumerRepository;
+
+    @Value("${cache.allowed}")
+    private  boolean allowCache;
 
     @GetMapping("/summary")
     clusterSummaryModel getClusterSummary(@RequestHeader("clusterIp") String clusterIp,
                                           @RequestParam(name = "refresh", required = false) Boolean  refresh
                                           ) throws InterruptedException {
         boolean refreshFlag = refresh != null ? refresh : false;
-
-        if(refreshFlag){
-            cacheManager.getCache("summary").evict(clusterIp);
+        clusterSummaryModel summaryModel;
+        if(refreshFlag || !allowCache){
+            summaryModel  = this.kafkaMonitorService.getClusterSummary(clusterIp);
+            if(allowCache)
+            this.summaryRepository.save(summaryModel,clusterIp);
         }
-        return  this.kafkaMonitorService.getClusterSummary(clusterIp,refreshFlag);
+        else{
+            summaryModel = this.summaryRepository.find(clusterIp);
+        }
+
+        return summaryModel;
+
+
     }
 
     @GetMapping("/topics")
@@ -48,10 +54,17 @@ public class kafkaMonitoringController {
                                @RequestParam(name = "refresh", required = false) Boolean  refresh
                                ){
         boolean refreshFlag = refresh != null ? refresh : false;
-        if(refreshFlag){
-            cacheManager.getCache("topics").evict(clusterIp);
+        List<topicModel> topics;
+        if(refreshFlag || !allowCache){
+            topics =  this.kafkaMonitorService.getTopics(clusterIp,false);
+            if(allowCache)
+            this.topicsRepository.save(topics,clusterIp);
         }
-       return this.kafkaMonitorService.getTopics(clusterIp,false,refreshFlag);
+        else{
+            topics = this.topicsRepository.findAll(clusterIp);
+        }
+
+       return  topics;
 
     }
 
@@ -67,33 +80,41 @@ public class kafkaMonitoringController {
                                      @RequestParam(name = "refresh", required = false) Boolean  refresh
                                      ){
         boolean refreshFlag = refresh != null ? refresh : false;
-        if(refreshFlag){
-            cacheManager.getCache("consumers").evict(clusterIp);
+        List<consumerModel> consumers;
+        if(refreshFlag || !allowCache){
+            final  var topics = this.kafkaMonitorService.getTopics(clusterIp,false);
+            consumers =    this.kafkaMonitorService.getConsumers(topics,clusterIp);
+            if(allowCache)
+            this.consumerRepository.save(consumers,clusterIp);
         }
-        final  var topics = this.kafkaMonitorService.getTopics(clusterIp,false,refreshFlag);
-        return this.kafkaMonitorService.getConsumers(topics,clusterIp,refreshFlag);
+        else{
+            consumers = this.consumerRepository.findAll(clusterIp);
+        }
+
+        return  consumers;
     }
 
     @GetMapping("/messages/{name:.+}")
     List<messageModel> getMessages(@RequestHeader(value = "clusterIp") String clusterIp, @PathVariable(value = "name") String name,
                                    @RequestParam(name = "size", required = false) Integer size,
                                    @RequestParam(name = "start", required = false) Long  start,
-                                   @RequestParam(name = "end", required = false) Long  end
+                                   @RequestParam(name = "end", required = false) Long  end,
+                                   @RequestParam(name = "sortDirection", required = false) String  sortDirection
                                    ){
-        final int count = (size != null? size : 200);
+        final long count = (size != null? size : 200);
+        final String sortDir = sortDirection != null ? sortDirection : pollingTypes.ASC;
         if(start == null && end == null){
-            return this.kafkaMonitorService.getLatestMessages(name,clusterIp,count);
+            return this.kafkaMonitorService.getMessages(name,clusterIp,count,sortDir);
         }
         else if(end == null){
-            return this.kafkaMonitorService.getMessages(name,clusterIp,count,start);
+            return this.kafkaMonitorService.getMessages(name,clusterIp,count,start,sortDir);
         }
         else if(start == null){
-            return this.kafkaMonitorService.getMessagesUntilTime(name,clusterIp,count,end);
+            return this.kafkaMonitorService.getMessagesUntilTime(name,clusterIp,count,end,sortDir);
         }
         else{
-            return this.kafkaMonitorService.getMessages(name,clusterIp,count,start,end);
+            return this.kafkaMonitorService.getMessages(name,clusterIp,count,start,end,sortDir);
         }
-
     }
 
     @GetMapping("/lastOffsets/{name:.+}")

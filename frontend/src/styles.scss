@@ -469,3 +469,62 @@
 .btn-circle{
   margin: 10px;
 }
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.kt-mat-snackbar {
+	display: flex;
+    //flex-wrap: wrap;
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: 3px;
+
+	.kt-mat-snackbar__message {
+		display: flex;
+        align-items: center;
+	}
+
+	.kt-mat-snackbar__btn {
+		padding: 0 0 0 15px;
+		display: flex;
+        align-items: center;
+	}
+
+	.kt-mat-snackbar__close {
+		padding: 0 0 0 5px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        .material-icons {
+            opacity: 0.8;
+            transition: all 0.3s ease;
+            color: #fff;
+
+            &:hover {
+            	transition: all 0.3s ease;
+            	opacity: 1;
+            }
+        }
+	}
+}
+
+.calendar-label{
+  margin-right: 5px;
+}
+
+.calendar-label-to{
+  margin-left: 5px;
+}
+
+
+.align-left {
+    text-align: left;
+}
+
+.align-righ {
+    text-align: right;
+}
+
+.btn-inline{
+  bottom: 10px;
+}

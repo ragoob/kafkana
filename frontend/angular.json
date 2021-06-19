@@ -31,12 +31,13 @@
               "src/assets"
             ],
             "styles": [
+                "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
                 "node_modules/bootstrap/scss/bootstrap.scss",
                 "src/assets/scss/paper-dashboard.scss",
                 "src/styles.scss",
                 "node_modules/primeicons/primeicons.css",
                 "node_modules/primeng/resources/themes/bootstrap4-dark-blue/theme.css",
-                "node_modules/primeng/resources/primeng.min.css"
+              "node_modules/primeng/resources/primeng.min.css"
             
             ],
             "scripts": []
@@ -100,7 +101,7 @@
               "src/assets"
             ],
             "styles": [
-              "./node_modules/@angular/material/prebuilt-themes/pink-bluegrey.css",
+              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
               "src/styles.scss"
             ],
             "scripts": []

@@ -2,7 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { AdminService } from '../core/services/admin.service';
-import { ThrowStmt } from '@angular/compiler';
+import { LayoutUtilsService, MessageType } from '../core/services/layout-utils.service';
 
 @Component({
   selector: 'app-add-new',
@@ -16,7 +16,8 @@ export class AddNewComponent implements OnInit {
     public dialogRef: MatDialogRef<AddNewComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
-    private adminService: AdminService
+    private adminService: AdminService,
+    private layoutUtilsService: LayoutUtilsService
     
     ) { 
 
@@ -51,6 +52,8 @@ export class AddNewComponent implements OnInit {
       if (this.data && this.data.edited){
         this.adminService.update(this.data.edited.id,this.addNewForm.value)
           .then(() => {
+            const message = `Cluster updated successfully.`;
+            this.layoutUtilsService.showActionNotification(message, MessageType.Update, 5000, true, false, undefined, 'top');
             this.close(this.addNewForm.value);
           })
       }
@@ -58,6 +61,8 @@ export class AddNewComponent implements OnInit {
       else{
         this.adminService.create(this.addNewForm.value)
           .then(() => {
+            const message = `Cluster created successfully.`;
+            this.layoutUtilsService.showActionNotification(message, MessageType.Create, 5000, true, false, undefined, 'top');
             this.close(this.addNewForm.value);
           })
       }

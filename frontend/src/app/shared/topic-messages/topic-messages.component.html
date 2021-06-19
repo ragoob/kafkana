@@ -1,65 +1,21 @@
 <div class="card card-dark">
   <div class="card-body">
     <div class="row">
-      <div class="col-lg-3">
-        <div class="form-group">
-          <label for="from">From</label>
-          <p-calendar
-            [style]="{ width: '100%' }"
-            id="from"
-            [showTime]="true"
-            hourFormat="12"
-            [(ngModel)]="from"
-          ></p-calendar>
-        </div>
+      <div class="col-lg-6">
+       <span class="calendar-label"> From :</span>  <p-calendar  [(ngModel)]="from" [showTime]="true"></p-calendar> 
+        <span class="calendar-label calendar-label-to">To :</span>  <p-calendar  [(ngModel)]="to" [showTime]="true"></p-calendar> 
       </div>
+      
+        <div class="col-lg-3" style="bottom: 10px;">
+        <button type="button" (click)="search()" class="btn btn-primary"><i class="fas fa-search"></i></button>
+         <button type="button" (click)="clearFilters()" class="btn btn-danger"><i class="fas fa-times"></i></button>
+       </div>
 
-      <div class="col-lg-3">
-        <div class="form-group">
-          <label for="to">To</label>
-          <p-calendar
-            [style]="{ width: '100%' }"
-            id="top"
-            [showTime]="true"
-            hourFormat="12"
-            [(ngModel)]="to"
-          ></p-calendar>
-        </div>
-      </div>
-
-      <div class="col-lg-3">
-        <div class="form-group">
-          <label for="count">Count</label>
-          <p-inputNumber
-            [style]="{ width: '100%' }"
-            id="count"
-            placeholder="Default value 200"
-            aria-placeholder="Default value 200"
-            [(ngModel)]="count"
-          ></p-inputNumber>
-        </div>
-      </div>
-      <div class="col-lg-3">
-        <div class="form-action">
-          <button
-            [disabled]="messages.length === 0 && filters.length === 0"
-            type="button"
-            class="btn btn-link"
-            (click)="moreFilters()"
-          >
-            More filters
-          </button>
-          <button type="button" class="btn btn-primary" (click)="search()">
-            <i class="fas fa-search"></i>
-          </button>
-        </div>
-      </div>
+      
     </div>
     <div class="row">
-      <div class="col-lg-5">
-        <label>Selected Columns: </label>
-
-        <p-multiSelect
+      <div class="col-lg-4">
+         <p-multiSelect
           [options]="columns"
           (onChange)="changeSelectionColumns($event)"
           [virtualScroll]="true"
@@ -67,16 +23,6 @@
           [style]="{ width: '100%' }"
           [(ngModel)]="selectedColumns"
         ></p-multiSelect>
-      </div>
-      <div class="col-lg-3">
-        <div class="p-field-checkbox">
-          <p-checkbox
-            [(ngModel)]="allowDetails"
-            [binary]="true"
-            inputId="allowDetails"
-          ></p-checkbox>
-          <label for="allowDetails">Show Details</label>
-        </div>
       </div>
     </div>
   </div>
@@ -90,9 +36,11 @@
   [rows]="10"
   [showCurrentPageReport]="true"
 >
+
   <ng-template pTemplate="caption">
-    <div class="p-d-flex">
-      <button
+    <div class="row">
+      <div class="col-auto align-left">
+        <button
         type="button"
         pButton
         pRipple
@@ -102,15 +50,34 @@
         pTooltip="XLS"
         tooltipPosition="bottom"
       ></button>
+      </div>
+    
+         <div class="col-auto align-left">
+            <input class="form-control" #countInput type="number" [(ngModel)]="count" placeholder="Messages size">
+         </div>
+         <div class="col-auto align-left">
+           <select class="form-control" (change)="sortByTimeStamp($event)">
+        
+          <option value="asc">
+             asc
+          </option>
+          <option value="desc">
+             desc
+          </option>
+        </select>
+         </div>
     </div>
+
   </ng-template>
   <ng-template pTemplate="header">
     <tr>
       <th *ngIf="allowDetails"></th>
-
-      <th *ngFor="let item of selectedColumns">
-        {{ item }}
+       <ng-container *ngFor="let item of selectedColumns">
+       <th>
+         {{item}}
       </th>
+       </ng-container>
+      
     </tr>
   </ng-template>
   <ng-template pTemplate="body" let-message let-expanded="expanded">
@@ -127,7 +94,13 @@
       </td>
 
       <td *ngFor="let item of selectedColumns">
-        {{ message[item] }}
+        <ng-container *ngIf="item === 'timestamp'">
+                {{ message[item] | date:'dd-MM-yyyy HH:mm:ss'}}
+        </ng-container>
+          <ng-container *ngIf="item !== 'timestamp'">
+                {{ message[item] }}
+        </ng-container>
+      
       </td>
     </tr>
   </ng-template>

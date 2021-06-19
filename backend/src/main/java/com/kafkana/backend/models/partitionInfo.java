@@ -1,8 +1,9 @@
 package com.kafkana.backend.models;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class partitionInfo {
+public class partitionInfo  implements Serializable {
    private int partition;
    private brokers leader;
     private List<brokers> replicas;

@@ -3,7 +3,6 @@ import com.kafkana.backend.abstraction.kafkaAdminService;
 import com.kafkana.backend.models.*;
 import org.apache.kafka.clients.admin.*;
 import org.apache.kafka.common.config.ConfigResource;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -41,9 +40,7 @@ public class kafkaAdminServiceImpl implements kafkaAdminService {
     }
 
     @Override
-    @Cacheable(value="configs",
-            key="{#clusterIp}")
-    public ArrayList<brokers> getConfig(String clusterIp,boolean refresh) {
+    public ArrayList<brokers> getConfig(String clusterIp) {
         ArrayList<brokers> configs = new ArrayList<>();
         try (final AdminClient admin = getAdminClient(clusterIp)){
          final  var clusterDescription =  admin.describeCluster();
@@ -67,10 +64,7 @@ public class kafkaAdminServiceImpl implements kafkaAdminService {
     }
 
     @Override
-    @Cacheable(cacheNames="brokers",
-            key="{#clusterIp}"
-            , condition="#refresh == false")
-    public ArrayList<brokers> getBrokers(String clusterIp,boolean refresh) {
+    public ArrayList<brokers> getBrokers(String clusterIp) {
         ArrayList<brokers> nodes = new ArrayList<>();
 
         try (final AdminClient admin = getAdminClient(clusterIp)){
@@ -93,7 +87,8 @@ public class kafkaAdminServiceImpl implements kafkaAdminService {
             admin.listTopics();
             isHealthy = true;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("Err.. " + e.getMessage());
+
         }
 
         return isHealthy;

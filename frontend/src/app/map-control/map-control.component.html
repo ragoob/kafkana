@@ -1,0 +1,20 @@
+<table class="table">
+    
+    <tbody>
+          <tr *ngFor="let map of values;let i = index">
+                                        <td>
+                                            <input (keyup)="updateMap()" type="text" placeholder="Key" class="form-control" [(ngModel)]="map.key" />
+                                            
+                                        </td>
+                                        <td>
+                                            <input (keyup)="updateMap()" (keyup.enter)="newRow(map)"  type="text" placeholder="Value" class="form-control"[(ngModel)]="map.value" />
+                                            
+                                        </td>
+                                         <td>
+                                               <button *ngIf="values.length > 1" pButton pRipple icon="pi pi-trash" (click)="delete(i)" class="p-button-rounded p-button-danger"
+                                            ></button>
+                                            
+                                        </td>
+                                    </tr>
+    </tbody>
+</table>
