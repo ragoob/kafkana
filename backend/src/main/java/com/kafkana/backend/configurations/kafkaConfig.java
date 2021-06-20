@@ -4,6 +4,7 @@ public class kafkaConfig {
     private  boolean allowtopicscreation;
     private  boolean allowtopicsdeletion;
     private  boolean allowproducemessage;
+    private  long pollduration;
 
     public boolean isAllowtopicscreation() {
         return allowtopicscreation;
@@ -27,5 +28,14 @@ public class kafkaConfig {
 
     public void setAllowproducemessage(boolean allowproducemessage) {
         this.allowproducemessage = allowproducemessage;
+    }
+
+
+    public long getPollduration() {
+        return pollduration;
+    }
+
+    public void setPollduration(long pollduration) {
+        this.pollduration = pollduration;
     }
 }

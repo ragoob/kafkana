@@ -1,6 +1,7 @@
 package com.kafkana.backend.services;
 
 import com.kafkana.backend.abstraction.kafkaMonitorService;
+import com.kafkana.backend.configurations.AppConfig;
 import com.kafkana.backend.models.*;
 import org.apache.kafka.clients.admin.*;
 import org.apache.kafka.clients.consumer.*;
@@ -12,8 +13,10 @@ import org.apache.kafka.common.errors.TopicAuthorizationException;
 import org.apache.kafka.common.errors.UnsupportedVersionException;
 import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.glassfish.jersey.internal.util.Property;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.util.*;
@@ -25,6 +28,9 @@ import static java.util.function.Predicate.not;
 
 @Service
 public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
+
+    @Autowired
+    private AppConfig appConfig;
     private static final Logger LOG = LoggerFactory.getLogger(kafkaMonitorServiceImpl.class);
     @Override
     public clusterSummaryModel getClusterSummary(String clusterIp) {
@@ -278,7 +284,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         long size = count > totalOffsetsCounts || count == 0 ? totalOffsetsCounts : count;
         while (moreRecords) {
             if(moreRecords){
-            final var polled = kafkaConsumer.poll(Duration.ofMillis(200));
+            final var polled = kafkaConsumer.poll(Duration.ofMillis(appConfig.getKafka().getPollduration()));
                 var records = polled.records(topic);
                 polledOffsets = polledOffsets +  polled.count();
                 System.out.println("Pulled messages " + polled.count());
@@ -330,7 +336,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         long size = count > totalOffsetsCounts || count == 0 ? totalOffsetsCounts : count;
         while (moreRecords) {
             if(moreRecords){
-                final var polled = kafkaConsumer.poll(Duration.ofMillis(200));
+                final var polled = kafkaConsumer.poll(Duration.ofMillis(appConfig.getKafka().getPollduration()));
                 var records = polled.records(topic);
                 polledOffsets = polledOffsets +  polled.count();
                 moreRecords = polledOffsets < size && polledOffsets > 0 && polled.count() > 0;
@@ -383,7 +389,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         long size = count > totalOffsetsCounts || count == 0 ? totalOffsetsCounts : count;
         while (moreRecords) {
             if(moreRecords){
-                final var polled = kafkaConsumer.poll(Duration.ofMillis(200));
+                final var polled = kafkaConsumer.poll(Duration.ofMillis(appConfig.getKafka().getPollduration()));
                 var records = polled.records(topic);
                 polledOffsets = polledOffsets +  polled.count();
                 moreRecords = polledOffsets < size && polledOffsets > 0 && polled.count() > 0;
@@ -422,7 +428,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         long size = count > totalOffsetsCounts || count == 0 ? totalOffsetsCounts : count;
         while (moreRecords) {
             if(moreRecords){
-                final var polled = kafkaConsumer.poll(Duration.ofMillis(200));
+                final var polled = kafkaConsumer.poll(Duration.ofMillis(appConfig.getKafka().getPollduration()));
                 var records = polled.records(topic);
                 polledOffsets = polledOffsets +  polled.count();
                 moreRecords = polledOffsets < size && polledOffsets > 0 && polled.count() > 0;
@@ -479,8 +485,10 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         final Properties props = new Properties();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
                 clusterIp);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG,
+                "KAFKANA_UI_MONITORING_V1");
         props.put(ConsumerConfig.CLIENT_ID_CONFIG,
-                "KAFKANA_UI_MONITORING-CONUMER_"+ UUID.randomUUID());
+                "KAFKANA_UI_MONITORING-CONUMER_V1");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
                 StringDeserializer.class.getName());
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,

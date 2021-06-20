@@ -12,3 +12,4 @@ kafka:
   allowtopicscreation: ${ALLOW_TOPIC_CREATION:false}
   allowtopicsdeletion: ${ALLOW_TOPIC_DELETION:false}
   allowproducemessage: ${ALLOW_PRODUCING:false}
+  pollduration: ${KAFKA_POLL_DURATION:3000}
