@@ -5,7 +5,6 @@ import com.kafkana.backend.models.brokers;
 import com.kafkana.backend.models.createTopicModel;
 import jdk.jshell.spi.ExecutionControl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,18 +15,15 @@ import java.util.HashMap;
 @CrossOrigin
 @RequestMapping("/api/kafkaAdmin")
 public class kafkaAdminController {
-    @Value("${kafka.allowtopicscreation}")
-    private  boolean allowtopicscreation;
-
-    @Value("${kafka.allowtopicsdeletion}")
-    private  boolean allowtopicsdeletion;
+    @Autowired(required = false)
+    private AppConfig appConfig;
 
     @Autowired
     private kafkaAdminService kafkaAdminService;
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     void  create(@RequestHeader(value = "clusterIp") String clusterIp, @RequestBody() createTopicModel model) throws ExecutionControl.NotImplementedException {
-      if(!allowtopicscreation)
+      if(!appConfig.getKafka().isAllowtopicscreation())
           throw  new ExecutionControl.NotImplementedException("Creating topics is disabled on this instance");
        this.kafkaAdminService.create(model,clusterIp);
     }
@@ -35,7 +31,7 @@ public class kafkaAdminController {
     @DeleteMapping("/{name}")
     @ResponseStatus(HttpStatus.OK)
     void  delete(@RequestHeader(value = "clusterIp") String clusterIp, @PathVariable(value = "name") String name) throws ExecutionControl.NotImplementedException {
-        if(!allowtopicsdeletion)
+        if(!appConfig.getKafka().isAllowtopicscreation())
             throw  new ExecutionControl.NotImplementedException("deleting topics is disabled on this instance");
         this.kafkaAdminService.delete(new createTopicModel(name),clusterIp);
     }
