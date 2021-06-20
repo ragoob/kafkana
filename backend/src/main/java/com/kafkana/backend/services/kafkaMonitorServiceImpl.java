@@ -276,17 +276,18 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         boolean moreRecords = true;
         int polledOffsets = 0;
         long size = count > totalOffsetsCounts || count == 0 ? totalOffsetsCounts : count;
-        short tryPolledWithZero = 0;
-        while (moreRecords) {
+        int failureToPullCount = 0;
+        while (moreRecords || failureToPullCount < partitions.size()) {
             if(moreRecords){
             final var polled = kafkaConsumer.poll(Duration.ofMillis(200));
                 var records = polled.records(topic);
                 if(polled.count() == 0){
-                    tryPolledWithZero++;
+                    failureToPullCount++;
                 }
                 polledOffsets = polledOffsets +  polled.count();
                 System.out.println("Pulled messages " + polled.count());
-                moreRecords = (polledOffsets < size  && polledOffsets > 0 &&  polled.count() > 0) || tryPolledWithZero < partitions.size();
+                moreRecords = (polledOffsets < size  && polledOffsets > 0 &&  polled.count() > 0);
+                failureToPullCount = moreRecords == false ? partitions.size() : failureToPullCount;
                 records.forEach(record -> {
                     if(messages.size() < size)
                         messages.add(record);
