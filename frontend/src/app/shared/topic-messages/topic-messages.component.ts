@@ -72,6 +72,7 @@ export class TopicMessagesComponent implements OnInit , AfterViewInit {
   public clearFilters(): void{
     this.from = null;
     this.to = null;
+    this.filterModel = {};
     this.search();
   }
  
