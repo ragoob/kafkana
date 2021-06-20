@@ -276,24 +276,17 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         boolean moreRecords = true;
         int polledOffsets = 0;
         long size = count > totalOffsetsCounts || count == 0 ? totalOffsetsCounts : count;
-        int tryingPollTimes = 0;
-        while (moreRecords || tryingPollTimes < partitions.size()) {
+        while (moreRecords) {
             if(moreRecords){
             final var polled = kafkaConsumer.poll(Duration.ofMillis(200));
                 var records = polled.records(topic);
-                tryingPollTimes++;
                 polledOffsets = polledOffsets +  polled.count();
                 System.out.println("Pulled messages " + polled.count());
                 moreRecords = (polledOffsets < size  && polledOffsets > 0 &&  polled.count() > 0);
-                for(var record:records ){
+                records.forEach(record -> {
                     if(messages.size() < size)
                         messages.add(record);
-                    else{
-                        tryingPollTimes = partitions.size();
-                        break;
-                    }
-                }
-
+                });
             }
             }
 
@@ -486,12 +479,10 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         final Properties props = new Properties();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
                 clusterIp);
-        UUID uuid = UUID.randomUUID();
-        String uuidAsString = uuid.toString();
         props.put(ConsumerConfig.GROUP_ID_CONFIG,
-                "KAFKANA_UI_MONITORING");
+                "KAFKANA_UI_MONITORING_V1");
         props.put(ConsumerConfig.CLIENT_ID_CONFIG,
-                "KAFKANA_UI_MONITORING-CONUMER-" + UUID.randomUUID());
+                "KAFKANA_UI_MONITORING-CONUMER_V1");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
                 StringDeserializer.class.getName());
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
