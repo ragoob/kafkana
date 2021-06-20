@@ -1,6 +1,8 @@
 package com.kafkana.backend.models;
 
-public class consumerPartitionModel {
+import java.io.Serializable;
+
+public class consumerPartitionModel implements Serializable {
     private final String groupId;
     private final String topic;
     private final int partitionId;
