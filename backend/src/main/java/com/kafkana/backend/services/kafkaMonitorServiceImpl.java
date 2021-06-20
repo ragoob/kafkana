@@ -281,6 +281,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
             final var polled = kafkaConsumer.poll(Duration.ofMillis(200));
                 var records = polled.records(topic);
                 polledOffsets = polledOffsets +  polled.count();
+                System.out.println("Pulled messages " + polled.count());
                 moreRecords = polledOffsets < size  && polledOffsets > 0 &&  polled.count() > 0;
                 records.forEach(record -> {
                     if(messages.size() < size)
