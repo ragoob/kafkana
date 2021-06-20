@@ -267,7 +267,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
                 kafkaConsumer.seek(partition, Math.max(0, startFrom));
             }
             else{
-                kafkaConsumer.seek(partition, 0);
+                kafkaConsumer.seekToBeginning(partitions);
             }
 
         }
