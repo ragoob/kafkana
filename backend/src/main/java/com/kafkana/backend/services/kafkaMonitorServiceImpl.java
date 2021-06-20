@@ -286,7 +286,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
                 }
                 polledOffsets = polledOffsets +  polled.count();
                 System.out.println("Pulled messages " + polled.count());
-                moreRecords = polledOffsets < size  && polledOffsets > 0 &&  (polled.count() > 0 && tryPolledWithZero < partitions.size());
+                moreRecords = polledOffsets < size   &&  ( polledOffsets > 0 && polled.count() > 0 && tryPolledWithZero < partitions.size());
                 records.forEach(record -> {
                     if(messages.size() < size)
                         messages.add(record);
