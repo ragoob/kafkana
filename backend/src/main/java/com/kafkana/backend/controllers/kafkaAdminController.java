@@ -15,11 +15,13 @@ import java.util.HashMap;
 @CrossOrigin
 @RequestMapping("/api/kafkaAdmin")
 public class kafkaAdminController {
-    @Autowired(required = false)
+
+    @Autowired
     private AppConfig appConfig;
 
     @Autowired
     private kafkaAdminService kafkaAdminService;
+
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     void  create(@RequestHeader(value = "clusterIp") String clusterIp, @RequestBody() createTopicModel model) throws ExecutionControl.NotImplementedException {

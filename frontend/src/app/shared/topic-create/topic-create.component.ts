@@ -51,7 +51,9 @@ export class TopicCreateComponent implements OnInit {
       this.close(this.addNewForm.value);
       const message = `Topic has been created successfully.`;
       this.layoutUtilsService.showActionNotification(message, MessageType.Create, 5000, true, false, undefined, 'top');
-    });
+    }).catch((error)=>{
+      this.layoutUtilsService.showActionNotification(error.error, MessageType.Create, 5000, true, false, undefined, 'top');
+    })
     
   }
 
