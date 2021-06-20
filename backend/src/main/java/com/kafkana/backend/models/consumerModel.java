@@ -1,9 +1,10 @@
 package com.kafkana.backend.models;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
-public class consumerModel implements Comparable<consumerModel> {
+public class consumerModel implements Comparable<consumerModel>, Serializable {
 
     private final String groupId;
     private final Map<String, consumerTopicModel> topics = new TreeMap<>();

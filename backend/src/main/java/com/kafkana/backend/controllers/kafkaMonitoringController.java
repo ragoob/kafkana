@@ -42,8 +42,14 @@ public class kafkaMonitoringController {
         }
         else{
             var cached = this.summaryRepository.find(clusterIp);
+            if(cached != null && cached.getBrokerCount() > 0) {
+                summaryModel = cached;
+            }
+            else{
+                summaryModel =  this.summaryRepository.find(clusterIp);
+                this.summaryRepository.save(summaryModel,clusterIp);
+            }
 
-            summaryModel =cached != null ? cached :  this.summaryRepository.find(clusterIp);
         }
 
         return summaryModel;
@@ -64,8 +70,13 @@ public class kafkaMonitoringController {
         }
         else{
             var cached = this.topicsRepository.findAll(clusterIp);
+            if(cached.size() > 0)
+                topics = cached;
+            else{
+                topics = this.kafkaMonitorService.getTopics(clusterIp,false);
+                this.topicsRepository.save(topics,clusterIp);
+            }
 
-            topics = cached.size() > 0 ?    cached : this.kafkaMonitorService.getTopics(clusterIp,false);
         }
 
        return  topics;
@@ -100,6 +111,7 @@ public class kafkaMonitoringController {
             else{
                 final  var topics = this.kafkaMonitorService.getTopics(clusterIp,false);
                 consumers =   this.kafkaMonitorService.getConsumers(topics,clusterIp);;
+                this.consumerRepository.save(consumers,clusterIp);
             }
 
         }
