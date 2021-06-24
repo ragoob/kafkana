@@ -29,3 +29,12 @@ Real time and management  dashboard  for multiple kafka clusters
    docker build -t kafkana-ui  --build-arg configuration=production -f frontend/Dockerfile .
    docker run -d -p 4200:80 kafkana-ui -e API_URL=localhost:8080
    ```
+
+# Using docker-compose with kafka cluster 3 brokers 
+  ```
+  - old version of docker
+  docker-compose up -d
+  
+  - new docker version 
+  docker compose up -d
+  ```
