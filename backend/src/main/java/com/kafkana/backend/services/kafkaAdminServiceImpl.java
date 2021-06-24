@@ -12,9 +12,11 @@ public class kafkaAdminServiceImpl implements kafkaAdminService {
     @Override
     public void create(createTopicModel model,String clusterIp) {
         try (final AdminClient admin = getAdminClient(clusterIp)){
-            NewTopic newTopic = new NewTopic(model.getTopicName(),model.getPartitions(),model.getReplication());
-            newTopic.configs(model.getConfigurations());
-            admin.createTopics(Collections.singleton(newTopic));
+            model.getTopics().forEach(topic->{
+                NewTopic newTopic = new NewTopic(topic,model.getPartitions(),model.getReplication());
+                newTopic.configs(model.getConfigurations());
+                admin.createTopics(Collections.singleton(newTopic));
+            });
         }
 
     }
