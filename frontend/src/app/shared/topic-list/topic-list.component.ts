@@ -6,6 +6,7 @@ import { ConfirmationService } from 'primeng/api';
 import { BehaviorSubject, ReplaySubject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Topic } from '../../core/models/topic.model';
+import { ConfigService } from '../../core/services/config.service';
 import { KafkaAdminService } from '../../core/services/kafka-admin.service';
 import { KafkaMonitorService } from '../../core/services/kafka-monitor.service';
 import { LayoutUtilsService, MessageType } from '../../core/services/layout-utils.service';
@@ -30,7 +31,8 @@ export class TopicListComponent implements OnInit, OnDestroy {
     private loader: LoadingService,
     public dialog: MatDialog,
     public layoutService: LayoutUtilsService,
-    private kafkaAdminService: KafkaAdminService
+    private kafkaAdminService: KafkaAdminService,
+    public configService: ConfigService
 
     
     ) { }

@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Inject, Injectable } from "@angular/core";
 import { API_BASE_URL } from "../constants";
 import { KafkaCluster } from "../models/kafka-cluster.model";
+import { KafkaConfig } from "../models/kafka-config.model";
 
 @Injectable()
 export class AdminService{
@@ -60,6 +61,12 @@ export class AdminService{
     healthCheck(clusterId: string): Promise<boolean> {
         return this.http.get<boolean>(`${this.baseUrl}/kafkaAdmin/health-check`
             , this.header(clusterId)
+        ).toPromise();
+    }
+
+    getConfiguration(): Promise<KafkaConfig> {
+        return this.http.get<KafkaConfig>(`${this.baseUrl}/admin`
+
         ).toPromise();
     }
 

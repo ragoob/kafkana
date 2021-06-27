@@ -31,6 +31,7 @@ import { PercentagePipe } from '../core/pipes/percentage.pipe';
 import { TopicsComponent } from '../pages/topics/topics.component';
 import { ConsumersComponent } from '../pages/consumers/consumers.component';
 import { MatButtonModule } from '@angular/material/button';
+import { ConfigService } from '../core/services/config.service';
 
  const AdminLayoutRoutes: Routes = [
   { path: 'dashboard/:id', component: DashboardComponent },
@@ -75,6 +76,6 @@ import { MatButtonModule } from '@angular/material/button';
     
   ],
   entryComponents: [PayloadFilterComponent],
-  providers: [KafkaMonitorService, KafkaAdminService, ConfirmationService, LoadingService]
+  providers: [KafkaMonitorService, KafkaAdminService, ConfirmationService, LoadingService,ConfigService]
 })
 export class LayoutsModule { }

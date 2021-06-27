@@ -20,7 +20,7 @@
                         <th>Partitions</th>
                         <th>Total offsets size</th>
                         <th></th>
-                        <th></th>
+                        <th *ngIf="configService.config?.allowtopicsdeletion"></th>
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-topic>
@@ -28,18 +28,18 @@
                         <td (click)="details(topic?.name)">{{topic?.name}}</td>
                         <td (click)="details(topic?.name)">{{topic?.partitions?.length}}</td>
                         <td (click)="details(topic?.name)"> {{topic?.totalSize}}</td>
-                        <td>
+                        <td *ngIf="configService.config?.allowtopicsdeletion">
                           
                             <button pButton pRipple icon="pi pi-trash" (click)="deleteTopic(topic?.name)" class="p-button-rounded p-button-danger"
                               ></button>
                         </td>
-                        <td>
+                       
                           
                      
                     </tr>
                 </ng-template>
-                <ng-template pTemplate="paginatorleft">
-                    <p-button type="button" (click)="addNewTopic()" icon="pi pi-plus" styleClass="p-button-text"></p-button>
+                <ng-template pTemplate="paginatorleft" >
+                    <p-button *ngIf="configService.config?.allowtopicscreation" type="button" (click)="addNewTopic()" icon="pi pi-plus" styleClass="p-button-text"></p-button>
                 </ng-template>
                
             </p-table>

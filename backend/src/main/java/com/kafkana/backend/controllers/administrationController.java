@@ -1,5 +1,7 @@
 package com.kafkana.backend.controllers;
 
+import com.kafkana.backend.configurations.AppConfig;
+import com.kafkana.backend.configurations.kafkaConfig;
 import com.kafkana.backend.models.kafkaCluster;
 import com.kafkana.backend.repositories.kafkaClusterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,27 +17,13 @@ import java.util.ArrayList;
 @RequestMapping("/api/admin")
 public class administrationController {
     @Autowired
-    private kafkaClusterRepository kafkaClusterRepository;
+    private AppConfig appConfig;
+
     @GetMapping()
-    ArrayList<kafkaCluster> getAll() {
-        return  this.kafkaClusterRepository.getAll();
+    kafkaConfig getAppConfig() {
+        return  this.appConfig.getKafka();
     }
 
-    @PostMapping()
-    @ResponseStatus(HttpStatus.CREATED)
-    ResponseEntity create(@RequestBody() kafkaCluster model) {
-        if(!this.kafkaClusterRepository.getById(model.getId()).isEmpty()){
-            return new ResponseEntity<>("Cluster already exists", HttpStatus.CONFLICT);
-        }
-        this.kafkaClusterRepository.add(model);
-        return new ResponseEntity<>(HttpStatus.CREATED);
 
-    }
-
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    void  delete(@PathVariable(value = "id") String id) {
-        this.kafkaClusterRepository.remove(id);
-    }
 
 }
