@@ -14,6 +14,7 @@ import { LayoutUtilsService, MessageType } from '../../core/services/layout-util
   styleUrls: ['./topic-messages.component.scss']
 })
 export class TopicMessagesComponent implements OnInit , AfterViewInit {
+  public rows: number = 25;
   @ViewChild('countInput') inputElRef?: ElementRef;
   @Input('clusterId') clusterId: string = "";
   private destoryed$: ReplaySubject<any> = new ReplaySubject(1);
@@ -28,6 +29,7 @@ export class TopicMessagesComponent implements OnInit , AfterViewInit {
   public selectedColumns: any[] = [];
   public columns: any[] = [];
   public allowDetails: boolean = false;
+  public sortDirection: 'asc' | 'desc' = 'desc';
   constructor(private monitoringService: KafkaMonitorService, public dialog: MatDialog, private cdref: ChangeDetectorRef, private layoutService: LayoutUtilsService) { }
   ngAfterViewInit(): void {
     fromEvent(this.inputElRef?.nativeElement, 'keydown')
@@ -64,9 +66,7 @@ export class TopicMessagesComponent implements OnInit , AfterViewInit {
   }
 
   public sortByTimeStamp(event: any): void{
-  
-    const sortDir: 'asc' | 'desc' = event.target.value;
-    this.search(sortDir);
+    this.search();
   }
 
   public clearFilters(): void{
@@ -103,12 +103,12 @@ export class TopicMessagesComponent implements OnInit , AfterViewInit {
     FileSaver.saveAs(data, fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION);
   }
 
-  public search(sortDir: 'asc' | 'desc' = 'asc'){
+  public search(){
     const start:number | undefined = this.from ? +this.from : undefined;
     const end: number | undefined = this.to ? +this.to : undefined;
-    const _count: number = this.count ? this.count : 0;
+    const _count: number = this.count ? this.count : 200;
     this.loaded = false;
-    this.monitoringService.getMessages(this.topic?.name ?? "", this.clusterId, _count, start, end, sortDir)
+    this.monitoringService.getMessages(this.topic?.name ?? "", this.clusterId, _count, start, end, this.sortDirection)
       .then(data => {
         this.messages = data;
         this.flattenMessageObject();

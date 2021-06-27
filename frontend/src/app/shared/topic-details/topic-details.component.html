@@ -1,8 +1,10 @@
 <div class="row">
     <div class="col-md-12">
-        <div class="card" style="min-height: 500px;" [ngClass]="{'loader-animated-background': !topic}">
+        <div class="card" style="min-height: 500px;" [ngClass]="{'loader-animated-background': !topic || !loaded}">
             <div class="card-header">
-                <h5 class="card-title">Topic details  ( {{topic?.name}} )</h5>
+                 <button mat-button (click)="loadTopic(topic?.name)" title="Click to refresh">
+                      <h5 class="card-title">Topic details  ( {{topic?.name}} )</h5>
+                 </button>&nbsp;
 
             </div>
             <div class="card-body">
@@ -41,6 +43,7 @@
                                         
                                         </tr>
                                  </tbody>
+                                 
                              </table>
                          </div>
                         </ng-template>
@@ -92,7 +95,7 @@
                                     </td>
                                    
                                      <td>
-                                        {{item.size - 1}}
+                                        {{item.size == 0 ? 0 : item.size - 1 }}
                                     </td>
                                     <td>
                                         {{item.underReplicated}}
@@ -102,6 +105,13 @@
                                     </td>
                                   </tr>
                               </tbody>
+                              <tfoot>
+                                     <tr>
+                                         <th colspan="7">
+                                           Total topic offsets size :  {{topic?.totalSize}}
+                                         </th>
+                                     </tr>
+                                 </tfoot>
                           </table>
                     
                         </ng-template>

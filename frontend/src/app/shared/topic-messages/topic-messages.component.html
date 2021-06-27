@@ -33,10 +33,11 @@
   #dt
   [value]="messages"
   dataKey="timestamp"
-  [loading]="!loaded"
-  [paginator]="true"
-  [rows]="10"
-  [showCurrentPageReport]="true"
+   [paginator]="true"
+  [rows]="rows" [showCurrentPageReport]="true" 
+                [loading]="!loaded"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                [rowsPerPageOptions]="[5,10,25,50,200,500,1000]"
 >
 
   <ng-template pTemplate="caption">
@@ -58,7 +59,7 @@
             <input class="form-control" #countInput type="number" [(ngModel)]="count" placeholder="Messages size">
          </div>
          <div class="col-auto align-left">
-           <select class="form-control" (change)="sortByTimeStamp($event)">
+           <select class="form-control" [(ngModel)]="sortDirection" (change)="sortByTimeStamp($event)">
         
           <option value="asc">
              asc
@@ -129,4 +130,7 @@
       </td>
     </tr>
   </ng-template>
+  <ng-template pTemplate="paginatorleft">
+                  
+                </ng-template>
 </p-table>

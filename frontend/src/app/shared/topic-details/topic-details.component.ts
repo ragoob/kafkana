@@ -18,6 +18,7 @@ export class TopicDetailsComponent implements OnInit, OnDestroy {
   private destoryed$: ReplaySubject<any> = new ReplaySubject(1);
   public topic?: Topic
   active: number = 1;
+  loaded: boolean = false;
   constructor(private monitoringService: KafkaMonitorService, private route: ActivatedRoute) { }
  
 
@@ -30,18 +31,20 @@ export class TopicDetailsComponent implements OnInit, OnDestroy {
       pipe(takeUntil(this.destoryed$))
       .subscribe(params => {
         this.clusterId = params.id;
-        this.loadTopic(params.topicId,params.id,);
+        this.loadTopic(params.topicId);
        
       })
   }
 
-  private loadTopic(topicName: string, clusterId: string) {
-    this.monitoringService.getTopic(topicName,clusterId)
+  public loadTopic(topicName?: string) {
+    this.loaded = false;
+    this.monitoringService.getTopic(topicName?? '',this.clusterId)
       .then(data => {
         this.topic = data;
+        
       }).catch(error=> {
         this.topic = new Topic();
-      })
+      }).finally(() => this.loaded = true);
   }
 
   

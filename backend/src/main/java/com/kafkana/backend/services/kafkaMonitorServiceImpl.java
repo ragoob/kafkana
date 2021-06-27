@@ -77,6 +77,9 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
             final var topics = getTopicMetadata(kafkaConsumer,admin,showDefaultConfig).values().stream()
                     .sorted(Comparator.comparing(topicModel::getName))
                     .collect(Collectors.toList());
+            topics.forEach(topic-> {
+                topic.setPartitions(getTopicPartitionSizes(topic,kafkaConsumer));
+            });
             kafkaConsumer.close();
             admin.close();
             return topics;
@@ -265,34 +268,46 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         final var latestOffsets = kafkaConsumer.endOffsets(partitions);
         long totalOffsetsCounts = 0;
         for (var partition : partitions) {
-            final var latestOffset = Math.max(0, latestOffsets.get(partition) - 1);
+            final var latestOffset = Math.max(0, latestOffsets.get(partition));
             totalOffsetsCounts = totalOffsetsCounts +latestOffset;
             if(sortingDirection.equals(pollingTypes.DESC)){
-                long size = count == 0 ? latestOffset : count;
-                long startFrom = latestOffset > size  ? latestOffset - size : 0;
+                long startFrom = latestOffset - count;
                 kafkaConsumer.seek(partition, Math.max(0, startFrom));
             }
             else{
                 kafkaConsumer.seek(partition,0);
             }
-
         }
 
-         List<ConsumerRecord<String, String>> messages = new ArrayList<>();
+        List<ConsumerRecord<String, String>> messages = new ArrayList<>();
+        if(totalOffsetsCounts == 0)
+        {
+            kafkaConsumer.close();
+            return messages;
+        }
+        if(totalOffsetsCounts < count){
+            count =  totalOffsetsCounts;
+        }
         boolean moreRecords = true;
         int polledOffsets = 0;
-        long size = count > totalOffsetsCounts || count == 0 ? totalOffsetsCounts : count;
         while (moreRecords) {
             if(moreRecords){
             final var polled = kafkaConsumer.poll(Duration.ofMillis(appConfig.getKafka().getPollduration()));
                 var records = polled.records(topic);
                 polledOffsets = polledOffsets +  polled.count();
-                System.out.println("Pulled messages " + polled.count());
-                moreRecords = (polledOffsets < size  && polledOffsets > 0 &&  polled.count() > 0);
-                records.forEach(record -> {
-                    if(messages.size() < size)
+                moreRecords = polledOffsets < count;
+                System.out.println("Polled offsets " + polledOffsets);
+                for(var record : records){
+                    if(messages.size() < count)
                         messages.add(record);
-                });
+                    else
+                    {
+                        moreRecords = false;
+                        break;
+                    }
+
+                }
+
             }
             }
 
@@ -313,7 +328,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         long totalOffsetsCounts = 0;
         short seekError = 0;
         for (var partition : partitions) {
-            final var latestOffset = Math.max(0, latestOffsets.get(partition) - 1);
+            final var latestOffset = Math.max(0, latestOffsets.get(partition));
             totalOffsetsCounts = totalOffsetsCounts + latestOffset;
             var timStampMap = new HashMap<TopicPartition,Long>();
             timStampMap.put(partition,from);
@@ -331,20 +346,26 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         }
 
         List<ConsumerRecord<String, String>> messages = new ArrayList<>();
+        if(totalOffsetsCounts == 0){
+            kafkaConsumer.close();
+            return  messages;
+        }
         boolean moreRecords = true;
         int polledOffsets = 0;
-        long size = count > totalOffsetsCounts || count == 0 ? totalOffsetsCounts : count;
         while (moreRecords) {
             if(moreRecords){
                 final var polled = kafkaConsumer.poll(Duration.ofMillis(appConfig.getKafka().getPollduration()));
                 var records = polled.records(topic);
                 polledOffsets = polledOffsets +  polled.count();
-                moreRecords = polledOffsets < size && polledOffsets > 0 && polled.count() > 0;
+                moreRecords = polledOffsets < count && totalOffsetsCounts >= count;
                 for (var record: records){
-                    if(messages.size() < size && record.timestamp() <= to)
+                    if(messages.size() < count && record.timestamp() <= to)
                         messages.add(record);
                     else
+                    {
                         moreRecords = false;
+                        break;
+                    }
                 }
 
             }
@@ -367,7 +388,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         long totalOffsetsCounts = 0;
         short seekError = 0;
         for (var partition : partitions) {
-            final var latestOffset = Math.max(0, latestOffsets.get(partition) - 1);
+            final var latestOffset = Math.max(0, latestOffsets.get(partition));
             totalOffsetsCounts = totalOffsetsCounts + latestOffset;
             var timStampMap = new HashMap<TopicPartition,Long>();
             timStampMap.put(partition,from);
@@ -384,18 +405,27 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         }
 
         List<ConsumerRecord<String, String>> messages = new ArrayList<>();
+        if(totalOffsetsCounts == 0)
+        {
+            kafkaConsumer.close();
+            return  messages;
+        }
         boolean moreRecords = true;
         int polledOffsets = 0;
-        long size = count > totalOffsetsCounts || count == 0 ? totalOffsetsCounts : count;
         while (moreRecords) {
             if(moreRecords){
                 final var polled = kafkaConsumer.poll(Duration.ofMillis(appConfig.getKafka().getPollduration()));
                 var records = polled.records(topic);
                 polledOffsets = polledOffsets +  polled.count();
-                moreRecords = polledOffsets < size && polledOffsets > 0 && polled.count() > 0;
+                moreRecords = polledOffsets < count && totalOffsetsCounts >= count;
                 for (var record: records){
-                    if(messages.size() < size)
+                    if(messages.size() < count)
                         messages.add(record);
+                    else
+                    {
+                        moreRecords = false;
+                        break;
+                    }
                 }
 
             }
@@ -417,23 +447,27 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         final var latestOffsets = kafkaConsumer.endOffsets(partitions);
         long totalOffsetsCounts = 0;
         for (var partition : partitions) {
-            final var latestOffset = Math.max(0, latestOffsets.get(partition) - 1);
+            final var latestOffset = Math.max(0, latestOffsets.get(partition));
             totalOffsetsCounts = totalOffsetsCounts + latestOffset;
             kafkaConsumer.seek(partition, 0);
         }
 
         List<ConsumerRecord<String, String>> messages = new ArrayList<>();
+        if(totalOffsetsCounts == 0)
+        {
+            kafkaConsumer.close();
+            return  messages;
+        }
         boolean moreRecords = true;
         int polledOffsets = 0;
-        long size = count > totalOffsetsCounts || count == 0 ? totalOffsetsCounts : count;
         while (moreRecords) {
             if(moreRecords){
                 final var polled = kafkaConsumer.poll(Duration.ofMillis(appConfig.getKafka().getPollduration()));
                 var records = polled.records(topic);
                 polledOffsets = polledOffsets +  polled.count();
-                moreRecords = polledOffsets < size && polledOffsets > 0 && polled.count() > 0;
+                moreRecords = polledOffsets < count && totalOffsetsCounts >= count;
                 for (var record: records){
-                    if(messages.size() < size && record.timestamp() <= to)
+                    if(messages.size() < count && record.timestamp() <= to)
                         messages.add(record);
                     else
                        {
@@ -610,6 +644,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
     Set<String> listConsumerGroups(AdminClient adminClient) {
         final Collection<ConsumerGroupListing> groupListing;
         try {
+
             groupListing = adminClient.listConsumerGroups().all().get();
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
@@ -672,7 +707,6 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         final var groupTopicPartitionOffsetMap = new TreeMap<String, Map<String, Map<Integer, Long>>>();
         for (var consumerGroupOffset : consumerGroupOffsets) {
             final var groupId = consumerGroupOffset.groupId;
-
             for (var topicPartitionOffset : consumerGroupOffset.offsets.entrySet()) {
                 final var topic = topicPartitionOffset.getKey().topic();
                 final var partition = topicPartitionOffset.getKey().partition();

@@ -30,6 +30,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { PercentagePipe } from '../core/pipes/percentage.pipe';
 import { TopicsComponent } from '../pages/topics/topics.component';
 import { ConsumersComponent } from '../pages/consumers/consumers.component';
+import { MatButtonModule } from '@angular/material/button';
 
  const AdminLayoutRoutes: Routes = [
   { path: 'dashboard/:id', component: DashboardComponent },
@@ -69,7 +70,9 @@ import { ConsumersComponent } from '../pages/consumers/consumers.component';
     FormsModule,
     MatDialogModule,
     MultiSelectModule,
-    CheckboxModule
+    CheckboxModule,
+    MatButtonModule
+    
   ],
   entryComponents: [PayloadFilterComponent],
   providers: [KafkaMonitorService, KafkaAdminService, ConfirmationService, LoadingService]

@@ -36,6 +36,8 @@ import { ActionNotificationComponent } from './action-natification/action-notifi
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { LayoutUtilsService } from './core/services/layout-utils.service';
 import { MapControlComponent } from './map-control/map-control.component';
+import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog/confirm-delete-dialog.component';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 
 
@@ -52,7 +54,8 @@ import { MapControlComponent } from './map-control/map-control.component';
     AddNewClusterButtonComponent,
     TopicCreateComponent,
     ActionNotificationComponent,
-    MapControlComponent
+    MapControlComponent,
+    ConfirmDeleteDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -76,7 +79,8 @@ import { MapControlComponent } from './map-control/map-control.component';
     FormsModule,
     ReactiveFormsModule,
     DragDropModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatProgressBarModule
     
 
   ],

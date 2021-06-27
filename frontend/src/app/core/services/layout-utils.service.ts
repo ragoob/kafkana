@@ -1,8 +1,10 @@
 // Angular
-import { Injectable } from '@angular/core';
+import { Injectable,EventEmitter } from '@angular/core';
 import {MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { BehaviorSubject } from 'rxjs';
  import { ActionNotificationComponent } from '../../action-natification/action-notification.component';
+import { ConfirmDeleteDialogComponent } from '../../confirm-delete-dialog/confirm-delete-dialog.component';
 // Partials for CRUD
 
 export enum MessageType {
@@ -59,6 +61,22 @@ export class LayoutUtilsService {
 			verticalPosition: _verticalPosition
 		});
 	}
+
+	/**
+	 * Showing Confirmation (Mat-Dialog) before Entity Removing
+	 *
+	 * @param title: stirng
+	 * @param description: stirng
+	 * @param waitDesciption: string
+	 */
+	deleteElement(title: string = '', description: string = '', waitDesciption: string = '', waitUntil?: BehaviorSubject<boolean>, panelClass: string = '' ) {
+		return this.dialog.open(ConfirmDeleteDialogComponent, {
+			data: { title, description, waitDesciption, waitUntil},
+			width: '440px',
+			panelClass: panelClass
+		});
+	}
+
 
 	
 	
