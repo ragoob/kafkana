@@ -17,8 +17,7 @@
                 <ng-template pTemplate="header">
                     <tr>
                         <th>Name</th>
-                        <th>Partitions</th>
-                        <th>Total offsets size</th>
+                     
                         <th></th>
                         <th *ngIf="configService.config?.allowtopicsdeletion"></th>
                     </tr>
@@ -26,8 +25,6 @@
                 <ng-template pTemplate="body" let-topic>
                     <tr  class="clickable-row">
                         <td (click)="details(topic?.name)">{{topic?.name}}</td>
-                        <td (click)="details(topic?.name)">{{topic?.partitions?.length}}</td>
-                        <td (click)="details(topic?.name)"> {{topic?.totalSize}}</td>
                         <td *ngIf="configService.config?.allowtopicsdeletion">
                           
                             <button pButton pRipple icon="pi pi-trash" (click)="deleteTopic(topic?.name)" class="p-button-rounded p-button-danger"
