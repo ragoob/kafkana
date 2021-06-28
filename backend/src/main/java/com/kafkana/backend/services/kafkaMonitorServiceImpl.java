@@ -70,23 +70,15 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
     }
     @Override
     public List<topicModel> getTopics(String clusterIp, boolean showDefaultConfig) {
-        final  var kafkaConsumer= createConsumer(clusterIp);
-        final  var admin = getAdminClient(clusterIp);
+        final var admin = getAdminClient(clusterIp);
         try{
-
-            final var topics = getTopicMetadata(kafkaConsumer,admin,showDefaultConfig).values().stream()
-                    .sorted(Comparator.comparing(topicModel::getName))
-                    .collect(Collectors.toList());
-            topics.forEach(topic-> {
-                topic.setPartitions(getTopicPartitionSizes(topic,kafkaConsumer));
-            });
-            kafkaConsumer.close();
-            admin.close();
-            return topics;
+            return admin.listTopics()
+                    .names().get().stream()
+                    .map(c-> new topicModel(c)).toList();
         } catch (Exception ex){
-            kafkaConsumer.close();
             admin.close();
-            throw ex;
+            admin.close();
+            return  new ArrayList<>();
         }
     }
     @Override
