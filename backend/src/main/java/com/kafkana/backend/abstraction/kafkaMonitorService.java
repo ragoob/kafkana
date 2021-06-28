@@ -12,7 +12,7 @@ public interface kafkaMonitorService {
     clusterSummaryModel getClusterSummary(String clusterIp);
     List<topicModel> getTopics(String clusterId,boolean showDefaultConfig);
     Optional<topicModel> getTopic(String topic, String clusterId,boolean showDefaultConfig);
-    List<consumerModel> getConsumers(Collection<topicModel> topicModels, String clusterId);
+    List<consumerModel> getConsumers(String clusterId);
     List<messageModel> getMessages(String topic,String clusterId,long size,long start, long end,String sortDirection);
     List<messageModel> getMessages(String topic,String clusterId,long size,String sortDirection);
     List<messageModel> getMessages(String topic,String clusterIp,long size,long start,String sortingDirection);

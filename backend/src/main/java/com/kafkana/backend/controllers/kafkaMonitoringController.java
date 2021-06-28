@@ -35,21 +35,12 @@ public class kafkaMonitoringController {
                                           ) throws InterruptedException {
         boolean refreshFlag = refresh != null ? refresh : false;
         clusterSummaryModel summaryModel;
-        if(refreshFlag || !allowCache){
-            summaryModel  = this.kafkaMonitorService.getClusterSummary(clusterIp);
-            if(allowCache)
-            this.summaryRepository.save(summaryModel,clusterIp);
-        }
-        else{
+        if(allowCache){
             var cached = this.summaryRepository.find(clusterIp);
-            if(cached != null && cached.getBrokerCount() > 0) {
-                summaryModel = cached;
-            }
-            else{
-                summaryModel =  this.summaryRepository.find(clusterIp);
-                this.summaryRepository.save(summaryModel,clusterIp);
-            }
-
+            summaryModel = cached == null || refreshFlag ? this.kafkaMonitorService.getClusterSummary(clusterIp) : cached;
+            this.summaryRepository.save(summaryModel,clusterIp);
+        }else{
+            summaryModel  = this.kafkaMonitorService.getClusterSummary(clusterIp);
         }
 
         return summaryModel;
@@ -63,20 +54,13 @@ public class kafkaMonitoringController {
                                ){
         boolean refreshFlag = refresh != null ? refresh : false;
         List<topicModel> topics;
-        if(refreshFlag || !allowCache){
-            topics =  this.kafkaMonitorService.getTopics(clusterIp,false);
-            if(allowCache)
+        if(allowCache){
+            var cached = this.kafkaMonitorService.getTopics(clusterIp,false);
+            topics = cached.size() == 0 || refreshFlag ? this.kafkaMonitorService.getTopics(clusterIp,false) : cached;
             this.topicsRepository.save(topics,clusterIp);
-        }
-        else{
-            var cached = this.topicsRepository.findAll(clusterIp);
-            if(cached.size() > 0)
-                topics = cached;
-            else{
-                topics = this.kafkaMonitorService.getTopics(clusterIp,false);
-                this.topicsRepository.save(topics,clusterIp);
-            }
 
+        }else{
+            topics = this.kafkaMonitorService.getTopics(clusterIp,false);
         }
 
        return  topics;
@@ -96,26 +80,13 @@ public class kafkaMonitoringController {
                                      ){
         boolean refreshFlag = refresh != null ? refresh : false;
         List<consumerModel> consumers;
-        if(refreshFlag || !allowCache){
-            final  var topics = this.kafkaMonitorService.getTopics(clusterIp,false);
-            consumers =    this.kafkaMonitorService.getConsumers(topics,clusterIp);
-            if(allowCache)
-            this.consumerRepository.save(consumers,clusterIp);
-        }
-        else{
-
+        if(allowCache){
             var cached = this.consumerRepository.findAll(clusterIp);
-            if(cached.size() > 0){
-                consumers = cached;
-            }
-            else{
-                final  var topics = this.kafkaMonitorService.getTopics(clusterIp,false);
-                consumers =   this.kafkaMonitorService.getConsumers(topics,clusterIp);;
-                this.consumerRepository.save(consumers,clusterIp);
-            }
-
+            consumers = cached.size() == 0 || refreshFlag ? this.getConsumers(clusterIp,refreshFlag) : cached;
+            this.consumerRepository.save(consumers,clusterIp);
+        }else{
+            consumers = this.getConsumers(clusterIp,refreshFlag);
         }
-
         return  consumers;
     }
 

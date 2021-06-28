@@ -99,8 +99,9 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         }
     }
     @Override
-    public List<consumerModel> getConsumers(Collection<topicModel> topicModels,String clusterIp) {
+    public List<consumerModel> getConsumers(String clusterIp) {
         final  var admin = getAdminClient(clusterIp);
+        Collection<topicModel> topicModels = this.getTopics(clusterIp,false);
         final var topics = topicModels.stream().map(topicModel::getName).collect(Collectors.toSet());
          try{
              final var consumerGroupOffsets = getConsumerOffsets(topics,admin);
