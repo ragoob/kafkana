@@ -34,7 +34,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
     private static final Logger LOG = LoggerFactory.getLogger(kafkaMonitorServiceImpl.class);
     @Override
     public clusterSummaryModel getClusterSummary(String clusterIp) {
-        Collection<topicModel> topics = this.getTopics(clusterIp,false);
+        Collection<topicModel> topics = this.getTopicsWithDetails(clusterIp,false);
         final var topicSummary = topics.stream()
                 .map(topic -> {
                     final var summary = new clusterSummaryModel();
@@ -81,6 +81,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
             return  new ArrayList<>();
         }
     }
+
     @Override
     public Optional<topicModel> getTopic(String topic,String clusterIp,boolean showDefaultConfig) {
         final  var kafkaConsumer= createConsumer(clusterIp);
@@ -752,5 +753,26 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         final AdminClient admin = getAdminClient(clusterIp);
         admin.deleteConsumerGroups(Collections.singleton(id));
         admin.close();
+    }
+
+    private List<topicModel> getTopicsWithDetails(String clusterIp, boolean showDefaultConfig){
+        final  var kafkaConsumer= createConsumer(clusterIp);
+        final  var admin = getAdminClient(clusterIp);
+        try{
+
+            final var topics = getTopicMetadata(kafkaConsumer,admin,showDefaultConfig).values().stream()
+                    .sorted(Comparator.comparing(topicModel::getName))
+                    .collect(Collectors.toList());
+            topics.forEach(topic-> {
+                topic.setPartitions(getTopicPartitionSizes(topic,kafkaConsumer));
+            });
+            kafkaConsumer.close();
+            admin.close();
+            return topics;
+        } catch (Exception ex){
+            kafkaConsumer.close();
+            admin.close();
+            throw ex;
+        }
     }
 }
