@@ -32,7 +32,7 @@ public class kafkaMonitoringController {
     @GetMapping("/summary")
     clusterSummaryModel getClusterSummary(@RequestHeader("clusterIp") String clusterIp,
                                           @RequestParam(name = "refresh", required = false) Boolean  refresh
-                                          ) throws InterruptedException {
+                                          ) {
         boolean refreshFlag = refresh != null ? refresh : false;
         clusterSummaryModel summaryModel;
         if(allowCache){

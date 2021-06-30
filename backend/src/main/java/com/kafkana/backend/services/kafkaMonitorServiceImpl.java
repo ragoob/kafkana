@@ -290,7 +290,6 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
                 var records = polled.records(topic);
                 polledOffsets = polledOffsets +  polled.count();
                 moreRecords = polledOffsets < count;
-                System.out.println("Polled offsets " + polledOffsets);
                 for(var record : records){
                     if(messages.size() < count)
                         messages.add(record);
