@@ -82,10 +82,10 @@ public class kafkaMonitoringController {
         List<consumerModel> consumers;
         if(allowCache){
             var cached = this.consumerRepository.findAll(clusterIp);
-            consumers = cached.size() == 0 || refreshFlag ? this.getConsumers(clusterIp,refreshFlag) : cached;
+            consumers = cached.size() == 0 || refreshFlag ? this.kafkaMonitorService.getConsumers(clusterIp) : cached;
             this.consumerRepository.save(consumers,clusterIp);
         }else{
-            consumers = this.getConsumers(clusterIp,refreshFlag);
+            consumers = this.kafkaMonitorService.getConsumers(clusterIp);
         }
         return  consumers;
     }

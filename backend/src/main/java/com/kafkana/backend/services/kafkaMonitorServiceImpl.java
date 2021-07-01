@@ -66,6 +66,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
                 : topicSummary.getPreferredReplicaPercent() / topics.size());
         topicSummary.setBrokerCount(topicSummary.getExpectedBrokerIds().size());
         topicSummary.setTimeStamp(new Date());
+
         return topicSummary;
     }
     @Override
@@ -550,14 +551,12 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         assignedPartitionList.forEach(topicPartition -> {
             final topicPartitionModel topicPartitionModel = partitionMap.get(topicPartition.partition());
             final long startOffset = kafkaConsumer.position(topicPartition);
-            LOG.debug("topic: {}, partition: {}, startOffset: {}", topicPartition.topic(), topicPartition.partition(), startOffset);
             topicPartitionModel.setFirstOffset(startOffset);
         });
 
         kafkaConsumer.seekToEnd(assignedPartitionList);
         assignedPartitionList.forEach(topicPartition -> {
             final long latestOffset = kafkaConsumer.position(topicPartition);
-            LOG.debug("topic: {}, partition: {}, latestOffset: {}", topicPartition.topic(), topicPartition.partition(), latestOffset);
             final topicPartitionModel partitionModel = partitionMap.get(topicPartition.partition());
             partitionModel.setSize(latestOffset);
         });
