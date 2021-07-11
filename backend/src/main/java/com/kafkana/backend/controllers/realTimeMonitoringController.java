@@ -23,7 +23,8 @@ public class realTimeMonitoringController {
         clusterSummaryModel summaryModel;
         if(allowCache){
             var cached = this.summaryRepository.find(params.getClusterIp());
-            summaryModel = cached == null || params.isRefresh() ? this.kafkaMonitorService.getClusterSummary(params.getClusterIp()) : cached;
+            summaryModel = cached == null || params.isRefresh() ?
+                    this.kafkaMonitorService.getClusterSummary(params.getClusterIp()) : cached;
             this.summaryRepository.save(summaryModel,params.getClusterIp());
         }else{
             summaryModel  = this.kafkaMonitorService.getClusterSummary(params.getClusterIp());

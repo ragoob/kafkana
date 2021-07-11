@@ -111,6 +111,7 @@ export class TopicMessagesComponent implements OnInit , AfterViewInit {
     this.monitoringService.getMessages(this.topic?.name ?? "", this.clusterId, _count, start, end, this.sortDirection)
       .then(data => {
         this.messages = data;
+        console.log(this.messages.map(msg=> msg.message))
         this.flattenMessageObject();
         this.populateColumns();
         this.populateFilters();

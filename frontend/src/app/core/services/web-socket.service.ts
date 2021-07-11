@@ -17,6 +17,8 @@ export class WebSocketService{
     }
 
     connect(topic: string): Promise<void> {
+        const ws = new SockJS(this.SocketURL);
+        this.stompClient = Stomp.over(ws);
         return new Promise((resolve, _) => {
             const _this = this;
             _this.stompClient?.connect({}, (frame: any) => {
