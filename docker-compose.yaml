@@ -69,7 +69,6 @@ services:
       - "8080:8080"
     environment:
       ALLOW_TOPIC_CREATION: 'true'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
       ALLOW_TOPIC_DELETION: 'true'
     depends_on:
       - zookeeper
