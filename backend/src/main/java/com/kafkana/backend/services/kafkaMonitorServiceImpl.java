@@ -288,9 +288,15 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         int emptyPollingTimes = 0;
         while (moreRecords) {
             if(moreRecords){
-                if(emptyPollingTimes == 3) moreRecords = false;
+                if(emptyPollingTimes == 3) {
+                    moreRecords = false;
+                }
+                System.out.println("********* Start fetching records from " + topic + " *********");
             final var polled = kafkaConsumer.poll(Duration.ofMillis(appConfig.getKafka().getPollduration()));
-                if(polled.count() == 0) emptyPollingTimes++;
+                System.out.println("********* polled records count in " + topic + " " + polled.count() + " *********");
+                if(polled.count() == 0) {
+                    emptyPollingTimes++;
+                }
                 var records = polled.records(topic);
 
                 polledOffsets = polledOffsets +  polled.count();
