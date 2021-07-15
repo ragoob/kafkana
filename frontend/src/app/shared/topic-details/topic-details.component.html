@@ -2,11 +2,11 @@
     <div class="col-md-12">
         <div class="card" style="min-height: 500px;" [ngClass]="{'loader-animated-background': !topic || !loaded}">
             <div class="card-header">
-                 <h5 class="card-title">Topic details  ( {{topic?.name}} )</h5>
-                 <span title="Click to refresh" (click)="loadTopic(topic?.name)"  style="cursor: pointer;">
-                     <i class="fas fa-retweet-alt"></i>
-                 </span>
-                 &nbsp;
+                 <h5 class="card-title">Topic details  ( {{topic?.name}} )   &nbsp; <span title="Click to refresh" (click)="loadTopic(topic?.name)"  style="cursor: pointer;">
+                     <i class="fa fa-refresh"></i>
+                 </span></h5>
+                
+               
 
             </div>
             <div class="card-body">
