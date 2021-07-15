@@ -117,6 +117,8 @@ export class TopicMessagesComponent implements OnInit , AfterViewInit {
         this.populateFilters();
         this.loaded = true;
       }).catch((error)=> {
+       
+      }).finally(()=>{
         this.loaded = true;
         this.messages = [];
       })

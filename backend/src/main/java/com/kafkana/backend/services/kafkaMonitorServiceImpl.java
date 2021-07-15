@@ -295,6 +295,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
             if(moreRecords){
                 if(emptyPollingTimes == 3) {
                     moreRecords = false;
+                    return messages;
                 }
                 System.out.println("********* Start fetching records from " + topic + " *********");
             final var polled = kafkaConsumer.poll(Duration.ofMillis(appConfig.getKafka().getPollduration()));
