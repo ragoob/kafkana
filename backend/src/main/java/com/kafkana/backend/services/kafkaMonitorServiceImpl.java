@@ -264,9 +264,9 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         long totalOffsetsCounts = 0;
         for (var partition : partitions) {
             final var latestOffset = Math.max(0, latestOffsets.get(partition));
-            totalOffsetsCounts = totalOffsetsCounts +latestOffset;
-            if(sortingDirection.equals(pollingTypes.DESC)){
-                long startFrom = latestOffset - count;
+            totalOffsetsCounts = totalOffsetsCounts + latestOffset;
+            if(sortingDirection.equals(pollingTypes.DESC) &&  latestOffset > count){
+                long startFrom =   latestOffset - count;
                 kafkaConsumer.seek(partition, Math.max(0, startFrom));
             }
             else{
