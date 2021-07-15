@@ -261,7 +261,6 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
                 .collect(Collectors.toList());
         kafkaConsumer.assign(partitions);
         final var latestOffsets = kafkaConsumer.endOffsets(partitions);
-        final var begainOffsets =  kafkaConsumer.beginningOffsets(partitions);
         long totalOffsetsCounts = 0;
         for (var partition : partitions) {
             final var latestOffset = Math.max(0, latestOffsets.get(partition));
@@ -286,10 +285,14 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         }
         boolean moreRecords = true;
         int polledOffsets = 0;
+        int emptyPollingTimes = 0;
         while (moreRecords) {
             if(moreRecords){
+                if(emptyPollingTimes == 3) moreRecords = false;
             final var polled = kafkaConsumer.poll(Duration.ofMillis(appConfig.getKafka().getPollduration()));
+                if(polled.count() == 0) emptyPollingTimes++;
                 var records = polled.records(topic);
+
                 polledOffsets = polledOffsets +  polled.count();
                 moreRecords = polledOffsets < count;
                 for(var record : records){
