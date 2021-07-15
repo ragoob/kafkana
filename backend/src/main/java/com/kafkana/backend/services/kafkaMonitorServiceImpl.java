@@ -293,7 +293,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         int emptyPollingTimes = 0;
         while (moreRecords) {
             if(moreRecords){
-                if(emptyPollingTimes == 3) {
+                if(emptyPollingTimes == partitions.size()) {
                     moreRecords = false;
                     return messages;
                 }
@@ -362,9 +362,17 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         }
         boolean moreRecords = true;
         int polledOffsets = 0;
+        int emptyPollingTimes =0;
         while (moreRecords) {
             if(moreRecords){
+                if(emptyPollingTimes == 3) {
+                    moreRecords = false;
+                    return messages;
+                }
                 final var polled = kafkaConsumer.poll(Duration.ofMillis(appConfig.getKafka().getPollduration()));
+                if(polled.count() == 0){
+                    emptyPollingTimes++;
+                }
                 var records = polled.records(topic);
                 polledOffsets = polledOffsets +  polled.count();
                 moreRecords = polledOffsets < count && totalOffsetsCounts >= count;
@@ -422,9 +430,17 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         }
         boolean moreRecords = true;
         int polledOffsets = 0;
+        int emptyPollingTimes =0;
         while (moreRecords) {
             if(moreRecords){
+                if(emptyPollingTimes == partitions.size()) {
+                    moreRecords = false;
+                    return messages;
+                }
                 final var polled = kafkaConsumer.poll(Duration.ofMillis(appConfig.getKafka().getPollduration()));
+                if(polled.count() == 0){
+                    emptyPollingTimes++;
+                }
                 var records = polled.records(topic);
                 polledOffsets = polledOffsets +  polled.count();
                 moreRecords = polledOffsets < count && totalOffsetsCounts >= count;
@@ -470,9 +486,17 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         }
         boolean moreRecords = true;
         int polledOffsets = 0;
+        int emptyPollingTimes = 0;
         while (moreRecords) {
             if(moreRecords){
+                if(emptyPollingTimes == partitions.size()) {
+                    moreRecords = false;
+                    return messages;
+                }
                 final var polled = kafkaConsumer.poll(Duration.ofMillis(appConfig.getKafka().getPollduration()));
+                if(polled.count() == 0){
+                    emptyPollingTimes++;
+                }
                 var records = polled.records(topic);
                 polledOffsets = polledOffsets +  polled.count();
                 moreRecords = polledOffsets < count && totalOffsetsCounts >= count;
