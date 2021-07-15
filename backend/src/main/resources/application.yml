@@ -13,3 +13,4 @@ kafka:
   allowtopicsdeletion: ${ALLOW_TOPIC_DELETION:true}
   allowproducemessage: ${ALLOW_PRODUCING:true}
   pollduration: ${KAFKA_POLL_DURATION:3000}
+  consumergroup: ${KAFKA_CONSUMER_GROUP}

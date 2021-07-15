@@ -261,6 +261,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
                 .collect(Collectors.toList());
         kafkaConsumer.assign(partitions);
         final var latestOffsets = kafkaConsumer.endOffsets(partitions);
+        final var begainOffsets =  kafkaConsumer.beginningOffsets(partitions);
         long totalOffsetsCounts = 0;
         for (var partition : partitions) {
             final var latestOffset = Math.max(0, latestOffsets.get(partition));
@@ -513,8 +514,8 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         final Properties props = new Properties();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
                 clusterIp);
-        props.put(ConsumerConfig.GROUP_ID_CONFIG,
-                "KAFKANA_UI_MONITORING_V1");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG,appConfig.getKafka().getConsumergroup()
+                );
         props.put(ConsumerConfig.CLIENT_ID_CONFIG,
                 "KAFKANA_UI_MONITORING-CONUMER_" + UUID.randomUUID().toString());
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
