@@ -516,7 +516,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         props.put(ConsumerConfig.GROUP_ID_CONFIG,
                 "KAFKANA_UI_MONITORING_V1");
         props.put(ConsumerConfig.CLIENT_ID_CONFIG,
-                "KAFKANA_UI_MONITORING-CONUMER_V1");
+                "KAFKANA_UI_MONITORING-CONUMER_" + UUID.randomUUID().toString());
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
                 StringDeserializer.class.getName());
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
