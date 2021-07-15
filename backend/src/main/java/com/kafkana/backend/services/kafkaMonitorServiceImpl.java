@@ -259,20 +259,25 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
                 .map(partitionInfo -> new TopicPartition(partitionInfo.topic(),
                         partitionInfo.partition()))
                 .collect(Collectors.toList());
-        kafkaConsumer.assign(partitions);
-        final var latestOffsets = kafkaConsumer.endOffsets(partitions);
         long totalOffsetsCounts = 0;
-        for (var partition : partitions) {
-            final var latestOffset = Math.max(0, latestOffsets.get(partition));
-            totalOffsetsCounts = totalOffsetsCounts + latestOffset;
-            if(sortingDirection.equals(pollingTypes.DESC) &&  latestOffset > count){
-                long startFrom =   latestOffset - count;
-                kafkaConsumer.seek(partition, Math.max(0, startFrom));
-            }
-            else{
-                kafkaConsumer.seek(partition,0);
-            }
-        }
+           try{
+               kafkaConsumer.assign(partitions);
+               final var latestOffsets = kafkaConsumer.endOffsets(partitions);
+
+               for (var partition : partitions) {
+                   final var latestOffset = Math.max(0, latestOffsets.get(partition));
+                   totalOffsetsCounts = totalOffsetsCounts + latestOffset;
+                   if(sortingDirection.equals(pollingTypes.DESC) &&  latestOffset > count){
+                       long startFrom =   latestOffset - count;
+                       kafkaConsumer.seek(partition, Math.max(0, startFrom));
+                   }
+                   else{
+                       kafkaConsumer.seek(partition,0);
+                   }
+               }
+           }catch (Exception ex){
+               System.out.println("Error in assign partitions " + ex.getMessage());
+           }
 
         List<ConsumerRecord<String, String>> messages = new ArrayList<>();
         if(totalOffsetsCounts == 0)
@@ -531,7 +536,7 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
                 StringDeserializer.class.getName());
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
                 StringDeserializer.class.getName());
-        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,"latest");
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,"earliest");
         return new KafkaConsumer<>(props);
     }
 
