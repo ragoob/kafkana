@@ -111,11 +111,14 @@ export class TopicMessagesComponent implements OnInit , AfterViewInit {
     this.monitoringService.getMessages(this.topic?.name ?? "", this.clusterId, _count, start, end, this.sortDirection)
       .then(data => {
         this.messages = data;
+        console.log(this.messages.map(msg=> msg.message))
         this.flattenMessageObject();
         this.populateColumns();
         this.populateFilters();
         this.loaded = true;
       }).catch((error)=> {
+       
+      }).finally(()=>{
         this.loaded = true;
         this.messages = [];
       })
@@ -126,7 +129,7 @@ export class TopicMessagesComponent implements OnInit , AfterViewInit {
     if (this.filterModel) {
       Object.keys(this.filterModel)
         .forEach(key => {
-          if (key && this.filterModel[key]) {
+          if (key && this.filterModel[key] &&  this.filterModel[key] != null && this.filterModel[key] != '' && (this.filterModel[key] as string).trim().length > 0) {
             this.messages = this.messages.filter(d => d.fromatedMessage && d.fromatedMessage[key] == this.filterModel[key]);
           }
         })

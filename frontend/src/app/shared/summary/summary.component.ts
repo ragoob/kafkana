@@ -3,8 +3,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ReplaySubject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 import { ClusterSummary } from '../../core/models/cluster-summary.model';
-import { KafkaMonitorService } from '../../core/services/kafka-monitor.service';
+import { KafkaCluster } from '../../core/models/kafka-cluster.model';
+import { SocketTopics } from '../../core/models/socket-topics.enum';
+import { AdminService } from '../../core/services/admin.service';
 import { LoadingService } from '../../core/services/loading.service';
+import { WebSocketService } from '../../core/services/web-socket.service';
 
 @Component({
   selector: 'app-summary',
@@ -12,25 +15,57 @@ import { LoadingService } from '../../core/services/loading.service';
   styleUrls: ['./summary.component.scss']
 })
 export class SummaryComponent implements OnInit ,OnDestroy{
-  clusterId: string = "";
+  cluster?: KafkaCluster;
   private destoryed$: ReplaySubject<any> = new ReplaySubject(1);
   public loaded: boolean = false;
   public summary?: ClusterSummary | null
-  constructor(private monitoringService: KafkaMonitorService, 
+  constructor(
     private route: ActivatedRoute,private router: Router,
-    private loader: LoadingService
+    private loader: LoadingService,
+    private webSocketService: WebSocketService,
+    private adminService: AdminService
     ) { }
 
   ngOnDestroy(): void {
     this.destoryed$.complete();
+     this.webSocketService.disconnect()
+     .then((msg)=> console.log(msg));
   }
 
   ngOnInit(): void {
+    this.webSocketService.aka$
+      .pipe(filter(ws => ws.topic == SocketTopics.SUMMARY),
+     takeUntil(this.destoryed$)
+    ).subscribe(msg=> {
+      this.loader.change('SUMMARY_LIST', true);
+      if (msg.event){
+       this.summary = JSON.parse(msg.event?.body);
+      }
+    });
+
+    this.webSocketService.onError$
+      .pipe(filter(ws => ws.topic == SocketTopics.SUMMARY),
+        takeUntil(this.destoryed$)
+      ).subscribe(error=> {
+        this.loader.change('SUMMARY_LIST', true);
+      });
+  
     this.route.params.
     pipe(takeUntil(this.destoryed$))
     .subscribe(params=> {
-      this.clusterId = params.id;
-      this.loadSummary(params.id);
+      this.cluster = this.adminService.findByid(params.id);
+      this.loader.change('SUMMARY_LIST', false);
+      this.webSocketService
+        .connect(SocketTopics.SUMMARY)
+        .then(() => {
+          this.webSocketService.send(SocketTopics.SUMMARY, 
+          {
+            clusterIp: this.cluster?.bootStrapServers,
+            refresh: false
+           }
+            );
+        });
+
     });
 
     this.loader.loaded$
@@ -41,26 +76,20 @@ export class SummaryComponent implements OnInit ,OnDestroy{
       })
   }
 
-  public loadSummary(clusterId: string,refresh: boolean =false){
-    this.loader.change('SUMMARY_LIST', false);
-    this.monitoringService.getSummary(clusterId, refresh)
-    .then(data=> {
-      this.summary = data;
-      this.loader.change('SUMMARY_LIST', true);
-    }).catch(error=> {
-      this.summary = null;
-      this.loader.change('SUMMARY_LIST', true);
-    })
-  }
+
 
   public brokerDetails(){
-    this.router.navigate(['/brokers-details',this.clusterId]);
+    this.router.navigate(['/brokers-details',this.cluster?.id]);
   }
 
   public topicsList(){
-    this.router.navigate(['/topics',this.clusterId]);
+    this.router.navigate(['/topics', this.cluster?.id]);
   }
   public forceReload(){
-    this.loadSummary(this.clusterId, true);
+    this.loader.change('SUMMARY_LIST', false);
+    this.webSocketService.send(SocketTopics.SUMMARY, {
+      clusterIp: this.cluster?.bootStrapServers,
+      refresh: true
+    });
   }
 }

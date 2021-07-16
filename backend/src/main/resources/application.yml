@@ -2,14 +2,15 @@ spring:
   application:
     name: kafkana
   server:
-port: 8081
+    port: 8083
 cache:
   allowed: ${ALLOW_CACHE:false}
 redis:
   host: ${REDIS_HOST:localhost}
   port: ${REDIS_PORT:6389}
 kafka:
-  allowtopicscreation: ${ALLOW_TOPIC_CREATION:false}
-  allowtopicsdeletion: ${ALLOW_TOPIC_DELETION:false}
-  allowproducemessage: ${ALLOW_PRODUCING:false}
+  allowtopicscreation: ${ALLOW_TOPIC_CREATION:true}
+  allowtopicsdeletion: ${ALLOW_TOPIC_DELETION:true}
+  allowproducemessage: ${ALLOW_PRODUCING:true}
   pollduration: ${KAFKA_POLL_DURATION:3000}
+  consumergroup: ${KAFKA_CONSUMER_GROUP}

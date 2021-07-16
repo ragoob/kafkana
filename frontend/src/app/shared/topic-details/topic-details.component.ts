@@ -1,11 +1,9 @@
-import { AfterContentChecked, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {  Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ReplaySubject, fromEvent  } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { Topic } from '../../core/models/topic.model';
 import { KafkaMonitorService } from '../../core/services/kafka-monitor.service';
-import { debounceTime } from 'rxjs/operators';
-
 @Component({
   selector: 'app-topic-details',
   templateUrl: './topic-details.component.html',

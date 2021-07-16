@@ -5,6 +5,7 @@ public class kafkaConfig {
     private  boolean allowtopicsdeletion;
     private  boolean allowproducemessage;
     private  long pollduration;
+    private  String consumergroup;
 
     public boolean isAllowtopicscreation() {
         return allowtopicscreation;
@@ -37,5 +38,13 @@ public class kafkaConfig {
 
     public void setPollduration(long pollduration) {
         this.pollduration = pollduration;
+    }
+
+    public String getConsumergroup() {
+        return consumergroup;
+    }
+
+    public void setConsumergroup(String consumergroup) {
+        this.consumergroup = consumergroup;
     }
 }

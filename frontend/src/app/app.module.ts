@@ -15,7 +15,7 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { MatCardModule } from '@angular/material/card';
 import { MatMenuModule } from '@angular/material/menu';
 import { RouterModule } from '@angular/router';
-import { API_BASE_URL } from './core/constants';
+import { API_BASE_URL, SOCKET_URL } from './core/constants';
 import { AdminLayoutComponent } from './layouts/admin-layout.component';
 import { HomeComponent } from './home/home.component';
 import { ButtonModule } from 'primeng/button';
@@ -38,6 +38,7 @@ import { LayoutUtilsService } from './core/services/layout-utils.service';
 import { MapControlComponent } from './map-control/map-control.component';
 import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog/confirm-delete-dialog.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { WebSocketService } from './core/services/web-socket.service';
 
 
 
@@ -84,7 +85,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     
 
   ],
-  providers: [{ provide: API_BASE_URL, useValue: environment.baseURL }, LayoutUtilsService, AdminService, { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: true, direction: 'ltr' } }],
+  providers: [{ provide: API_BASE_URL, useValue: environment.baseURL }, { provide: SOCKET_URL, useValue: environment.socketURL }, LayoutUtilsService, AdminService, 
+    { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: true, direction: 'ltr' } }, WebSocketService],
   entryComponents: [AddNewComponent, PayloadFilterComponent],
   bootstrap: [AppComponent]
 })
