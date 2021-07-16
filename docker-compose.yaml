@@ -70,6 +70,7 @@ services:
     environment:
       ALLOW_TOPIC_CREATION: 'true'
       ALLOW_TOPIC_DELETION: 'true'
+      ALLOW_CACHE: 'false' // require redis 
     depends_on:
       - zookeeper
 
@@ -80,5 +81,6 @@ services:
       - "5200:80"
     environment:
       API_URL: http://localhost:8080/api
+      SOCKET_URL: http://localhost:8080/ws
     depends_on:
       - zookeeper
