@@ -23,6 +23,16 @@ Real time and management  dashboard  for multiple kafka clusters
     docker build -t kafkana-api  -f backend/Dockerfile .
     docker run -d -p 8080:8080 kafkana-api
     ```
+ # Configurations
+  | Variable       | Type         |Description|
+| ------------- |:-------------:| -----:|
+| ALLOW_CACHE   | boolean       | use redis to cache topics, kpi ,etch |
+| REDIS_HOST    | string        | redis host in case of allow cache |
+| REDIS_PORT    | number        |    redis port in case of allow cache  |
+| ALLOW_TOPIC_CREATION    | boolean        |    allow creating topics  |
+| ALLOW_TOPIC_DELETION    | boolean       |    allow deleting topics  |
+| KAFKA_POLL_DURATION    | number       |    poll duration in consumer with ms default 3000  |
+| KAFKA_CONSUMER_GROUP    |string       |    consumer group name  |
 
  - Frontend:
    ```
