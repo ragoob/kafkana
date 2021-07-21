@@ -20,7 +20,7 @@ export class TopicMessagesComponent implements OnInit , AfterViewInit {
   private destoryed$: ReplaySubject<any> = new ReplaySubject(1);
   @Input('topic') topic?: Topic
   messages: Message[] = [];
-  loaded: boolean = false;
+  loaded: boolean = true;
   public from?: Date | null;
   public to?: Date | null;
   public count?: number | null;
@@ -62,7 +62,6 @@ export class TopicMessagesComponent implements OnInit , AfterViewInit {
       && (JSON.parse(localStorage.getItem(`Selected_Columns_${this.topic?.name}`) ?? "[]") as any[]).length > 0 ?
       JSON.parse(localStorage.getItem(`Selected_Columns_${this.topic?.name}`) ?? "[]") as any [] : 
       defaultSelectedColumns;
-    this.search();
   }
 
   public sortByTimeStamp(event: any): void{
@@ -111,16 +110,15 @@ export class TopicMessagesComponent implements OnInit , AfterViewInit {
     this.monitoringService.getMessages(this.topic?.name ?? "", this.clusterId, _count, start, end, this.sortDirection)
       .then(data => {
         this.messages = data;
-        console.log(this.messages.map(msg=> msg.message))
         this.flattenMessageObject();
         this.populateColumns();
         this.populateFilters();
         this.loaded = true;
       }).catch((error)=> {
-       
+        this.messages = [];
       }).finally(()=>{
         this.loaded = true;
-        this.messages = [];
+        
       })
    
   }
