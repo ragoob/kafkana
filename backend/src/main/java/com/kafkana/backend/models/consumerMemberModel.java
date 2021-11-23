@@ -1,6 +1,8 @@
 package com.kafkana.backend.models;
 
-public class consumerMemberModel {
+import java.io.Serializable;
+
+public class consumerMemberModel implements Serializable {
 
     public consumerMemberModel(String id) {
         this.id = id;
