@@ -1,32 +1,20 @@
 package com.kafkana.backend.models;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Objects;
-import java.util.TreeMap;
+import java.util.*;
+
 public class consumerModel implements Comparable<consumerModel>, Serializable {
 
     private final String groupId;
-    private final Map<String, consumerTopicModel> topics = new TreeMap<>();
+    private  final   brokers broker;
+    private List<consumerMemberModel> members;
 
-    public consumerModel(String groupId) {
+    public consumerModel(String groupId, com.kafkana.backend.models.brokers broker) {
         this.groupId = groupId;
+        this.broker = broker;
     }
 
     public String getGroupId() {
         return groupId;
-    }
-
-    public void addTopic(consumerTopicModel topic) {
-        topics.put(topic.getTopic(), topic);
-    }
-
-    public consumerTopicModel getTopic(String topic) {
-        return topics.get(topic);
-    }
-
-    public Collection<consumerTopicModel> getTopics() {
-        return topics.values();
     }
 
     @Override
@@ -51,4 +39,15 @@ public class consumerModel implements Comparable<consumerModel>, Serializable {
         return Objects.hashCode(groupId);
     }
 
+    public List<consumerMemberModel> getMembers() {
+        return members;
+    }
+
+    public void setMembers(List<consumerMemberModel> members) {
+        this.members = members;
+    }
+
+    public com.kafkana.backend.models.brokers getBroker() {
+        return broker;
+    }
 }

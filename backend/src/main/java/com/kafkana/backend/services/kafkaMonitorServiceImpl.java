@@ -100,20 +100,63 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
             return Optional.empty();
         }
     }
+
     @Override
     public List<consumerModel> getConsumers(String clusterIp) {
         final  var admin = getAdminClient(clusterIp);
-        Collection<topicModel> topicModels = this.getTopics(clusterIp,false);
-        final var topics = topicModels.stream().map(topicModel::getName).collect(Collectors.toSet());
-         try{
-             final var consumerGroupOffsets = getConsumerOffsets(topics,admin);
-             admin.close();
-             return convert(consumerGroupOffsets, topicModels);
-         }catch (Exception ex){
-             admin.close();
-             return  new ArrayList<>();
-         }
+        final  var consumer  =this.createConsumer(clusterIp);
+        List<consumerModel> consumerList = new ArrayList<>();
+        try{
+            List<String> groupIds = admin.listConsumerGroups().all().get().
+                    stream().map(s -> s.groupId()).collect(Collectors.toList());
+            Map<String, ConsumerGroupDescription> groups = admin.
+                    describeConsumerGroups(groupIds).all().get();
+            for (final String groupId : groupIds) {
+                Map<TopicPartition, OffsetAndMetadata> groupOffsets =
+                        admin.listConsumerGroupOffsets(groupId)
+                                .partitionsToOffsetAndMetadata().get();
+
+                Map<TopicPartition, Long> endOffsets = consumer.endOffsets(groupOffsets.keySet());
+
+
+                ConsumerGroupDescription description = groups.get(groupId);
+                var coordinator = description.coordinator();
+                var brokers = new brokers(coordinator.id(), coordinator.host(), coordinator.port(), coordinator.rack());
+                var group = new consumerModel(description.groupId(), brokers);
+                var members = new ArrayList<consumerMemberModel>();
+                description.members().forEach(c -> {
+                    c.assignment().topicPartitions().forEach(t-> {
+                        var member = new consumerMemberModel();
+                        member.setId(c.consumerId());
+                        member.setClientId(c.clientId());
+                        member.setHost(c.host().replace("/",""));
+                        member.setTopic(t.topic());
+                        member.setPartition(t.partition());
+                        var topicOffset = groupOffsets.get(new TopicPartition(t.topic(),t.partition()));
+                        var endOffset = endOffsets.get(new TopicPartition(t.topic(),t.partition()));
+                        if(topicOffset != null){
+                            member.setLastCommittedOffset(topicOffset.offset());
+                        }
+                        if(endOffset != null){
+                            member.setEndOffsets(endOffset);
+                        }
+                        member.setLag(member.getEndOffsets() - member.getLastCommittedOffset());
+                        members.add(member);
+                    });
+
+                });
+                group.setMembers(members);
+                consumerList.add(group);
+            }
+        }catch (Exception ex){
+            System.out.println(ex);
+        }
+
+        admin.close();
+        consumer.close();
+        return  consumerList;
     }
+
 
 
     @Override
@@ -735,49 +778,6 @@ public class kafkaMonitorServiceImpl  implements kafkaMonitorService {
         }
     }
 
-    private static List<consumerModel> convert(List<ConsumerGroupOffsets> consumerGroupOffsets, Collection<topicModel> topicModels) {
-        final var topicMap = topicModels.stream().collect(Collectors.toMap(topicModel::getName, Function.identity()));
-        final var groupTopicPartitionOffsetMap = new TreeMap<String, Map<String, Map<Integer, Long>>>();
-        for (var consumerGroupOffset : consumerGroupOffsets) {
-            final var groupId = consumerGroupOffset.groupId;
-            for (var topicPartitionOffset : consumerGroupOffset.offsets.entrySet()) {
-                final var topic = topicPartitionOffset.getKey().topic();
-                final var partition = topicPartitionOffset.getKey().partition();
-                final var offset = topicPartitionOffset.getValue().offset();
-                groupTopicPartitionOffsetMap
-                        .computeIfAbsent(groupId, __ -> new TreeMap<>())
-                        .computeIfAbsent(topic, __ -> new TreeMap<>())
-                        .put(partition, offset);
-            }
-        }
-
-        final var consumerModels = new ArrayList<consumerModel>(consumerGroupOffsets.size());
-        for (var groupTopicPartitionOffset : groupTopicPartitionOffsetMap.entrySet()) {
-            final var groupId = groupTopicPartitionOffset.getKey();
-            final var consumerModel = new consumerModel(groupId);
-            consumerModels.add(consumerModel);
-
-            for (var topicPartitionOffset : groupTopicPartitionOffset.getValue().entrySet()) {
-                final var topic = topicPartitionOffset.getKey();
-                final var consumerTopicModel = new consumerTopicModel(topic);
-                consumerModel.addTopic(consumerTopicModel);
-
-                for (var partitionOffset : topicPartitionOffset.getValue().entrySet()) {
-                    final var partition = partitionOffset.getKey();
-                    final var offset = partitionOffset.getValue();
-                    final var offsetModel = new consumerPartitionModel(groupId, topic, partition);
-                    consumerTopicModel.addOffset(offsetModel);
-                    offsetModel.setOffset(offset);
-                    final var topicModel = topicMap.get(topic);
-                    final var topicModelPartition = topicModel.getPartition(partition);
-                    offsetModel.setSize(topicModelPartition.map(topicPartitionModel::getSize).orElse(0L));
-                    offsetModel.setFirstOffset(topicModelPartition.map(topicPartitionModel::getFirstOffset).orElse(0L));
-                }
-            }
-        }
-
-        return consumerModels;
-    }
 
     private static Map<String, String> headersToMap(Headers headers) {
         final var map = new TreeMap<String, String>();
