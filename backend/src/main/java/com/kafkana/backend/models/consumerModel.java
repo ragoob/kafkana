@@ -8,7 +8,7 @@ public class consumerModel implements Comparable<consumerModel>, Serializable {
     private  final   brokers broker;
     private List<consumerMemberModel> members;
 
-    public consumerModel(String groupId, com.kafkana.backend.models.brokers broker) {
+    public consumerModel(String groupId, brokers broker) {
         this.groupId = groupId;
         this.broker = broker;
     }
