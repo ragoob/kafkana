@@ -2,7 +2,7 @@ package com.kafkana.backend.models;
 import java.io.Serializable;
 import java.util.*;
 
-public class consumerModel implements Comparable<consumerModel>, Serializable {
+public class consumerModel implements Serializable {
 
     private final String groupId;
     private  final   brokers broker;
@@ -17,10 +17,7 @@ public class consumerModel implements Comparable<consumerModel>, Serializable {
         return groupId;
     }
 
-    @Override
-    public int compareTo(consumerModel that) {
-        return this.groupId.compareTo(that.groupId);
-    }
+
 
     @Override
     public boolean equals(Object o) {
