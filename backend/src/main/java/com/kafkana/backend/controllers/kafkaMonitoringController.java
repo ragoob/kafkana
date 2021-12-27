@@ -95,10 +95,15 @@ public class kafkaMonitoringController {
                                    @RequestParam(name = "size", required = false) Integer size,
                                    @RequestParam(name = "start", required = false) Long  start,
                                    @RequestParam(name = "end", required = false) Long  end,
+                                   @RequestParam(name = "partition",required = false) Integer partition,
                                    @RequestParam(name = "sortDirection", required = false) String  sortDirection
                                    ){
         final long count = (size != null? size : 200);
         final String sortDir = sortDirection != null ? sortDirection : pollingTypes.ASC;
+        if(partition != null){
+
+            return this.kafkaMonitorService.getMessages(name,clusterIp,count,start,end,sortDir,partition);
+        }
         if(start == null && end == null){
             return this.kafkaMonitorService.getMessages(name,clusterIp,count,sortDir);
         }
