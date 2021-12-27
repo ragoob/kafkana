@@ -20,7 +20,7 @@ export class TopicMessagesComponent implements OnInit , AfterViewInit {
   private destoryed$: ReplaySubject<any> = new ReplaySubject(1);
   @Input('topic') topic?: Topic
   messages: Message[] = [];
-  loaded: boolean = false;
+  loaded: boolean = true;
   public from?: Date | null;
   public to?: Date | null;
   public count?: number | null;
@@ -30,6 +30,9 @@ export class TopicMessagesComponent implements OnInit , AfterViewInit {
   public columns: any[] = [];
   public allowDetails: boolean = false;
   public sortDirection: 'asc' | 'desc' = 'desc';
+  public partition?: number | null;
+  public startOffset?: number | null;
+  public endOffset?: number | null;
   constructor(private monitoringService: KafkaMonitorService, public dialog: MatDialog, private cdref: ChangeDetectorRef, private layoutService: LayoutUtilsService) { }
   ngAfterViewInit(): void {
     fromEvent(this.inputElRef?.nativeElement, 'keydown')
@@ -62,7 +65,6 @@ export class TopicMessagesComponent implements OnInit , AfterViewInit {
       && (JSON.parse(localStorage.getItem(`Selected_Columns_${this.topic?.name}`) ?? "[]") as any[]).length > 0 ?
       JSON.parse(localStorage.getItem(`Selected_Columns_${this.topic?.name}`) ?? "[]") as any [] : 
       defaultSelectedColumns;
-    this.search();
   }
 
   public sortByTimeStamp(event: any): void{
@@ -73,6 +75,9 @@ export class TopicMessagesComponent implements OnInit , AfterViewInit {
     this.from = null;
     this.to = null;
     this.filterModel = {};
+    this.startOffset = null;
+    this.endOffset = null;
+    this.partition = null;
     this.search();
   }
  
@@ -103,24 +108,36 @@ export class TopicMessagesComponent implements OnInit , AfterViewInit {
     FileSaver.saveAs(data, fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION);
   }
 
+
+
   public search(){
-    const start:number | undefined = this.from ? +this.from : undefined;
-    const end: number | undefined = this.to ? +this.to : undefined;
+    const _partition: number | undefined = this.partition ? this.partition : undefined;
+    let start:number | undefined;
+    let end: number | undefined;
+    if(_partition){
+      start = this.startOffset? this.startOffset : undefined;
+      end = this.endOffset ? this.endOffset : 0;
+    }else{
+      start = this.from ? +this.from : undefined;
+      end= this.to ? +this.to :  undefined;
+    }
+ 
     const _count: number = this.count ? this.count : 200;
+  
+    
     this.loaded = false;
-    this.monitoringService.getMessages(this.topic?.name ?? "", this.clusterId, _count, start, end, this.sortDirection)
+    this.monitoringService.getMessages(this.topic?.name ?? "", this.clusterId, _count, start, end,_partition, this.sortDirection)
       .then(data => {
         this.messages = data;
-        console.log(this.messages.map(msg=> msg.message))
         this.flattenMessageObject();
         this.populateColumns();
         this.populateFilters();
         this.loaded = true;
       }).catch((error)=> {
-       
+        this.messages = [];
       }).finally(()=>{
         this.loaded = true;
-        this.messages = [];
+        
       })
    
   }

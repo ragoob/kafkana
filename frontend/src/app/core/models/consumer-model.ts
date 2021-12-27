@@ -1,10 +1,14 @@
+import { Brokers } from "./brokers.model";
+import { ConsumerMember } from "./consumer-member";
 import { ConsumerTopic } from "./consumer-topic.model";
 
 export class Consumer{
     constructor() {
         this.groupId = "";
-        this.topics = [];
+        this.members = [];
+        
     }
     groupId: string;
-    topics: ConsumerTopic[];
+    members: ConsumerMember[]
+    broker?: Brokers;
 }

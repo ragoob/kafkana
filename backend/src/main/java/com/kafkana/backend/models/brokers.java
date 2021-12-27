@@ -4,10 +4,11 @@ import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.admin.ConfigEntry;
 import org.apache.kafka.common.Node;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class brokers {
+public class brokers implements Serializable {
     private  int id;
     private  String host;
     private  int port;

@@ -36,7 +36,7 @@
     <tr>
       <th></th>
       <th>Group Id</th>
-      <th>Topics Count</th>
+      <th>Coordinator</th>
     </tr>
   </ng-template>
   <ng-template pTemplate="body" let-consumer let-expanded="expanded">
@@ -52,47 +52,75 @@
         ></button>
       </td>
       <td>{{ consumer?.groupId }}</td>
-      <td>{{ consumer?.topics?.length }}</td>
+      <td>{{consumer.broker?.id}} - {{consumer.broker?.host}}:{{consumer.broker?.port}}</td>
     </tr>
   </ng-template>
     <ng-template pTemplate="rowexpansion" let-item>
      <tr>
          <td colspan="3">
- <div class="row">
-        <div class="col-lg-12">
-    <table class="table borderless">
-       
-      <tbody>
-       <ng-container *ngFor="let topic of item?.topics">
-           <tr>
-         <th>
-             Topic Name :  {{
-            topic.topic
-          }}  
-         </th>
-         <th>
-             total consumed offset
-         </th>
-          <th>
-             last consumed offset
-         </th>
-        </tr>
-           <tr *ngFor="let partition of topic.partitions">
-              <td>
-                 Partition: {{partition.partitionId}}
-              </td>
-              <td>
-              {{partition.size}}
+
+          <p-table [value]="item?.members" dataKey="id" styleClass="p-datatable-striped">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Id</th>
+                    <th> Client Id</th>
+                    <th>
+                      Client Host
+                    </th>
+                    <th>
+                      Topic 
+                   </th>
+                    <th>
+                       Partition 
+                    </th>
+                    <th>
+                      Last Committed Offset 
+                    </th>
+                    <th>
+                      End of Offset
+                    </th>
+                    <th>
+                      Lag
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-member>
+                <tr class="small">
+                  <td>
+                    {{member.id}}
+                 </td>
+                 <td>
+                  {{member.clientId}}
+               </td>
+                 <td>
+                  {{member.host}}
+               </td>
+               <td>
+                 {{member.topic}}
+               </td>
+               <td>
+                {{member.partition}}
               </td>
                <td>
-              {{partition.size == 0 ? partition.size : partition.size - 1}}
+               {{member.lastCommittedOffset}}
+               </td>
+                
+               <td>
+                {{member.endOffsets}}
               </td>
-           </tr>
-       </ng-container>
-      </tbody>
-    </table>
-        </div>
-    </div>
+              <td>
+                {{member.lag}}
+              </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="6">There are no members under this group.</td>
+                </tr>
+            </ng-template>
+        </p-table>
+
+
          </td>
      </tr>
   </ng-template>
