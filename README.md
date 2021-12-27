@@ -10,7 +10,7 @@ Real time and management  dashboard  for multiple kafka clusters
  - Create / Delete topics
  - Cluster summary topic count,partition count,unde replicated count,preferred replica rercent,broker count etc..
  - Get topic by name with details
- - Get messages from topic with filter by timeStamp start - end with message details 
+ - Get messages from topic with filter by timeStamp start - end and by offsets from - to  with message details 
 
 # Technolgies
  - Backend java with spring-boot framework
